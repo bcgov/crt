@@ -76,7 +76,7 @@ namespace Crt.Data.Repositories
                     .Include(x => x.WinningCntrctrLkup)
                     .Where(x => x.ProjectId == result.ProjectId && x.WinningCntrctrLkupId != null)
                     .OrderBy(x => x.DbAuditLastUpdateTimestamp)
-                    .FirstOrDefault().WinningCntrctrLkup.CodeName;
+                    .FirstOrDefault()?.WinningCntrctrLkup.CodeName;
                 
                 result.WinningContractorName = winningContractor;
 
