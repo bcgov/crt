@@ -159,9 +159,8 @@ namespace Crt.Domain.Services
             var diTask = Task.Run(async() => await _geoServerApi.GetPolygonOfInterestForDistrict(segmentBBox));
             var ecTask = Task.Run(async() => await _dataBCApi.GetPolygonOfInterestForElectoralDistrict(segmentBBox));
             var erTask = Task.Run(async() => await _dataBCApi.GetPolygonOfInterestForEconomicRegion(segmentBBox));
-            var hwTask = Task.Run(async () => await _geoServerApi.GetPolygonOfInterestForHighways(segmentBBox));
             
-            Task.WaitAll(saTask, diTask, ecTask, erTask, hwTask);
+            Task.WaitAll(saTask, diTask, ecTask, erTask);
 
             var serviceAreaPolygons = saTask.Result;
             var districtPolygons = diTask.Result;

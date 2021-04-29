@@ -8,10 +8,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using GJFeature = GeoJSON.Net.Feature;  // use an alias since Feature exists in HttpClients.Models
 
-using NetTopologySuite.Geometries;
-using NetTopologySuite.Geometries.Utilities;
-using NetTopologySuite.Operation.Polygonize;
-
 namespace Crt.HttpClients
 {
     public interface IGeoServerApi
@@ -21,7 +17,6 @@ namespace Crt.HttpClients
         Task<string> GetProjectExtent(decimal projectId);
         Task<List<PolygonLayer>> GetPolygonOfInterestForServiceArea(string boundingBox);
         Task<List<PolygonLayer>> GetPolygonOfInterestForDistrict(string boundingBox);
-        Task<List<PolygonLayer>> GetPolygonOfInterestForHighways(string boundingBox);
         HttpClient Client { get; }
         public string Path { get; }
     }
@@ -97,55 +92,6 @@ namespace Crt.HttpClients
             var featureCollection = SpatialUtils.ParseJSONToFeatureCollection(content);
             
             return (featureCollection != null) ? string.Join(",", featureCollection.BoundingBoxes) : null;
-        }
-
-        public async Task<List<PolygonLayer>> GetPolygonOfInterestForHighways(string boundingBox)
-        {
-            List<PolygonLayer> layerPolygons = new List<PolygonLayer>();
-            List<LineString> lineStrings = new List<LineString>();
-
-            //build the query and get the geoJSON return
-            var query = Path + string.Format(_queries.HighwayFeatures, "cwr:V_NM_NLT_DSA_GDSA_SDO_DT", boundingBox);
-            var content = await (await _api.GetWithRetry(Client, query)).Content.ReadAsStringAsync();
-
-            var featureCollection = SpatialUtils.ParseJSONToFeatureCollection(content);
-
-            //continue if we have a feature collection
-            if (featureCollection != null)
-            {
-                foreach (GJFeature.Feature feature in featureCollection.Features)
-                {
-                    //feature.Type
-                    var simplifiedGeom = SpatialUtils.GenerateSimplifiedPolygonGeometryFromMultilineString(feature);
-
-                    layerPolygons.Add(new PolygonLayer
-                    {
-                        NTSGeometry = simplifiedGeom,
-                        Name = (string)feature.Properties["NE_UNIQUE"],
-                        Number = feature.Properties["HIGHWAY_NUMBER"].ToString()
-                    });
-                }
-
-                
-                
-                
-                //return g.Factory.CreateGeometryCollection(polyArray);
-
-                //iterate the features in the parsed geoJSON collection
-                /*foreach (GJFeature.Feature feature in featureCollection.Features)
-                {
-                    var simplifiedGeom = SpatialUtils.GenerateSimplifiedPolygonGeometry(feature);
-
-                    layerPolygons.Add(new PolygonLayer
-                    {
-                        NTSGeometry = simplifiedGeom,
-                        //Name = (string)feature.Properties["CONTRACT_AREA_NAME"],
-                        //Number = feature.Properties["CONTRACT_AREA_NUMBER"].ToString()
-                    });
-                }*/
-            }
-
-            return layerPolygons;
         }
 
         public async Task<List<PolygonLayer>> GetPolygonOfInterestForServiceArea(string boundingBox)
