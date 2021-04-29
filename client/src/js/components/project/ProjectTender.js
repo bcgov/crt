@@ -256,7 +256,7 @@ const ProjectTender = ({ match, fiscalYears, showValidationErrorDialog }) => {
             <Col xs="auto">Project Tender Details</Col>
             <Col>
               <Authorize requires={Constants.PERMISSIONS.PROJECT_W}>
-                <Button color="primary" className="float-right" onClick={onAddTenderClicked} title={'Add Tender'}>
+                <Button color="primary" className="float-right" onClick={onAddTenderClicked}>
                   + Add
                 </Button>
               </Authorize>
@@ -297,12 +297,7 @@ const ProjectTender = ({ match, fiscalYears, showValidationErrorDialog }) => {
             </Col>
             <Col>
               <Authorize requires={Constants.PERMISSIONS.PROJECT_W}>
-                <Button
-                  color="primary"
-                  className="float-right"
-                  onClick={onAddQAClicked}
-                  title={'Add Quantity or Accomplishment'}
-                >
+                <Button color="primary" className="float-right" onClick={onAddQAClicked}>
                   + Add
                 </Button>
               </Authorize>

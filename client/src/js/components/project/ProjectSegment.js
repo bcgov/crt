@@ -165,12 +165,7 @@ function ProjectSegment({ showValidationErrorDialog, ratioRecordTypes, match }) 
             <Col xs="auto">{'Project Segments'}</Col>
             <Col>
               <Authorize requires={Constants.PERMISSIONS.PROJECT_W}>
-                <Button
-                  color="primary"
-                  className="float-right"
-                  onClick={addSegmentClicked}
-                  title={'Add Segment or View Map'}
-                >
+                <Button color="primary" className="float-right" onClick={addSegmentClicked}>
                   + Add Segment / View Map
                 </Button>
               </Authorize>
