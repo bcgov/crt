@@ -109,7 +109,7 @@ const RatioTable = ({
           </Col>
           <Col>
             <Authorize requires={Constants.PERMISSIONS.PROJECT_W}>
-              <Button color="primary" className="float-right" onClick={onAddClicked}>
+              <Button color="primary" className="float-right" onClick={onAddClicked} title={`Add ${title}`}>
                 + Add
               </Button>
             </Authorize>

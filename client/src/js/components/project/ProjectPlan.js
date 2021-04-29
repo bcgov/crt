@@ -216,7 +216,12 @@ const ProjectPlan = ({ match, fiscalYears, phases, showValidationErrorDialog }) 
             </Col>
             <Col>
               <Authorize requires={Constants.PERMISSIONS.PROJECT_W}>
-                <Button color="primary" className="float-right" onClick={addFinTargetClicked}>
+                <Button
+                  color="primary"
+                  className="float-right"
+                  onClick={addFinTargetClicked}
+                  title="Add Finanical Planning Target"
+                >
                   + Add
                 </Button>
               </Authorize>
@@ -258,7 +263,7 @@ const ProjectPlan = ({ match, fiscalYears, phases, showValidationErrorDialog }) 
                   icon="edit"
                   className="float-right"
                   onClick={() => handleAnnouncementEditFormClick(data.id)}
-                  title="Edit Record"
+                  title="Edit Public Project Information"
                   iconSize="lg"
                 />
               </Authorize>
