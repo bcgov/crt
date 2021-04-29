@@ -29,7 +29,7 @@ const validationSchema = Yup.object({
   projectName: Yup.string().required('Project name required'),
   regionId: Yup.number().required('Region required'),
   capIndxLkupId: Yup.number().required('Capital Index required'),
-  rcLkupId: Yup.number().required('RC Number required'),
+  rcLkupId: Yup.number().nullable().required('RC Number required'),
 });
 
 const EditProjectFormFields = ({

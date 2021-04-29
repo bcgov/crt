@@ -20,5 +20,8 @@ namespace Crt.HttpClients
         
         public readonly string PolygonOfInterest
             = "service=WFS&version=2.0.0&request=GetFeature&typeName={0}&outputFormat=application/json&srsName=EPSG:4326&BBOX={1},EPSG:4326";
+
+        public readonly string HighwayFeatures
+            = "service=WFS&version=2.0.0&request=GetFeature&typeName={0}&outputFormat=application/json&srsname=EPSG:4326&BBOX={1},EPSG:4326";
     }
 }

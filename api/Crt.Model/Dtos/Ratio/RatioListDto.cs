@@ -22,7 +22,7 @@ namespace Crt.Model.Dtos.Ratio
         public virtual ServiceAreaDto ServiceAreaLkup { get; set; }
         [JsonIgnore]
         public virtual DistrictDto DistrictLkup { get; set; }*/
-        public string RatioRecordName { get => RatioRecordLkup?.Description; }
+        public string RatioRecordName { get => RatioRecordLkup?.CodeName; }
         public string RatioRecordType { get => RatioRecordTypeLkup?.CodeName; }
         public string ServiceAreaName { get; set; }
         public string DistrictName { get; set; }

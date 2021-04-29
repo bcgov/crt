@@ -73,7 +73,7 @@ const DeleteButton = ({
   return (
     <React.Fragment>
       <FontAwesomeButton
-        color={date || isActive === false ? 'secondary' : 'danger'}
+        color={moment().isSameOrAfter(date, 'day') || isActive === false ? 'secondary' : 'danger'}
         icon={iconName}
         id={buttonId}
         {...props}

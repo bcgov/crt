@@ -73,6 +73,8 @@ const Routes = (currentUser) => {
 };
 
 const defaultPath = (currentUser) => {
+  if (currentUser.permissions?.includes(Constants.PERMISSIONS.PROJECT_R)) return Constants.PATHS.PROJECTS;
+
   if (currentUser.permissions?.includes(Constants.PERMISSIONS.USER_R)) return Constants.PATHS.ADMIN_USERS;
 
   if (currentUser.permissions?.includes(Constants.PERMISSIONS.ROLE_R)) return Constants.PATHS.ADMIN_ROLES;
