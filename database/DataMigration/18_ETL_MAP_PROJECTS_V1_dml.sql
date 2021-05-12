@@ -118,7 +118,7 @@ WHILE 1 = 1
 BEGIN
 	FETCH NEXT FROM prj_cursor 
 	INTO @legProjId, @prjNum, @prjName, @desc, @scope, @prjRegionId, @prjCapIndxId, @prjNrstTwnId, @prjRCId
-	, @prjPMId, (@prjAnncmtVal * 1000), (@prjC035Val * 1000), @prjAnncmtComm, @prjEndDate;
+	, @prjPMId, @prjAnncmtVal, @prjC035Val, @prjAnncmtComm, @prjEndDate;
 	
 	IF @@FETCH_STATUS <> 0
 	BEGIN
@@ -163,8 +163,8 @@ BEGIN
 		, @prjNrstTwnId
 		, @prjRCId
 		, @prjPMId
-		, @prjAnncmtVal
-		, @prjC035Val
+		, @prjAnncmtVal * 1000
+		, @prjC035Val * 1000
 		, @prjAnncmtComm
 		, @prjEndDate
 		, @app_user
@@ -173,7 +173,7 @@ BEGIN
 		, @app_user
 		, @utcdate
 		, @app_guid)
-
+	
 	INSERT INTO MAP_PROJECT VALUES (@legProjId, (SELECT MAX(newProjId) FROM @insertedTableVar));
 
 END;

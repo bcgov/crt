@@ -9,8 +9,7 @@ INSERT INTO CRT_SEGMENT
 	(PROJECT_ID
 	,START_LATITUDE
 	,START_LONGITUDE
-	,END_LATITUDE
-	,END_LONGITUDE
+	,GEOMETRY
 	,DESCRIPTION
 	,APP_CREATE_USERID
 	,APP_CREATE_TIMESTAMP
@@ -21,8 +20,7 @@ INSERT INTO CRT_SEGMENT
 SELECT mp.CRT_ID
 	, tp.Latitude AS START_LATITUDE
 	, tp.Longitude AS START_LONGTITUDE
-	, tp.[Latitude End] AS END_LATITUDE
-	, tp.[Longitude End] AS END_LONGTITUDE
+	, Geometry::STGeomFromText('POINT(' + CONVERT(varchar, tp.Longitude) + ' ' + CONVERT(varchar, tp.Latitude) + ')', 4326)
 	, 'Migrated from Access DB'
 	, @app_user
 	, @utcdate

@@ -9,17 +9,13 @@ Manual mapping may or may not be needed, however it is advisable to perform it a
 
 A number of the Access tables will require some manual adjustment in order to perform the mapping, to help simplify this process there is a mapping.xslx spreadsheet that can be used. 
 
-The following tables will require manual mapping adjustments
+The following tables will require manual mapping adjustments, Project Manager just requires a script to be run to load the PM data.
 
 |  | Access Table | CRT Table |
 | --- | --- | --- |
 | [Details](#mapping-tblaccomplishments) | tblAccomplishments | CRT_CODE_LOOKUP |
-| [Details](#mapping-tblprojectphases) | tblProjectPhases | CRT_CODE_LOOKUP |
 | [Details](#mapping-tbltowns) | tblTowns | CRT_CODE_LOOKUP |
-| [Details](#mapping-tblcategories) | tblCategories | CRT_CODE_LOOKUP |
-| [Details](#mapping-tblmotiregions) | tblMOTIRegions | CRT_REGION |
 | [Details](#mapping-tblprojectmanager) | tblProjectManager | CRT_CODE_LOOKUP |
-| [Details](#mapping-tblelements) | tblElements | CRT_ELEMENT |
 <br>
 
 ### Mapping tblAccomplishments 
@@ -58,43 +54,6 @@ The following tables will require manual mapping adjustments
 
 8. Once the mapping is corrected you must recopy the formula in Col E to allow it to re-evaluate. Hightlight Cell E3 and double click the bottom right corner.
 9. Copy the generated SQL inserts and paste them into the _01_ETL_MAP_QTYACCOMP_V1_dml.sql_ file where the generated inserts go. (It's commented)
-
-[Back to Top](#mapping-access-data-to-crt-data)
-  
-
-
----
-### Mapping tblProjectPhases
-
-1. Open the Mapping workbook -> ./Mapping.xslx
-2. Open the file ./02_ETL_MAP_PHASE_V1_dml.sql
-3. Execute the following query to retrieve the legacy Access records
-    ```sql
-    SELECT ID, [Project Phase Description] FROM tblProjectPhases
-    WHERE Active = 1
-    ORDER BY [Project Phase Description]
-    ```
-4. Copy the results and paste them starting at Row 3 Col A (don't copy headers) into the **Phase** sheet of the workbook
-5. Execute the following query to retrieve the associated CRT code lookup records
-    ```sql
-    SELECT CODE_LOOKUP_ID, CODE_NAME FROM CRT_CODE_LOOKUP
-    WHERE CODE_SET = 'PHASE'
-    AND END_DATE IS NULL
-    ORDER BY CODE_NAME
-    ```
-6. Copy the results and paste them starting at Row 3 Col C (don't copy headers) into the **Phase** sheet of the workbook
-7. You'll notice there are more legacy entries than CRT ones. You'll need to make the following manual adjustments
-    - The first mismatch should be ***Design***. Highlight Col C & D of this row and Insert, Shift Cells Down
-    - Enter in the values for ***Engineer***  
-  
-
-
-    | Legacy Value | Updated CRT Value |
-    | --- | --- |
-    | Design | Engineer |
-    
-8. Once the mapping is corrected you must recopy the formula in Col E to allow it to re-evaluate. Hightlight Cell E3 and double click the bottom right corner.
-9. Copy the generated SQL inserts and paste them into the **02_ETL_MAP_PHASE_V1_dml.sql** file where the generated inserts go. (It's commented)
 
 [Back to Top](#mapping-access-data-to-crt-data)
   
@@ -144,75 +103,9 @@ The following tables will require manual mapping adjustments
 
 
 ---
-### Mapping tblCategories
-
-1. Open the Mapping workbook -> ./Mapping.xslx
-2. Open the file ./12_ETL_MAP_PROGRAM_CATEGORY_V1_dml.sql
-3. Execute the following query to retrieve the legacy Access records
-    ```sql
-    SELECT ID, Category FROM tblCategories
-    WHERE Active = 1
-    ORDER BY CASE
-		WHEN ID = 1 THEN 1 -- capital
-		WHEN ID = 2 THEN 2 -- preservation
-		WHEN ID = 6 THEN 3 -- stimulus
-		WHEN ID = 3 THEN 4 -- transit
-		WHEN ID = 4 THEN 5 -- unclassified
-		ELSE 9 -- default in case
-	END
-    ```
-4. Copy the results and paste them starting at Row 3 Col A (don't copy headers) into the **ProgramCategory** sheet of the workbook
-5. Execute the following query to retrieve the associated CRT code lookup records
-    ```sql
-    SELECT CODE_LOOKUP_ID, CODE_NAME FROM CRT_CODE_LOOKUP
-    WHERE CODE_SET = 'PROGRAM_CATEGORY'
-    AND END_DATE IS NULL
-    ORDER BY CODE_NAME
-    ```
-6. Copy the results and paste them starting at Row 3 Col C (don't copy headers) into the **ProgramCategory** sheet of the workbook
-7. This one had the re-ordering handled in the order by clause, nothing more to do besides verify.
-9. Copy the generated SQL inserts and paste them into the **12_ETL_MAP_PROGRAM_CATEGORY_V1_dml.sql** file where the generated inserts go. (It's commented)
-
-[Back to Top](#mapping-access-data-to-crt-data)
-  
-
-
----
-### Mapping tblMOTIRegions
-
-1. Open the Mapping workbook -> ./Mapping.xslx
-2. Open the file ./13_ETL_MAP_REGION_V1_dml.sql
-3. Execute the following query to retrieve the legacy Access records
-    ```sql
-    SELECT ID, RegionShort FROM tblMOTIRegions
-    WHERE Active = 1
-    ORDER BY RegionShort
-    ```
-4. Copy the results and paste them starting at Row 3 Col A (don't copy headers) into the **Region** sheet of the workbook
-5. Execute the following query to retrieve the associated CRT code lookup records
-    ```sql
-    SELECT REGION_ID, REGION_NAME FROM CRT_REGION
-    WHERE END_DATE IS NULL
-    UNION ALL
-    SELECT REGION_ID, REGION_NAME FROM CRT_REGION
-    WHERE END_DATE IS NULL AND REGION_NAME = 'Headquarters'
-    ORDER BY REGION_NAME
-    ```
-6. Copy the results and paste them starting at Row 3 Col C (don't copy headers) into the **Region** sheet of the workbook
-7. This one had the re-ordering handled in the order by returning a duplicate Headquarters entry clause, verify that both ENG & HQ map to Headquarters.
-8. Once the mapping is corrected you must recopy the formula in Col E to allow it to re-evaluate. Hightlight Cell E3 and double click the bottom right corner.
-9. Copy the generated SQL inserts and paste them into the **13_ETL_MAP_REGION_V1_dml.sql** file where the generated inserts go. (It's commented)
-
-[Back to Top](#mapping-access-data-to-crt-data)
-  
-
-
----
 ### Mapping tblProjectManager
 
-1. Open the Mapping workbook -> ./Mapping.xslx
-2. Open the file ./14_ETL_MAP_PROJECT_MANAGER_V1_dml.sql
-3. This map will first require the insertion of the Program Manager data from the Access Database, this can be accomplished by executing the following script...
+1. Perform the insertion of the Program Manager data from the Access Database, this can be accomplished by executing the following script...
     ```sql
     -- straight across copy of PM's in Legacy Access DB into CRT 
 
@@ -250,58 +143,7 @@ The following tables will require manual mapping adjustments
     COMMIT
     GO
     ```
-4. Once the above has been executed, run the following query to retrieve the legacy Access records
-    ```sql
-    SELECT ID, [Full Name] FROM tblProjectManagers
-    WHERE Active = 1
-    ORDER BY [Full Name]
-    ```
-4. Copy the results and paste them starting at Row 3 Col A (don't copy headers) into the **ProgramManager** sheet of the workbook
-5. Execute the following query to retrieve the associated CRT code lookup records
-    ```sql
-    SELECT CODE_LOOKUP_ID, CODE_NAME FROM CRT_CODE_LOOKUP
-    WHERE CODE_SET = 'PROJECT_MANAGER'
-    AND END_DATE IS NULL
-    ORDER BY CODE_NAME
-    ```
-6. Copy the results and paste them starting at Row 3 Col C (don't copy headers) into the **ProgramManager** sheet of the workbook
-8. This one should require nothing more than a visual verification since we copied like for like in the first steps.
-9. Copy the generated SQL inserts and paste them into the **14_ETL_MAP_PROJECT_MANAGER_V1_dml.sql** file where the generated inserts go. (It's commented)
-
-[Back to Top](#mapping-access-data-to-crt-data)
-  
-
-
----
-### Mapping tblElements
-
-1. Open the Mapping workbook -> ./Mapping.xslx
-2. Open the file ./16_ETL_MAP_ELEMENT_V1_dml.sql
-3. Execute the following query to retrieve the legacy Access records
-    ```sql
-    SELECT ID, Code FROM tblElements
-    ORDER BY Code ASC
-    ```
-4. Copy the results and paste them starting at Row 3 Col A (don't copy headers) into the **Element** sheet of the workbook
-5. Execute the following query to retrieve the associated CRT code lookup records
-    ```sql
-    SELECT ELEMENT_ID, CODE FROM CRT_ELEMENT 
-    WHERE END_DATE IS NULL
-    ORDER BY CODE ASC
-    ```
-6. Copy the results and paste them starting at Row 3 Col C (don't copy headers) into the **Element** sheet of the workbook
-7. You'll notice there are more legacy entries than CRT ones. You'll need to make the following manual adjustments
-    - The only mismatch should be ***Sl***. Highlight Col C & D of this row and Insert, Shift Cells Down
-    - Enter in the values for ***Unknown***  
-  
-
-
-    | Legacy Value | Updated CRT Value |
-    | --- | --- |
-    | Sl | Unknown |
-    
-8. Once the mapping is corrected you must recopy the formula in Col E to allow it to re-evaluate. Hightlight Cell E3 and double click the bottom right corner.
-9. Copy the generated SQL inserts and paste them into the **16_ETL_MAP_ELEMENT_V1_dml.sql** file where the generated inserts go. (It's commented)
+2. Execute the file ./14_ETL_MAP_PROJECT_MANAGER_V1_dml.sql
 
 [Back to Top](#mapping-access-data-to-crt-data)
   

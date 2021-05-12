@@ -41,12 +41,51 @@ GO
 BEGIN TRANSACTION
 SET NOCOUNT ON
 
-/*** Generated Inserts Go Here ***/
-INSERT INTO MAP_PROGRAM_CATEGORY VALUES (1, 1234);  --Capital  > Capital Expansion
-INSERT INTO MAP_PROGRAM_CATEGORY VALUES (4, 1238);  --Unclassified > Other
-INSERT INTO MAP_PROGRAM_CATEGORY VALUES (2, 1235);  --Preservation > Preservation
-INSERT INTO MAP_PROGRAM_CATEGORY VALUES (6, 1236);  --Stimulus > Stimulus
-INSERT INTO MAP_PROGRAM_CATEGORY VALUES (3, 1237);  --Transit > Transit
+DECLARE @legacyId int, @codeId int;
+DECLARE @legacyName nvarchar(255), @codeName varchar(255);
+DECLARE @cmd nvarchar(max);
+
+DECLARE pc_cursor CURSOR FOR
+	SELECT tc.ID, tc.Category, ccl.CODE_LOOKUP_ID, ccl.CODE_NAME FROM 
+	(SELECT ID, Category,
+	CASE WHEN ID = 1 THEN 2 -- capital
+		WHEN ID = 2 THEN 4 -- preservation
+		WHEN ID = 6 THEN 3 -- stimulus
+		WHEN ID = 3 THEN 1 -- transit
+		WHEN ID = 4 THEN 5 -- other
+		ELSE 9 -- default in case
+	END AS SORT
+	FROM tblCategories
+	WHERE Active = 1) AS tc
+	LEFT JOIN
+	(SELECT CODE_LOOKUP_ID, CODE_NAME, ROW_NUMBER() OVER( ORDER BY CODE_NAME ) AS SORT
+	FROM CRT_CODE_LOOKUP
+	WHERE CODE_SET = 'PROGRAM_CATEGORY'
+	AND END_DATE IS NULL) AS ccl
+	ON tc.SORT = ccl.SORT
+	ORDER BY CODE_NAME, tc.SORT
+
+OPEN pc_cursor
+
+WHILE 1 = 1
+BEGIN
+	FETCH NEXT FROM pc_cursor into @legacyId, @legacyName, @codeId, @codeName;
+
+	IF @@FETCH_STATUS <> 0
+	BEGIN
+		BREAK;
+	END;
+	
+	--INSERT INTO MAP_PROGRAM_CATEGORY VALUES (1, 890);  --Capital Expansion > Capital
+
+	SET @cmd = N'INSERT INTO MAP_PROGRAM_CATEGORY VALUES (' + CAST(@legacyId AS varchar) + ', ' + CAST(@codeId AS varchar) + '); --' + @codeName;
+
+	PRINT @cmd;
+	EXEC sp_executesql @cmd;
+END;
+
+CLOSE pc_cursor
+DEALLOCATE pc_cursor
 
 COMMIT
 GO
@@ -56,47 +95,17 @@ DECLARE @legacyCnt int, @crtCnt int, @mappedCnt int;
 
 -- retrieve values from Legacy table
 SELECT @legacyCnt = COUNT(*) 
-FROM tblAccomplishments
+FROM tblCategories
 WHERE Active = 1
 
 --retrieve values from CRT Code Table
 SELECT @crtCnt = COUNT(*) 
 FROM CRT_CODE_LOOKUP
-WHERE CODE_SET = 'PHASE'
+WHERE CODE_SET = 'PROGRAM_CATEGORY'
 AND END_DATE IS NULL
 
 SELECT @mappedCnt = COUNT(*) 
-FROM MAP_PHASE
+FROM MAP_PROGRAM_CATEGORY
 
 PRINT CHAR(10) + 'Found ' + CONVERT(varchar, @legacyCnt) + ' Legacy Items and ' + CONVERT(varchar, @crtCnt) + ' CRT CodeLookup Items'
 PRINT 'Mapped ' + CONVERT(varchar, @mappedCnt) + ' Total Items'
-
---SELECT * FROM MAP_PHASE
-
-BEGIN
-	DECLARE @missing int;
-
-	SELECT @missing = COUNT(*) 
-	FROM tblProjects
-	WHERE [Project Phase] IN (SELECT ID FROM 
-		(SELECT * FROM MAP_PHASE mp
-		RIGHT JOIN tblProjectPhases pp
-		ON pp.ID = mp.LEGACY_ID
-		WHERE pp.Active = 1) AS Phase
-		WHERE LEGACY_ID IS NULL)
-
-	PRINT 'Found ' + CONVERT(varchar, @missing) + ' Projects linked to un-mapped Phases'
-END
-
-/*
--- Should find zero!
-
-SELECT *
-FROM tblProjects
-WHERE [Project Phase] IN (SELECT ID FROM 
-	(SELECT * FROM MAP_PHASE mp
-	RIGHT JOIN tblProjectPhases pp
-	ON pp.ID = mp.LEGACY_ID
-	WHERE pp.Active = 1) AS Phase
-	WHERE LEGACY_ID IS NULL)
-*/

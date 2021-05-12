@@ -34,42 +34,15 @@ GO
 
 BEGIN TRANSACTION
 
-SET NOCOUNT ON;
-
-DECLARE @legacyId int, @codeId int;
-DECLARE @legacyName nvarchar(255), @codeName varchar(255);
-DECLARE @cmd nvarchar(max);
-
-DECLARE er_cursor CURSOR FOR
-	SELECT r.ID, r.[Geo Region Name], cl.CODE_LOOKUP_ID, cl.CODE_NAME
-	FROM CRT_CODE_LOOKUP cl
-	JOIN tblRegions r
-	ON r.[Geo Region Name] = cl.CODE_NAME
-	WHERE cl.CODE_SET = 'ECONOMIC_REGION'
-	AND cl.END_DATE IS NULL
-	ORDER BY cl.CODE_NAME, r.[Geo Region Name]
-
-OPEN er_cursor
-
-WHILE 1 = 1
-BEGIN
-	FETCH NEXT FROM er_cursor into @legacyId, @legacyName, @codeId, @codeName;
-
-	IF @@FETCH_STATUS <> 0
-	BEGIN
-		BREAK;
-	END;
-	
-	--INSERT INTO MAP_ECONOMIC_REGION VALUES (5, 520);  --Cariboo
-
-	SET @cmd = N'INSERT INTO MAP_ECONOMIC_REGION VALUES (' + CAST(@legacyId AS varchar) + ', ' + CAST(@codeId AS varchar) + '); --' + @codeName;
-
-	PRINT @cmd;
-	EXEC sp_executesql @cmd;
-END;
-
-CLOSE er_cursor
-DEALLOCATE er_cursor
+INSERT INTO MAP_ECONOMIC_REGION VALUES (5, 520);  --Cariboo > Cariboo
+INSERT INTO MAP_ECONOMIC_REGION VALUES (3, 521);  --Kootenays > Kootenay
+INSERT INTO MAP_ECONOMIC_REGION VALUES (1, 518);  --Lower Mainland > Lower Mainland/Southwest
+INSERT INTO MAP_ECONOMIC_REGION VALUES (6, 523);  --North Central > Nechako
+INSERT INTO MAP_ECONOMIC_REGION VALUES (7, 524);  --North East > North Coast
+INSERT INTO MAP_ECONOMIC_REGION VALUES (8, 525);  --North West > Northeast
+INSERT INTO MAP_ECONOMIC_REGION VALUES (9, 517);  --Province > Province
+INSERT INTO MAP_ECONOMIC_REGION VALUES (4, 519);  --Thompson Okanagan > Thompson Okanagan
+INSERT INTO MAP_ECONOMIC_REGION VALUES (2, 522);  --Vancouver Island > Vancouver Island and Coast
 
 COMMIT
 GO

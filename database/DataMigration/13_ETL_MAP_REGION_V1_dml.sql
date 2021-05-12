@@ -36,12 +36,52 @@ GO
 BEGIN TRANSACTION
 SET NOCOUNT ON
 
-/*** Generated Inserts Go Here ***/
-INSERT INTO MAP_REGION VALUES (6, 1);  --Headquarters > ENG
-INSERT INTO MAP_REGION VALUES (4, 1);  --Headquarters > HQ
-INSERT INTO MAP_REGION VALUES (3, 4);  --Northern > NR
-INSERT INTO MAP_REGION VALUES (1, 2);  --South Coast > SCR
-INSERT INTO MAP_REGION VALUES (2, 3);  --Southern Interior > SIR
+DECLARE @legacyId int, @codeId int;
+DECLARE @legacyName nvarchar(255), @codeName varchar(255);
+DECLARE @cmd nvarchar(max);
+
+DECLARE rg_cursor CURSOR FOR
+	SELECT tmr.ID, tmr.RegionShort, cr.REGION_ID, cr.REGION_NAME FROM 
+	(SELECT ID, RegionShort,
+	CASE WHEN ID = 6 THEN 0 -- ENG
+		WHEN ID = 4 THEN 1 -- HQ
+		WHEN ID = 3 THEN 2 -- NR
+		WHEN ID = 1 THEN 3 -- SCR
+		WHEN ID = 2 THEN 4 -- SIR
+		ELSE 9 -- default in case
+	END AS SORT
+	FROM tblMOTIRegions
+	WHERE Active = 1) as tmr
+	LEFT JOIN
+	(SELECT REGION_ID, REGION_NAME, ROW_NUMBER() OVER( ORDER BY REGION_NAME ) AS SORT FROM CRT_REGION
+	WHERE END_DATE IS NULL
+	UNION ALL
+	SELECT REGION_ID, REGION_NAME, 0 AS SORT FROM CRT_REGION
+	WHERE END_DATE IS NULL AND REGION_NAME = 'Headquarters') AS cr
+	ON cr.SORT = tmr.SORT
+	ORDER BY cr.REGION_NAME, tmr.RegionShort
+
+OPEN rg_cursor
+
+WHILE 1 = 1
+BEGIN
+	FETCH NEXT FROM rg_cursor into @legacyId, @legacyName, @codeId, @codeName;
+
+	IF @@FETCH_STATUS <> 0
+	BEGIN
+		BREAK;
+	END;
+	
+	--INSERT INTO MAP_REGION VALUES (6, 1);  --Headquarters > ENG
+
+	SET @cmd = N'INSERT INTO MAP_REGION VALUES (' + CAST(@legacyId AS varchar) + ', ' + CAST(@codeId AS varchar) + '); --' + @codeName;
+
+	PRINT @cmd;
+	EXEC sp_executesql @cmd;
+END;
+
+CLOSE rg_cursor
+DEALLOCATE rg_cursor
 
 COMMIT
 GO

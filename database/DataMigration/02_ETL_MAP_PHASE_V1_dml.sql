@@ -34,15 +34,47 @@ GO
 BEGIN TRANSACTION
 SET NOCOUNT ON
 
-/*** Generated Inserts Go Here ***/
-INSERT INTO MAP_PHASE VALUES (8, 694);  --Complete
-INSERT INTO MAP_PHASE VALUES (1, 691);  --Construct
-INSERT INTO MAP_PHASE VALUES (2, 690);  --Engineer
-INSERT INTO MAP_PHASE VALUES (3, 690);  --Engineer
-INSERT INTO MAP_PHASE VALUES (5, 692);  --Other
-INSERT INTO MAP_PHASE VALUES (4, 689);  --Plan
-INSERT INTO MAP_PHASE VALUES (7, 693);  --Shelf Ready
-INSERT INTO MAP_PHASE VALUES (6, 695);  --Unknown
+DECLARE @legacyId int, @codeId int;
+DECLARE @legacyName nvarchar(255), @codeName varchar(255);
+DECLARE @cmd nvarchar(max);
+
+DECLARE ph_cursor CURSOR FOR
+	SELECT 
+	  ID
+	  , [Project Phase Description]
+	  , COALESCE(CODE_NAME, 'Engineer') AS CODE_NAME
+	  , COALESCE(CODE_LOOKUP_ID, (SELECT CODE_LOOKUP_ID FROM CRT_CODE_LOOKUP WHERE CODE_NAME = 'Engineer')) AS CODE_LOOKUP_ID
+	  FROM 
+	(SELECT ID, [Project Phase Description] FROM tblProjectPhases
+	WHERE Active = 1) AS tpp
+	LEFT JOIN 
+	(SELECT CODE_LOOKUP_ID, CODE_NAME FROM CRT_CODE_LOOKUP
+	WHERE CODE_SET = 'PHASE'
+	AND END_DATE IS NULL) AS ccl
+	ON tpp.[Project Phase Description] = ccl.CODE_NAME
+	ORDER BY CODE_NAME, tpp.[Project Phase Description]
+
+OPEN ph_cursor
+
+WHILE 1 = 1
+BEGIN
+	FETCH NEXT FROM ph_cursor into @legacyId, @legacyName, @codeName, @codeId;
+
+	IF @@FETCH_STATUS <> 0
+	BEGIN
+		BREAK;
+	END;
+	
+	--INSERT INTO MAP_CAP_INDX VALUES (6, 6);  --Capitalizable/Expense-Some components<15yrs
+
+	SET @cmd = N'INSERT INTO MAP_PHASE VALUES (' + CAST(@legacyId AS varchar) + ', ' + CAST(@codeId AS varchar) + '); --' + @codeName;
+
+	PRINT @cmd;
+	EXEC sp_executesql @cmd;
+END;
+
+CLOSE ph_cursor
+DEALLOCATE ph_cursor
 
 COMMIT
 GO
