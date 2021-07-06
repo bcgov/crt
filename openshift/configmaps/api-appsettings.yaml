@@ -9,7 +9,7 @@ objects:
         {
           "AllowedHosts": "*",
           "Constants": {
-              "Version": "1.0.0.0",
+              "Version": "1.0.1.0",
               "SwaggerApiUrl": "/swagger/v1/swagger.json"
           },
           "Serilog": {
@@ -84,7 +84,7 @@ objects:
             "Timeout": 60
           },
           "GeoServerPRD": {
-            "Url": "https://prdoas5.apps.th.gov.bc.ca/ogs-geoV06",
+            "Url": "https://prdoas5.apps.th.gov.bc.ca",
             "Path": "ogs-geoV06/ows?",
             "Timeout": 60
           },
