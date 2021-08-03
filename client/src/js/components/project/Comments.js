@@ -151,7 +151,7 @@ const Comments = ({ title, dataList, projectId, noteType, show = 1 }) => {
             tableColumns={tableColumns}
             editable
             deletable
-            editPermissionName={Constants.PERMISSIONS.USER_W}
+            editPermissionName={Constants.PERMISSIONS.PROJECT_W}
             onEditClicked={onEditClicked}
             onDeleteClicked={onDeleteClicked}
             hover={false}
