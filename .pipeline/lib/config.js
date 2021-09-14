@@ -5,6 +5,7 @@ const changeId = options.pr; //aka pull-request
 const version = "1.0.0";
 const name = "crt";
 
+Object.assign(options.git, { owner: "ychung-mot", repository: "crt" });
 const phases = {
   build: {
     namespace: "2d982c-tools",
