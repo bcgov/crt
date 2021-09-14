@@ -97,7 +97,7 @@ jobs:
           DEBUG=* npm run deploy -- --pr=${{ github.event.pull_request.number }} --env=uat --git.branch.name=${{github.head_ref}} --git.ref=${{github.head_ref}}
 
   deploy-to-prod:
-    needs: [build, deploy-to-test]
+    needs: [build, deploy-to-uat]
     environment:
       name: prod
     runs-on: ubuntu-16.04
