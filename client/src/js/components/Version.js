@@ -5,6 +5,7 @@ import MaterialCard from './ui/MaterialCard';
 import UIHeader from './ui/UIHeader';
 
 import * as api from '../Api';
+import * as Constants from '../Constants';
 
 const Version = () => {
   const [versionInfo, setVersionInfo] = useState({});
@@ -54,9 +55,15 @@ const Version = () => {
       </Row>
       <Row>
         <Col xs="3">
-          <strong>Git Commit</strong>
+          <strong>Git Commit (API)</strong>
         </Col>
         <Col>{versionInfo.commit}</Col>
+      </Row>
+      <Row>
+        <Col xs="3">
+          <strong>Git Commit (Client)</strong>
+        </Col>
+        <Col>{Constants.RUNTIME_OPENSHIFT_BUILD_COMMIT}</Col>
       </Row>
       <Row>
         <Col xs="3">
