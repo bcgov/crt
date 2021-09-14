@@ -2,7 +2,7 @@
 
 CRT makes use of Github Actions and pipline-cli to manage OpenShift deployments. These tools enable a Github Pull Request (PR) based CI/CD pipeline. Github Actions will monitor Github repository for pull requests and start a new build based on that.
 
-This document will not go into the details of how to use BCDK and pipeline-cli. For documentation on those, you can refer to the following links
+This document will not go into the details of how to use Github Actions and pipeline-cli. For documentation on those, you can refer to the following links
 
 - [Github Actions](https://docs.github.com/en/actions)
 - [pipeline-cli](https://github.com/BCDevOps/pipeline-cli)
@@ -10,7 +10,6 @@ This document will not go into the details of how to use BCDK and pipeline-cli. 
 ## Prerequisites
 
 - Admin access to OpenShift namespaces, preferably using the standard BC Gov setup of `tools`, `dev`, `test` and `prod` namespaces
-- Github personal access token for an account that has contributor access to your repository. It needs to include `repo:status`, `repo_deployment`, `public_repo` and `admin:repo_hook` permissions
 - Redhat image pull [service account](docs/RedhatServiceAccount.md)
 - _optional, KeyCloak service account for automatically creating client Valid Redirect URIs for PR based deployments_
 
