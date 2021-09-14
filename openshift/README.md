@@ -30,7 +30,7 @@ The Openshift Service Account Access Token is used to give Github Actions access
 ```
 oc project 2d982c-tools
 
-oc process -f moti-cicd-service-account.yaml -p NAME=moti-cicd | oc apply -f -
+oc process -f moti-cicd-service-account.yaml -p NAME=moti-cicd -p PROJECT=2d982c | oc apply -f -
 
 oc process -f moti-cicd-role-binding.yaml -p NAME=moti-cicd -p NAMESPACE=2d982c-tools -p PROJECT=2d982c | oc apply -f -
 
