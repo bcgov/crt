@@ -97,8 +97,9 @@ objects:
       annotations:
         haproxy.router.openshift.io/timeout: 5m
       creationTimestamp: null
-      name: ${NAME}${SUFFIX}
+      name: ${NAME}
     spec:
+      host: crt-2d982c-${ENV}.apps.silver.devops.gov.bc.ca
       path: "/"
       port:
         targetPort: web
