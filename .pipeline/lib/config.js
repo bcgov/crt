@@ -27,7 +27,7 @@ const phases = {
     instance: `${name}-dev-${changeId}`,
     version: `${version}-${changeId}`,
     tag: `dev-${version}-${changeId}`,
-    host: `crt-${changeId}-2d982c-dev.apps.silver.devops.gov.bc.ca`,
+    host: `crt-2d982c-dev.apps.silver.devops.gov.bc.ca`,
     dwpbi_url: "https://dev-dwpbi.th.gov.bc.ca/reports/browse/CRT",
     url_prefix: "dev-",
     dotnet_env: "Development",
