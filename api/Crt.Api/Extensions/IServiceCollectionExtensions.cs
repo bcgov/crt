@@ -105,7 +105,6 @@ namespace Crt.Api.Extensions
             {
                 options.Authority = config.GetValue<string>("JWT:Authority");
                 options.Audience = config.GetValue<string>("JWT:Audience");
-                options.RequireHttpsMetadata = false;
                 options.IncludeErrorDetails = true;
                 options.EventsType = typeof(CrtJwtBearerEvents);
             });
