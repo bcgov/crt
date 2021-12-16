@@ -1,11 +1,9 @@
-FROM image-registry.openshift-image-registry.svc:5000/2d982c-tools/node:1 AS builder
+FROM image-registry.openshift-image-registry.svc:5000/2d982c-tools/node-python:1 AS builder
 LABEL maintainer="young-jin.chung@gov.bc.ca"
 
 COPY . ./src
 
-RUN cd ./src && npm install --production && \
-    npm run build
-
+RUN cd ./src && npm ci && npm run build
 
 FROM image-registry.openshift-image-registry.svc:5000/2d982c-tools/nginx-116-rhel8:1
 
