@@ -87,11 +87,14 @@ The `.pipeline` directory contains the scripts for running pipeline-cli against 
 
 You will need to configure the scripts in the `.pipeline` directory to work with your OpenShift namespaces.
 
-The scripts need to be updated are
+The pipeline scripts to configure are as follows
 
+- [.pipeline/lib/build.js](/.pipeline/lib/build.js)
+- [.pipeline/lib/clean.js](/.pipeline/lib/clean.js)
 - [.pipeline/lib/config.js](/.pipeline/lib/config.js)
-
-The values to modify are the `namespace` and `host` values. Update them to match your OpenShift namespaces.
+- [.pipeline/lib/deploy.js](/.pipeline/lib/deploy.js)
+- [.pipeline/lib/utils.js](/.pipeline/lib/utils.js)
+- [.pipeline/lib/keycloak.js](/.pipeline/lib/keycloak.js)
 
 ## Pull Request Build and Deploy
 
