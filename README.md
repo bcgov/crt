@@ -7,7 +7,7 @@ This web application is intended to replace the current access based tool which 
 ## Prerequisites
 
 - .Net 5 SDK
-- Node.JS v10.0 or newer
+- Node.JS v13.7.0 or newer
 - Microsoft SQL Server 2017 or newer
 
 ## Dependencies
