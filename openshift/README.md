@@ -49,7 +49,7 @@ This section will describe the necessary steps required to configure the pipelin
 
 The API Server and Hangfire Server make use of the [api-appsettings.yaml](configmaps/api-appsettings.yaml) file for runtime configurations in OpenShift.
 
-The configmap replaces the default `appSettings.json` file from the `CRT.Api` and `CRT.Hangfire` projects via the `s2i run` script when a pod is starting up. So it is imporant it has the correct configurations.
+The configmap replaces the default `appSettings.json` file from the `CRT.Api` project via the `s2i run` script when a pod is starting up. So it is imporant it has the correct configurations.
 
 The API Server and Hangfire Server share the same configmap, so it's important to include configurations for both projects.
 
