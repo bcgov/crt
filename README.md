@@ -7,7 +7,7 @@ This web application is intended to replace the current access based tool which 
 ## Prerequisites
 
 - .Net 5 SDK
-- Node.JS v10.0 or newer
+- Node.JS v13.7.0 or newer
 - Microsoft SQL Server 2017 or newer
 
 ## Dependencies
@@ -42,13 +42,7 @@ Use the following steps to configure the local development environment
    - Update the connection string to match the database
    - Make note of or update the port for the API Server in Visual Studio or through the `properties/launchSettings.json` file.
 
-4. Configure Hangfire Server settings
-
-   - Copy `api/Crt.Hangfire/appsettigns.json` to `api/Crt.Hangfire/appsettigns.Development.json`
-   - Update the placeholder values with real values, eg., replace the `<ServiceAccount:User>` with actual IDIR service account in the `{ "ServiceAccount": { "User": "<ServiceAccount:User>" } }` field
-   - Update the connection string to match the database
-
-5. Configure the React development settings
+4. Configure the React development settings
 
    - Create the `client/.env.development.local` file and add the following content
 
@@ -85,19 +79,7 @@ Use the following steps to run the local development environment
    dotnet run
    ```
 
-2. Run the Hangfire Server. _It's only neccessary to run the Hangfire Server if debugging Hangfire jobs_
-
-   - F5 in Visual Studio
-   - Or from console
-
-   ```
-   cd api/Crt.Hangfire
-   dotnet restore
-   dotnet build
-   dotnet run
-   ```
-
-3. Run the React frontend
+2. Run the React frontend
    ```
    cd client
    npm install

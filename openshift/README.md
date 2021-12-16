@@ -49,9 +49,7 @@ This section will describe the necessary steps required to configure the pipelin
 
 The API Server and Hangfire Server make use of the [api-appsettings.yaml](configmaps/api-appsettings.yaml) file for runtime configurations in OpenShift.
 
-The configmap replaces the default `appSettings.json` file from the `CRT.Api` and `CRT.Hangfire` projects via the `s2i run` script when a pod is starting up. So it is imporant it has the correct configurations.
-
-The API Server and Hangfire Server share the same configmap, so it's important to include configurations for both projects.
+The configmap replaces the default `appSettings.json` file from the `CRT.Api` project via the `s2i run` script when a pod is starting up. So it is imporant it has the correct configurations.
 
 ### Create Secret Objects
 
@@ -101,7 +99,14 @@ Once Github Actions Workflow is properly configured, it is ready to monitor pull
 
 Every pull request made to your repository will trigger a new build and create a standalone deployment in the `dev` namespace. This allows you to test new features independantly of other features.
 
-If [configured properly](https://github.com/BCDevOps/bcdk#automatically-clean-up-pull-request-deployments), Github Actions will also automatically clean up the environments when a pull request is merged or closed.
+If [configured properly](https://github.com/BCDevOps/bcdk#automatically-clean-up-pull-request-deployments), you can clean up the environments when a pull request is merged or closed using
+
+```
+npm run clean -- --pr=<pr#> ---env=<env>
+
+# Alternative you can use --env=all if you have the transient option configured properly
+npm run clean -- --pr=<pr#> --env=all
+```
 
 ## Manually Build and Deploy
 
