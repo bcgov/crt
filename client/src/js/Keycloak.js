@@ -21,7 +21,7 @@ keycloak.login = (options) => {
 export const init = (onSuccess) => {
   //disable checkLoginIframe
   //https://medium.com/@szoradi.balazs/keycloak-login-infinite-loop-9005bcd9a915
-  keycloak.init({ onLoad: 'login-required', promiseType: 'native', checkLoginIframe: false }).then((authenticated) => {
+  keycloak.init({ onLoad: 'login-required', promiseType: 'native', checkLoginIframe: false}).then((authenticated) => {
     if (authenticated && onSuccess) {
       onSuccess();
     }
