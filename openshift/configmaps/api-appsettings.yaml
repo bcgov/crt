@@ -3,7 +3,7 @@ kind: Template
 metadata:
   name: "true"
 objects:
-  - apiVersion: template.openshift.io/v1
+  - apiVersion: v1
     data:
       appsettings.json: |-
         {
