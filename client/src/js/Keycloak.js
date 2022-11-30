@@ -14,7 +14,7 @@ export const keycloak = Keycloak(keycloakConfig);
 
 const login = keycloak.login;
 keycloak.login = (options) => {
-  options.idpHint = 'idir';
+  options.idpHint = 'oidc-custom-idir';
   login(options);
 };
 
@@ -26,6 +26,7 @@ export const init = (onSuccess) => {
       onSuccess();
     }
   });
+
 
   keycloak.onAuthLogout = () => {
     window.location.reload();
