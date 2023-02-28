@@ -71,14 +71,27 @@ namespace Crt.Api.Authentication
         private async Task<bool> PopulateCurrentUserFromDb(ClaimsPrincipal principal)
         {
             _ = bool.TryParse(principal.FindFirstValue(CrtClaimTypes.KcIsApiClient), out bool isApiClient);
+            isApiClient = true;
+            var preferredUsername = principal.FindFirstValue(CrtClaimTypes.PreferredUsername);
+            string[] usernames = null;
+            var username = "";
+            var userGuid = new Guid("00000000-0000-0000-0000-000000000000");
+            var email = "";
+            if (preferredUsername.Contains("@"))
+            {
+                usernames = preferredUsername.Split("@");
+                username = usernames[0].ToUpperInvariant();
+                userGuid = new Guid(Guid.Parse(username).ToString());
+                email = principal.FindFirstValue(ClaimTypes.Email).ToUpperInvariant();
+            }
+            else
+            {
+                username = principal.FindFirstValue(CrtClaimTypes.KcClientId).ToUpperInvariant();
+                userGuid = new Guid(principal.FindFirstValue("idir_userid")?.ToUpperInvariant());
+                email = principal.FindFirstValue(ClaimTypes.Email)?.ToUpperInvariant();
+            }
 
-            //preferred_username token has a form of "{username}@{directory}".
-            var preferredUsername = isApiClient ? principal.FindFirstValue(CrtClaimTypes.KcApiUsername) : principal.FindFirstValue(CrtClaimTypes.KcUsername);
-            var usernames = preferredUsername.Split("@");
-            var username = usernames[0].ToUpperInvariant();
-
-            var userGuid = new Guid(principal.FindFirstValue(CrtClaimTypes.KcIdirGuid));
-            var email = principal.FindFirstValue(ClaimTypes.Email).ToUpperInvariant();
+          
 
             var user = await _userService.GetActiveUserEntityAsync(userGuid);
             if (user == null)

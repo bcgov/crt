@@ -170,6 +170,8 @@ namespace Crt.Api.Controllers
         {
             var client = await _keyCloakService.GetUserClientAsync();
 
+            
+
             if (client == null)
             {
                 return NotFound();

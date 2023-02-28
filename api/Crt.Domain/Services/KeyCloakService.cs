@@ -132,6 +132,7 @@ namespace Crt.Domain.Services
 
                 // Get newly created Keycloak client INTERNAL id
                 var newId = response.Headers.Location.Segments[response.Headers.Location.Segments.Length - 1];
+
                 _currentUser.ApiClientId = newId;
 
                 // Write new Keycloak client INTERNAL id to database 
@@ -194,6 +195,7 @@ namespace Crt.Domain.Services
                 RequestUri = new Uri($"{_authority}/protocol/openid-connect/token"),
                 Content = new FormUrlEncodedContent(new Dictionary<string, string> { { "grant_type", "client_credentials" } })
             };
+
             requestToken.Headers.Authorization = new AuthenticationHeaderValue("Basic", basicAuth);
 
             try
@@ -218,7 +220,6 @@ namespace Crt.Domain.Services
             var httpClient = _httpClientFactory.CreateClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             httpClient.BaseAddress = new Uri($"{_authority.Replace("auth/realms", "auth/admin/realms")}/");
-
             return httpClient;
         }
 
