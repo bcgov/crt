@@ -25,7 +25,12 @@ objects:
                     "Name": "Async",
                     "Args": {
                         "configure": [
-                            { "Name": "Console" }
+                            { 
+                              "Name": "Console",
+                              "Args": {
+                                "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+                              } 
+                            }
                         ]
                     }
                 },
@@ -51,7 +56,7 @@ objects:
               "WorkerCount": 1
           },
           "JWT": {
-              "Authority": "https://dev.oidc.gov.bc.ca/auth/realms/<realmid>",
+              "Authority": "https://dev.loginproxy.gov.bc.ca/auth/realms/<realmid>",
               "Audience": "<app-id>"
           },
           "ServiceAccount": {
