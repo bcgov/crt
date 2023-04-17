@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Crt.Api.Middlewares
 {
@@ -13,10 +14,13 @@ namespace Crt.Api.Middlewares
     {
         private HttpClient _httpClient;
         private readonly RequestDelegate _nextMiddleware;
+        private readonly ILogger _logger;
 
-        public ReverseProxyMiddleware(RequestDelegate nextMiddleware)
+        public ReverseProxyMiddleware(RequestDelegate nextMiddleware, ILogger<ReverseProxyMiddleware> logger)
         {
             _nextMiddleware = nextMiddleware;
+            _logger = logger;
+
         }
 
         public async Task Invoke(HttpContext context, IGeoServerApi geoServerApi)
@@ -27,7 +31,7 @@ namespace Crt.Api.Middlewares
 
             if (targetUri != null)
             {
-                Console.WriteLine($"Proxy - {targetUri}");
+                _logger.LogInformation($"Proxy - {targetUri}");
 
                 var targetRequestMessage = CreateTargetMessage(context, targetUri);
 
