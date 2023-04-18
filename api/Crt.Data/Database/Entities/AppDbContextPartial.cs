@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,12 +21,14 @@ namespace Crt.Data.Database.Entities
 
         public readonly CrtCurrentUser _currentUser;
         private readonly IConfiguration _config;
+        private readonly ILogger<AppDbContext> _logger;
 
-        public AppDbContext(DbContextOptions<AppDbContext> options, CrtCurrentUser currentUser, IConfiguration config)
+        public AppDbContext(DbContextOptions<AppDbContext> options, CrtCurrentUser currentUser, IConfiguration config, ILogger<AppDbContext> logger)
             : base(options)
         {
             _currentUser = currentUser;
             _config = config;
+            _logger = logger;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -47,7 +50,8 @@ namespace Crt.Data.Database.Entities
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                string exceptionMessage = e.ToString();
+                _logger.LogError($"AppDbContext exception: {exceptionMessage}");
                 throw;
             }
 

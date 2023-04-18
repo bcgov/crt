@@ -46,7 +46,6 @@ namespace Crt.HttpClients
             var seconds = config.GetValue<int>(section);
             if (seconds <= 0)
             {
-                Console.WriteLine($"Config - Invalid {section} value: {seconds}");
                 seconds = 90;
             }
 
