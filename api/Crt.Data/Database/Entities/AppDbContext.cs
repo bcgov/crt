@@ -1,6 +1,11 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using System.Linq;
+
+
 
 #nullable disable
 
@@ -4351,6 +4356,37 @@ namespace Crt.Data.Database.Entities
                 .HasMax(999999999);
 
             OnModelCreatingPartial(modelBuilder);
+        }
+
+        public class BlankTriggerAddingConvention : IModelFinalizingConvention
+        {
+            public virtual void ProcessModelFinalizing(
+                IConventionModelBuilder modelBuilder,
+                IConventionContext<IConventionModelBuilder> context)
+            {
+                foreach (var entityType in modelBuilder.Metadata.GetEntityTypes())
+                {
+                    var table = StoreObjectIdentifier.Create(entityType, StoreObjectType.Table);
+                    if (table != null
+                        && entityType.GetDeclaredTriggers().All(t => t.GetDatabaseName(table.Value) == null))
+                    {
+                        entityType.Builder.HasTrigger(table.Value.Name + "_Trigger");
+                    }
+
+                    foreach (var fragment in entityType.GetMappingFragments(StoreObjectType.Table))
+                    {
+                        if (entityType.GetDeclaredTriggers().All(t => t.GetDatabaseName(fragment.StoreObject) == null))
+                        {
+                            entityType.Builder.HasTrigger(fragment.StoreObject.Name + "_Trigger");
+                        }
+                    }
+                }
+            }
+        }
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            configurationBuilder.Conventions.Add(_ => new BlankTriggerAddingConvention());
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
