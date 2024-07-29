@@ -299,6 +299,11 @@ namespace Crt.Domain.Services
 
                 if (percentInPolygon > 0)
                 {
+                    var existingRatioRecord = _validator.CodeLookup
+                            .Where(x => x.CodeSet == CodeSet.ElectoralDistrict && x.CodeValueText == polygon.Name)
+                            .FirstOrDefault();
+                    if (existingRatioRecord == null) continue;
+
                     //generate the new ratio
                     var newRatio = new RatioCreateDto
                     {
