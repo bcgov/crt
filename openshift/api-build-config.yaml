@@ -80,9 +80,7 @@ objects:
           from:
             kind: ImageStreamTag
             name: "dotnet-70:7.0"
-          scripts:
-            - script: | 
-              rm -rf Crt.Api/obj
+            
         type: Source
 parameters:
   - description: Name of the project (CRT)
