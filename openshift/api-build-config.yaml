@@ -82,7 +82,7 @@ objects:
             name: "dotnet-70:7.0"
           scripts:
             - name: restore
-            script: | 
+            - script: | 
               dotnet restore ${DOTNET_STARTUP_PROJECT}
               rm -rf Crt.Api/bin
               rm -rf Crt.Api/obj
