@@ -9,6 +9,7 @@
     <Company>Ministry of Transportation and Infrastructure</Company>
     <Description>The API server for CRT (Capital Rehabilitation Project Tracking)</Description>
     <Copyright>Copyright© 2020, Province of British Columbia.</Copyright>
+    <TargetFrameworks>net7.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
