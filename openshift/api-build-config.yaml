@@ -80,7 +80,13 @@ objects:
           from:
             kind: ImageStreamTag
             name: "dotnet-70:7.0"
-            
+          
+          scripts:
+            - script: |
+                dotnet restore ${DOTNET_STARTUP_PROJECT}
+                rm -rf Crt.Api/bin
+                rm -rf Crt.Api/obj
+  
         type: Source
 parameters:
   - description: Name of the project (CRT)
