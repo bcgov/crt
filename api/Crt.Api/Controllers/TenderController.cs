@@ -41,7 +41,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPost]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<TenderCreateDto>> CreateTender(decimal projectId, TenderCreateDto tender)
         {
             var result = await IsProjectAuthorized(projectId);
@@ -59,7 +59,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPost("{id}/clone", Name ="CloneTender")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<TenderDto>> CloneTender(decimal projectId, decimal id)
         {
             var result = await IsProjectAuthorized(projectId);
@@ -75,7 +75,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> UpdateTender(decimal projectId, decimal id, TenderUpdateDto tender)
         {
             var result = await IsProjectAuthorized(projectId);
@@ -104,7 +104,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> DeleteTender(decimal projectId, decimal id)
         {
             var result = await IsProjectAuthorized(projectId);

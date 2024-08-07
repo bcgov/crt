@@ -53,7 +53,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPost]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<NoteDto>> CreateNote(decimal projectId, NoteCreateDto note)
         {
             if (projectId != note.ProjectId)
@@ -72,7 +72,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> UpdateNote(decimal id, NoteUpdateDto note)
         {
             if (id != note.NoteId)
@@ -96,7 +96,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> DeleteActivityCode(decimal id)
         {
             var response = await _noteService.DeleteNoteAsync(id);

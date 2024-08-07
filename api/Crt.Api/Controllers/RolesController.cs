@@ -45,7 +45,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPost]
-        [RequiresPermission(Permissions.RoleWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<RoleDto>> CreateRole(RoleCreateDto role)
         {
             var response = await _roleSvc.CreateRoleAsync(role);
@@ -59,7 +59,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [RequiresPermission(Permissions.RoleWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> UpdateRole(decimal id, RoleUpdateDto role)
         {
             if (id != role.RoleId)
@@ -83,7 +83,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RequiresPermission(Permissions.RoleWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> DeleteRole(decimal id, RoleDeleteDto role)
         {
             if (id != role.RoleId)

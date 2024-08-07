@@ -38,7 +38,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPost]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<CodeLookupCreateDto>> CreateCodeLookup(CodeLookupCreateDto codeLookup)
         {
             var response = await _codeTableService.CreateCodeLookupAsync(codeLookup);
@@ -64,7 +64,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> UpdateCodeLookup(decimal id, CodeLookupUpdateDto codeLookup)
         {
             if (id != codeLookup.CodeLookupId)
@@ -88,7 +88,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RequiresPermission(Permissions.CodeWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> DeleteActivityCode(decimal id)
         {
             var response = await _codeTableService.DeleteCodeLookupAsync(id);

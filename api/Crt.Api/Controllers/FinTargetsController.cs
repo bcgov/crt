@@ -41,7 +41,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPost]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<FinTargetDto>> CreateFinTarget(decimal projectId, FinTargetCreateDto finTarget)
         {
             var result = await IsProjectAuthorized(projectId);
@@ -59,7 +59,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> UpdateFinTarget(decimal projectId, decimal id, FinTargetUpdateDto finTarget)
         {
             var result = await IsProjectAuthorized(projectId);
@@ -88,7 +88,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> DeleteFinTarget(decimal projectId, decimal id)
         {
             var result = await IsProjectAuthorized(projectId);
@@ -128,7 +128,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPost("{id}/clone", Name="CloneFinTarget")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<FinTargetDto>> CloneFinTarget(decimal projectId, decimal id)
         {
             var result = await IsProjectAuthorized(projectId);

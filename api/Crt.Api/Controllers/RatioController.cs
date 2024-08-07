@@ -32,7 +32,7 @@ namespace Crt.Api.Controllers
         /// <param name="ratio"></param>
         /// <returns></returns>
         [HttpPost]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<RatioDto>> CreateRatio(decimal projectId, RatioCreateDto ratio)
         {
             var result = await IsProjectAuthorized(projectId);
@@ -50,7 +50,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> UpdateRatio(decimal projectId, decimal id, RatioUpdateDto ratio)
         {
             var result = await IsProjectAuthorized(projectId);
@@ -95,7 +95,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> DeleteRatio(decimal projectId, decimal id)
         {
             var result = await IsProjectAuthorized(projectId);
@@ -118,7 +118,7 @@ namespace Crt.Api.Controllers
 
         [HttpPut]
         [Route("~/api/projects/{projectId}/ratios")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> DetermineProjectRatios(decimal projectId)
         {
             var result = await IsProjectAuthorized(projectId);

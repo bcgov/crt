@@ -55,7 +55,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPost]
-        [RequiresPermission(Permissions.CodeWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<ElementCreateDto>> CreateElement(ElementCreateDto element)
         {
             var response = await _elementService.CreateElementAsync(element);
@@ -68,7 +68,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [RequiresPermission(Permissions.CodeWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> UpdateElement(decimal id, ElementUpdateDto element)
         {
             if (id != element.ElementId)
@@ -92,7 +92,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RequiresPermission(Permissions.CodeWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> DeleteActivityCode(decimal id)
         {
             var response = await _elementService.DeleteElementAsync(id);
