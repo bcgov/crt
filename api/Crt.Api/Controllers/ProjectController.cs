@@ -59,7 +59,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPost]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<ProjectCreateDto>> CreateProject(ProjectCreateDto project)
         {
             var problem = IsRegionIdAuthorized(project.RegionId);
@@ -79,7 +79,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> UpdateProject(decimal id, ProjectUpdateDto project)
         {
             var problem = IsRegionIdAuthorized(project.RegionId);
@@ -109,7 +109,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> DeleteProject(decimal id, ProjectDeleteDto project)
         {
             if (id != project.ProjectId)

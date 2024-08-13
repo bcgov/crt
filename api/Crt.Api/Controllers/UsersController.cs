@@ -89,7 +89,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpGet("adaccount/{username}", Name = "GeAdAccount")]
-        [RequiresPermission(Permissions.UserWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<AdAccountDto>> GetAdAccountAsync(string username)
         {
             var adAccount = await _userService.GetAdAccountAsync(username);
@@ -101,7 +101,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPost]
-        [RequiresPermission(Permissions.UserWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<UserDto>> CreateUser(UserCreateDto user)
         {
             var response = await _userService.CreateUserAsync(user);
@@ -115,7 +115,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [RequiresPermission(Permissions.UserWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> UpdateUser(decimal id, UserUpdateDto user)
         {
             if (id != user.SystemUserId)
@@ -140,7 +140,7 @@ namespace Crt.Api.Controllers
 
 
         [HttpDelete("{id}")]
-        [RequiresPermission(Permissions.UserWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> DeleteUser(decimal id, UserDeleteDto user)
         {
             if (id != user.SystemUserId)
@@ -165,7 +165,7 @@ namespace Crt.Api.Controllers
 
         #region API Client
         [HttpGet("api-client", Name = "GetUserKeycloakClient")]
-        [RequiresPermission(Permissions.ApiClientWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<KeycloakClientDto>> GetUserKeycloakClient()
         {
             var client = await _keyCloakService.GetUserClientAsync();
@@ -181,7 +181,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPost("api-client")]
-        [RequiresPermission(Permissions.ApiClientWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<KeycloakClientDto>> CreateUserKeycloakClient()
         {
             var response = await _keyCloakService.CreateUserClientAsync();
@@ -195,7 +195,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPost("api-client/secret")]
-        [RequiresPermission(Permissions.ApiClientWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> RegenerateUserKeycloakClientSecret()
         {
             var response = await _keyCloakService.RegenerateUserClientSecretAsync();

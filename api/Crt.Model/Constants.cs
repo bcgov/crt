@@ -46,6 +46,9 @@ namespace Crt.Model
         public const string ProjectRead = "PROJECT_R";
         public const string ProjectWrite = "PROJECT_W";
         public const string ApiClientWrite = "API_W";
+        // Use this permission to disable all write access for all users
+        public const string AllWrite = "ALL_W";
+
     }
 
     public static class Entities

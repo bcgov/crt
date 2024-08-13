@@ -28,7 +28,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPost]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<SegmentCreateDto>> CreateSegment(decimal projectId, SegmentCreateDto segment)
         {
             var result = await IsProjectAuthorized(projectId);
@@ -46,7 +46,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult<SegmentCreateDto>> UpdateSegment(decimal projectId, decimal id, SegmentUpdateDto segment)
         {
             var result = await IsProjectAuthorized(projectId);
@@ -99,7 +99,7 @@ namespace Crt.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RequiresPermission(Permissions.ProjectWrite)]
+        [RequiresPermission(Permissions.AllWrite)]
         public async Task<ActionResult> DeleteSegment(decimal projectId, decimal id)
         {
             var result = await IsProjectAuthorized(projectId);
