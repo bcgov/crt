@@ -10,7 +10,7 @@ const keycloakConfig = {
     : process.env.REACT_APP_SSO_CLIENT,
 };
 
-export const keycloak = Keycloak(keycloakConfig);
+export const keycloak = new Keycloak(keycloakConfig);
 
 const login = keycloak.login;
 keycloak.login = (options) => {
@@ -49,5 +49,12 @@ export const init = (onSuccess) => {
 };
 
 export const logout = () => {
-  keycloak.logout();
+  keycloak.createLogoutUrl = function() {
+    const testUrl =  keycloak.endpoints.logout()
+      + '?id_token_hint=' + keycloak.idToken
+      + '&post_logout_redirect_uri=' + encodeURIComponent(window.location.href);
+    return testUrl;
+  };
+
+  keycloak.logout({ redirectUri: window.location.href });
 };
