@@ -34,7 +34,7 @@ objects:
             deployment: ${NAME}${SUFFIX}
         spec:
           containers:
-            - image: ${NAME}:${VERSION}
+            - image: image-registry.openshift-image-registry.svc:5000/2d982c-${ENV}/${NAME}:${VERSION}
               name: twm
               ports:
                 - containerPort: 8080
