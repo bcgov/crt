@@ -34,7 +34,7 @@ objects:
             deployment: ${NAME}${SUFFIX}
         spec:
           containers:
-            - image: image-registry.openshift-image-registry.svc:5000/2d982c-${ENV}/${NAME}:${VERSION}
+            - image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}:${VERSION}
               name: twm
               ports:
                 - containerPort: 8080
@@ -65,16 +65,6 @@ objects:
                 - name: CRT_DEPLOY_SUFFIX
                   value: ${SUFFIX}
       test: false
-      triggers:
-        - imageChangeParams:
-            automatic: true
-            containerNames:
-              - twm
-            from:
-              kind: ImageStreamTag
-              name: ${NAME}:${VERSION}
-          type: ImageChange
-        - type: ConfigChange
   - apiVersion: v1
     kind: Service
     metadata:
@@ -137,5 +127,10 @@ parameters:
   - description: MEMORY
     displayName: MEMORY Request
     name: MEMORY
+    required: true
+    value: ""
+  - description: NAMESPACE
+    displayName: 
+    name: NAMESPACENAMESPACE
     required: true
     value: ""
