@@ -85,7 +85,6 @@ module.exports = (settings) => {
           SUFFIX: phases[phase].suffix,
           VERSION: phases[phase].tag,
           ENV: phases[phase].phase,
-          NAMESPACE: phases[phase].namespace,
         },
       }
     )

@@ -130,7 +130,7 @@ parameters:
     required: true
     value: ""
   - description: NAMESPACE
-    displayName: 
-    name: NAMESPACENAMESPACE
+    displayName: NAMESPACE
+    name: NAMESPACE
     required: true
     value: ""
