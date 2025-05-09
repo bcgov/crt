@@ -3,14 +3,15 @@ apiVersion: template.openshift.io/v1
 metadata:
   name: ${PROJECT_NAME}
 objects:
-  - apiVersion: v1
-    kind: DeploymentConfig
+  - apiVersion: apps/v1
+    kind: Deployment
     metadata:
       name: ${NAME}${SUFFIX}
     spec:
       replicas: 1
       selector:
-        deploymentconfig: ${NAME}${SUFFIX}
+        matchLabels:
+          deployment: ${NAME}${SUFFIX}
       strategy:
         activeDeadlineSeconds: 21600
         resources: {}
@@ -21,7 +22,7 @@ objects:
         metadata:
           name: ${NAME}${SUFFIX}
           labels:
-            deploymentconfig: ${NAME}${SUFFIX}
+            deployment: ${NAME}${SUFFIX}
         spec:
           containers:
             - image: image-registry.openshift-image-registry.svc:5000/2d982c-tools/${IMAGE_STREAM_TAG}
@@ -91,23 +92,10 @@ objects:
                 persistentVolumeClaim:
                   claimName: ${NAME}${SUFFIX}
       test: false
-      triggers:
-        - type: ConfigChange
-        - imageChangeParams:
-            automatic: true
-            containerNames:
-              - ${NAME}${SUFFIX}
-            from:
-              kind: ImageStreamTag
-              name: ${IMAGE_STREAM_TAG}
-              namespace: 2d982c-tools
-          type: ImageChange
   - kind: PersistentVolumeClaim
     apiVersion: v1
     metadata:
       name: ${NAME}${SUFFIX}
-    selector:
-        deploymentconfig: ${NAME}${SUFFIX}
     spec:
       storageClassName: "${PERSISTENT_VOLUME_CLASS}"
       accessModes:
@@ -126,7 +114,7 @@ objects:
           port: 5432
           targetPort: 5432
       selector:
-        deploymentconfig: ${NAME}${SUFFIX}
+        deployment: ${NAME}${SUFFIX}
 parameters:
   - description: Name of the project (CRT)
     displayName: PROJECT_NAME

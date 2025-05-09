@@ -16,35 +16,36 @@ objects:
     spec:
       lookupPolicy:
         local: false
-  - apiVersion: v1
-    kind: DeploymentConfig
+  - apiVersion: apps/v1
+    kind: Deployment
     metadata:
       creationTimestamp: null
       name: ${NAME}${SUFFIX}
     spec:
       replicas: 1
       selector:
-        deploymentconfig: ${NAME}${SUFFIX}
+        matchLabels:
+          deployment: ${NAME}${SUFFIX}
       strategy: {}
       template:
         metadata:
           creationTimestamp: null
           labels:
-            deploymentconfig: ${NAME}${SUFFIX}
+            deployment: ${NAME}${SUFFIX}
         spec:
           containers:
-            - image: ${NAME}:${VERSION}
+            - image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}:${VERSION}
               name: twm
               ports:
                 - containerPort: 8080
                   protocol: TCP
-              resources:
-                requests:
-                  cpu: ${CPU}
-                  memory: ${MEMORY}
-                limits:
-                  cpu: ${CPU}
-                  memory: ${MEMORY}
+              # resources:
+              #   requests:
+              #     cpu: ${CPU}
+              #     memory: ${MEMORY}
+              #   limits:
+              #     cpu: ${CPU}
+              #     memory: ${MEMORY}
               env:
                 - name: CLIENT_SSO_HOST
                   valueFrom:
@@ -64,16 +65,6 @@ objects:
                 - name: CRT_DEPLOY_SUFFIX
                   value: ${SUFFIX}
       test: false
-      triggers:
-        - imageChangeParams:
-            automatic: true
-            containerNames:
-              - twm
-            from:
-              kind: ImageStreamTag
-              name: ${NAME}:${VERSION}
-          type: ImageChange
-        - type: ConfigChange
   - apiVersion: v1
     kind: Service
     metadata:
@@ -86,7 +77,7 @@ objects:
           protocol: TCP
           targetPort: 8080
       selector:
-        deploymentconfig: ${NAME}${SUFFIX}
+        deployment: ${NAME}${SUFFIX}
 parameters:
   - description: Name of the project (CRT)
     displayName: PROJECT_NAME
@@ -136,5 +127,10 @@ parameters:
   - description: MEMORY
     displayName: MEMORY Request
     name: MEMORY
+    required: true
+    value: ""
+  - description: NAMESPACE
+    displayName: NAMESPACE
+    name: NAMESPACE
     required: true
     value: ""

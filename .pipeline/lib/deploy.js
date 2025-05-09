@@ -35,6 +35,7 @@ module.exports = (settings) => {
           HOST: phases[phase].host,
           CPU: phases[phase].twm_cpu,
           MEMORY: phases[phase].twm_memory,
+          NAMESPACE: phases[phase].namespace,
         },
       }
     )
@@ -53,6 +54,7 @@ module.exports = (settings) => {
           REACT_APP_DWPBI_URL: phases[phase].dwpbi_url,
           CPU: phases[phase].client_cpu,
           MEMORY: phases[phase].client_memory,
+          NAMESPACE: phases[phase].namespace,
         },
       }
     )
@@ -113,6 +115,7 @@ module.exports = (settings) => {
           ASPNETCORE_ENVIRONMENT: phases[phase].dotnet_env,
           CPU: phases[phase].api_cpu,
           MEMORY: phases[phase].api_memory,
+          NAMESPACE: phases[phase].namespace,
         },
       }
     )

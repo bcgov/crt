@@ -16,35 +16,36 @@ objects:
     spec:
       lookupPolicy:
         local: false
-  - apiVersion: v1
-    kind: DeploymentConfig
+  - apiVersion: apps/v1
+    kind: Deployment
     metadata:
       creationTimestamp: null
       name: ${NAME}${SUFFIX}
     spec:
       replicas: 1
       selector:
-        deploymentconfig: ${NAME}${SUFFIX}
+        matchLabels:
+          deployment: ${NAME}${SUFFIX}
       strategy: {}
       template:
         metadata:
           creationTimestamp: null
           labels:
-            deploymentconfig: ${NAME}${SUFFIX}
+            deployment: ${NAME}${SUFFIX}
         spec:
           containers:
-            - image: ${NAME}:${VERSION}
+            - image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}:${VERSION}
               name: client
               ports:
                 - containerPort: 8080
                   protocol: TCP
-              resources:
-                requests:
-                  cpu: ${CPU}
-                  memory: ${MEMORY}
-                limits:
-                  cpu: ${CPU}
-                  memory: ${MEMORY}
+              # resources:
+              #   requests:
+              #     cpu: ${CPU}
+              #     memory: ${MEMORY}
+              #   limits:
+              #     cpu: ${CPU}
+              #     memory: ${MEMORY}
               env:
                 - name: REACT_APP_SSO_HOST
                   valueFrom:
@@ -68,16 +69,6 @@ objects:
                 - name: REACT_APP_DWPBI_URL
                   value: ${REACT_APP_DWPBI_URL}
       test: false
-      triggers:
-        - imageChangeParams:
-            automatic: true
-            containerNames:
-              - client
-            from:
-              kind: ImageStreamTag
-              name: ${NAME}:${VERSION}
-          type: ImageChange
-        - type: ConfigChange
   - apiVersion: v1
     kind: Service
     metadata:
@@ -90,7 +81,7 @@ objects:
           protocol: TCP
           targetPort: 8080
       selector:
-        deploymentconfig: ${NAME}${SUFFIX}
+        deployment: ${NAME}${SUFFIX}
   - apiVersion: route.openshift.io/v1
     kind: Route
     metadata:
@@ -164,5 +155,10 @@ parameters:
   - description: MEMORY
     displayName: MEMORY Request
     name: MEMORY
+    required: true
+    value: ""
+  - description: NAMESPACE
+    displayName: NAMESPACE
+    name: NAMESPACE
     required: true
     value: ""
