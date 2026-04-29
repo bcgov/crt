@@ -1,0 +1,229 @@
+{
+  "applicationName": "CRT",
+  "version": "1.0.7.0",
+  "keywords": [
+    "capital rehabilitation",
+    "project tracking",
+    "transportation",
+    "MOTI",
+    "BC Government",
+    "REST API",
+    "dotnet",
+    "react",
+    "openshift"
+  ],
+  "Database": [
+    {
+      "name": "Microsoft SQL Server",
+      "version": ""
+    },
+    {
+      "name": "PostgreSQL",
+      "version": "10"
+    }
+  ],
+  "Programming Language": [
+    {
+      "name": "C#",
+      "version": "11"
+    },
+    {
+      "name": "JavaScript",
+      "version": ""
+    },
+    {
+      "name": "SQL",
+      "version": ""
+    }
+  ],
+  "Web Framework": [
+    {
+      "name": "ASP.NET Core",
+      "version": "7.0"
+    },
+    {
+      "name": "React",
+      "version": "16.14.0"
+    }
+  ],
+  "Hosting Environment": [
+    {
+      "name": "OpenShift",
+      "version": ""
+    },
+    {
+      "name": "Nginx",
+      "version": "1.16"
+    },
+    {
+      "name": "Red Hat Enterprise Linux",
+      "version": "8"
+    }
+  ],
+  "CI/CD Pipeline": [
+    {
+      "name": "GitHub Actions",
+      "version": ""
+    },
+    {
+      "name": "pipeline-cli",
+      "version": ""
+    }
+  ],
+  "Scheduler": [
+    {
+      "name": "Hangfire",
+      "version": "1.7.18"
+    }
+  ],
+  "Caching": [],
+  "Message Broker": [],
+  "CMS": [],
+  "Document Management System": [],
+  "Dependencies": [
+    {
+      "name": "Entity Framework Core",
+      "version": "7.0.9"
+    },
+    {
+      "name": "AutoMapper",
+      "version": "10.1.1"
+    },
+    {
+      "name": "Serilog.AspNetCore",
+      "version": "3.4.0"
+    },
+    {
+      "name": "Swashbuckle.AspNetCore",
+      "version": "5.6.3"
+    },
+    {
+      "name": "NetTopologySuite",
+      "version": "2.5.0"
+    },
+    {
+      "name": "NetCore.AutoRegisterDi",
+      "version": "2.1.0"
+    },
+    {
+      "name": "CsvHelper",
+      "version": "16.1.0"
+    },
+    {
+      "name": "MailKit",
+      "version": "2.10.0"
+    },
+    {
+      "name": "Novell.Directory.Ldap.NETStandard",
+      "version": "3.4.0"
+    },
+    {
+      "name": "Microsoft.AspNetCore.Authentication.JwtBearer",
+      "version": "7.0.9"
+    },
+    {
+      "name": "Microsoft.AspNetCore.Mvc.Versioning",
+      "version": "4.2.0"
+    },
+    {
+      "name": "axios",
+      "version": "0.21.1"
+    },
+    {
+      "name": "react-redux",
+      "version": "7.2.2"
+    },
+    {
+      "name": "redux-thunk",
+      "version": "2.3.0"
+    },
+    {
+      "name": "react-router-dom",
+      "version": "5.2.0"
+    },
+    {
+      "name": "formik",
+      "version": "2.2.5"
+    },
+    {
+      "name": "reactstrap",
+      "version": "8.7.1"
+    },
+    {
+      "name": "bootstrap",
+      "version": "4.5.3"
+    },
+    {
+      "name": "lodash",
+      "version": "4.17.21"
+    },
+    {
+      "name": "moment",
+      "version": "2.29.1"
+    },
+    {
+      "name": "keycloak-js",
+      "version": "26.2.0"
+    }
+  ],
+  "Others": {
+    "Development and Testing": [
+      {
+        "name": "xunit",
+        "version": "2.4.1"
+      },
+      {
+        "name": "Moq",
+        "version": "4.15.2"
+      },
+      {
+        "name": "AutoFixture",
+        "version": "4.15.0"
+      },
+      {
+        "name": "coverlet.collector",
+        "version": "1.3.0"
+      }
+    ],
+    "BC Government Integration": [
+      {
+        "name": "Keycloak / LoginProxy SSO",
+        "version": ""
+      },
+      {
+        "name": "LDAP (Active Directory)",
+        "version": ""
+      }
+    ],
+    "Miscellaneous": [
+      {
+        "name": "OpenLayers",
+        "version": "6.5.0"
+      },
+      {
+        "name": "ol-mapbox-style",
+        "version": "6.3.0"
+      },
+      {
+        "name": "jQuery",
+        "version": "3.5.1"
+      },
+      {
+        "name": "jQuery UI",
+        "version": "1.12.1"
+      },
+      {
+        "name": "proj4js",
+        "version": "2.6.3"
+      },
+      {
+        "name": "bootbox",
+        "version": "5.5.2"
+      },
+      {
+        "name": "keycloak-js adapter (TWM)",
+        "version": "12.0.3"
+      }
+    ]
+  }
+}
