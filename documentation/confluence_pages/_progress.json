@@ -27,7 +27,9 @@
     {
       "title": "Team Calendar - Phase 1",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302730/Team+Calendar+-+Phase+1",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/project-overview/team-calendar-phase-1.md",
+      "timestamp": "2026-05-08T21:07:00Z"
     },
     {
       "title": "Stakeholders",
@@ -46,47 +48,65 @@
     {
       "title": "Project Glossary",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302662/Project+Glossary",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/project-overview/project-glossary.md",
+      "timestamp": "2026-05-08T21:07:00Z"
     },
     {
       "title": "Status",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302616/Status",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/project-overview/status.md",
+      "timestamp": "2026-05-08T21:08:00Z"
     },
     {
       "title": "Release Details",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302654/Release+Details",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/release-details/release-details.md",
+      "timestamp": "2026-05-08T21:08:00Z"
     },
     {
       "title": "CRT 1.0.0 Release",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302826/CRT+1.0.0+Release",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/release-details/crt-1.0.0-release.md",
+      "timestamp": "2026-05-08T21:08:00Z"
     },
     {
       "title": "CRT 1.0.0 Release summary",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302834/CRT+1.0.0+Release+summary",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/release-details/crt-1.0.0-release-summary.md",
+      "timestamp": "2026-05-08T21:09:00Z"
     },
     {
       "title": "CRT 1.0.0 Deployment Plan",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302830/CRT+1.0.0+Deployment+Plan",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/release-details/crt-1.0.0-deployment-plan.md",
+      "timestamp": "2026-05-08T21:09:00Z"
     },
     {
       "title": "CRT 1.0.0 Transition plan checklist",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302836/CRT+1.0.0+Transition+plan+checklist",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/release-details/crt-1.0.0-transition-plan-checklist.md",
+      "timestamp": "2026-05-08T21:10:00Z"
     },
     {
       "title": "Access DB SharePoint decommissioning",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302912/Access+DB+SharePoint+decommissioning",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/release-details/access-db-sharepoint-decommissioning.md",
+      "timestamp": "2026-05-08T21:10:00Z"
     },
     {
       "title": "User Support",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302838/User+Support",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/user-support/user-support.md",
+      "timestamp": "2026-05-08T21:05:00Z"
     },
     {
       "title": "Frequently Asked Questions (FAQ)",
@@ -98,7 +118,9 @@
     {
       "title": "Tech Ops",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302668/Tech+Ops",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/user-support/tech-ops/tech-ops.md",
+      "timestamp": "2026-05-08T21:06:00Z"
     },
     {
       "title": "Configuring CRT app with Configmap",
@@ -383,37 +405,51 @@
     {
       "title": "System Access",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302674/System+Access",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/system-definition/system-access.md",
+      "timestamp": "2026-05-08T20:49:00Z"
     },
     {
       "title": "Configuration",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102309737/Configuration",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/system-definition/configuration.md",
+      "timestamp": "2026-05-08T20:49:00Z"
     },
     {
       "title": "Offline",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102309739/Offline",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/system-definition/offline.md",
+      "timestamp": "2026-05-08T20:49:00Z"
     },
     {
       "title": "Extensibility",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102309741/Extensibility",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/system-definition/extensibility.md",
+      "timestamp": "2026-05-08T20:49:00Z"
     },
     {
       "title": "Performance",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102309743/Performance",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/system-definition/performance.md",
+      "timestamp": "2026-05-08T20:50:00Z"
     },
     {
       "title": "Spatial",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302676/Spatial",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/system-definition/spatial.md",
+      "timestamp": "2026-05-08T20:50:00Z"
     },
     {
       "title": "Stability",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102309746/Stability",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/system-definition/stability.md",
+      "timestamp": "2026-05-08T20:50:00Z"
     },
     {
       "title": "Technical Documentation",
@@ -439,32 +475,44 @@
     {
       "title": "Conceptual Data Model",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302636/Conceptual+Data+Model",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/database/conceptual-data-model.md",
+      "timestamp": "2026-05-08T20:51:00Z"
     },
     {
       "title": "CRT ETL field map",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302790/CRT+ETL+field+map",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/database/crt-etl-field-map.md",
+      "timestamp": "2026-05-08T20:52:00Z"
     },
     {
       "title": "Database Roles",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302664/Database+Roles",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/database/database-roles.md",
+      "timestamp": "2026-05-08T20:53:00Z"
     },
     {
       "title": "Legacy documentation",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302716/Legacy+documentation",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/database/legacy-documentation.md",
+      "timestamp": "2026-05-08T20:53:00Z"
     },
     {
       "title": "Logical Data Model",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302638/Logical+Data+Model",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/database/logical-data-model.md",
+      "timestamp": "2026-05-08T20:53:00Z"
     },
     {
       "title": "Physical Data Model",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302644/Physical+Data+Model",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/database/physical-data-model.md",
+      "timestamp": "2026-05-08T20:54:00Z"
     },
     {
       "title": "API Documentation",
@@ -504,72 +552,100 @@
     {
       "title": "01 - Calculate Segment Lengths",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302818/01+-+Calculate+Segment+Lengths",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/spatial-integration/calculate-segment-lengths.md",
+      "timestamp": "2026-05-08T20:55:00Z"
     },
     {
       "title": "02 - Calculate Project Extent",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302824/02+-+Calculate+Project+Extent",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/spatial-integration/calculate-project-extent.md",
+      "timestamp": "2026-05-08T20:56:00Z"
     },
     {
       "title": "03 - Obtain the Polygons of Interest",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302822/03+-+Obtain+the+Polygons+of+Interest",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/spatial-integration/obtain-polygons-of-interest.md",
+      "timestamp": "2026-05-08T20:57:00Z"
     },
     {
       "title": "04 - Calculate Ratio for each Polygon of Interest",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302828/04+-+Calculate+Ratio+for+each+Polygon+of+Interest",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/spatial-integration/calculate-ratio-polygon.md",
+      "timestamp": "2026-05-08T20:57:00Z"
     },
     {
       "title": "DataBC Route Planner",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302739/DataBC+Route+Planner",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/spatial-integration/databc-route-planner.md",
+      "timestamp": "2026-05-08T20:58:00Z"
     },
     {
       "title": "DataBC Spatial Services",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302802/DataBC+Spatial+Services",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/spatial-integration/databc-spatial-services.md",
+      "timestamp": "2026-05-08T20:58:00Z"
     },
     {
       "title": "GeoServer Query (POST)",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302807/GeoServer+Query+POST",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/spatial-integration/geoserver-query-post.md",
+      "timestamp": "2026-05-08T20:58:00Z"
     },
     {
       "title": "Internal Interfaces",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302742/Internal+Interfaces",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/spatial-integration/internal-interfaces.md",
+      "timestamp": "2026-05-08T20:59:00Z"
     },
     {
       "title": "MoTI Internal Spatial Service (GeoServer)",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302800/MoTI+Internal+Spatial+Service+GeoServer",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/technical-documentation/spatial-integration/moti-internal-spatial-service.md",
+      "timestamp": "2026-05-08T20:59:00Z"
     },
     {
       "title": "Quality Assurance",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102310119/Quality+Assurance",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/quality-assurance/quality-assurance.md",
+      "timestamp": "2026-05-08T21:00:00Z"
     },
     {
       "title": "Agile Business Validation Testing",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302720/Agile+Business+Validation+Testing",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/quality-assurance/agile-business-validation-testing.md",
+      "timestamp": "2026-05-08T21:00:00Z"
     },
     {
       "title": "Bug Management Process",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102310122/Bug+Management+Process",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/quality-assurance/bug-management-process.md",
+      "timestamp": "2026-05-08T21:01:00Z"
     },
     {
       "title": "Test Plan",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102310125/Test+Plan",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/quality-assurance/test-plan.md",
+      "timestamp": "2026-05-08T21:01:00Z"
     },
     {
       "title": "Development",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302630/Development",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/development/development.md",
+      "timestamp": "2026-05-08T21:02:00Z"
     },
     {
       "title": "Build and Deployment",
@@ -581,7 +657,9 @@
     {
       "title": "Deployments Matrix",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302866/Deployments+Matrix",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/development/deployments-matrix.md",
+      "timestamp": "2026-05-08T21:02:00Z"
     },
     {
       "title": "Developer Guide",
@@ -628,27 +706,37 @@
     {
       "title": "Environments versions",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302873/Environments+versions",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/development/environments-versions.md",
+      "timestamp": "2026-05-08T21:02:00Z"
     },
     {
       "title": "System Access Management",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302875/System+Access+Management",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/development/system-access-management.md",
+      "timestamp": "2026-05-08T21:03:00Z"
     },
     {
       "title": "Production Implementation",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302672/Production+Implementation",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/production-implementation/production-implementation.md",
+      "timestamp": "2026-05-08T21:04:00Z"
     },
     {
       "title": "Deployment Instructions",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302862/Deployment+Instructions",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/production-implementation/deployment-instructions.md",
+      "timestamp": "2026-05-08T21:04:00Z"
     },
     {
       "title": "DEV Deployment Instructions",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302786/DEV+Deployment+Instructions",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/production-implementation/dev-deployment-instructions.md",
+      "timestamp": "2026-05-08T21:04:00Z"
     },
     {
       "title": "Production Deployment Instructions",
@@ -660,172 +748,240 @@
     {
       "title": "File lists",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102309719/File+lists",
-      "status": "pending"
+      "status": "skipped",
+      "reason": "empty template page",
+      "timestamp": "2026-05-08T21:04:00Z"
     },
     {
       "title": "CRT 1.0 Sprint Reviews",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302764/CRT+1.0+Sprint+Reviews",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/sprint-reviews/sprint-reviews.md",
+      "timestamp": "2026-05-08T21:11:00Z"
     },
     {
       "title": "CRT1.0 Sprint 1 Review",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302766/CRT1.0+Sprint+1+Review",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/sprint-reviews/crt1.0-sprint-1-review.md",
+      "timestamp": "2026-05-08T21:11:00Z"
     },
     {
       "title": "CRT1.0 Sprint 2 Review",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302778/CRT1.0+Sprint+2+Review",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/sprint-reviews/crt1.0-sprint-2-review.md",
+      "timestamp": "2026-05-08T21:12:00Z"
     },
     {
       "title": "CRT1.0 Sprint 3 Review",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302782/CRT1.0+Sprint+3+Review",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/sprint-reviews/crt1.0-sprint-3-review.md",
+      "timestamp": "2026-05-08T21:12:00Z"
     },
     {
       "title": "CRT1.0 Sprint 4 Review",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302792/CRT1.0+Sprint+4+Review",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/sprint-reviews/crt1.0-sprint-4-review.md",
+      "timestamp": "2026-05-08T21:12:00Z"
     },
     {
       "title": "CRT1.0 Sprint 5 Review",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302813/CRT1.0+Sprint+5+Review",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/sprint-reviews/crt1.0-sprint-5-review.md",
+      "timestamp": "2026-05-08T21:12:00Z"
     },
     {
       "title": "CRT1.0 Sprint 6 Review",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302852/CRT1.0+Sprint+6+Review",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/sprint-reviews/crt1.0-sprint-6-review.md",
+      "timestamp": "2026-05-08T21:13:00Z"
     },
     {
       "title": "CRT1.0 Sprint 7 Review",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302854/CRT1.0+Sprint+7+Review",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/sprint-reviews/crt1.0-sprint-7-review.md",
+      "timestamp": "2026-05-08T21:13:00Z"
     },
     {
       "title": "CRT1.0 Sprint 8 Review",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302880/CRT1.0+Sprint+8+Review",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/sprint-reviews/crt1.0-sprint-8-review.md",
+      "timestamp": "2026-05-08T21:13:00Z"
     },
     {
       "title": "CRT1.0 Retrospectives",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302768/CRT1.0+Retrospectives",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/retrospectives/retrospectives.md",
+      "timestamp": "2026-05-08T21:15:00Z"
     },
     {
       "title": "CRT1.0.0 Business Retrospective",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302927/CRT1.0.0+Business+Retrospective",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/retrospectives/crt1.0.0-business-retrospective.md",
+      "timestamp": "2026-05-08T21:18:00Z"
     },
     {
       "title": "CRT1.0.0 Sprint 1 Retrospective",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302758/CRT1.0.0+Sprint+1+Retrospective",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/retrospectives/crt1.0.0-sprint-1-retrospective.md",
+      "timestamp": "2026-05-08T21:15:00Z"
     },
     {
       "title": "CRT1.0.0 Sprint 2 Retrospective",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302780/CRT1.0.0+Sprint+2+Retrospective",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/retrospectives/crt1.0.0-sprint-2-retrospective.md",
+      "timestamp": "2026-05-08T21:16:00Z"
     },
     {
       "title": "CRT1.0.0 Sprint 3 Retrospective",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302784/CRT1.0.0+Sprint+3+Retrospective",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/retrospectives/crt1.0.0-sprint-3-retrospective.md",
+      "timestamp": "2026-05-08T21:16:00Z"
     },
     {
       "title": "CRT1.0.0 Sprint 4 Retrospective",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302794/CRT1.0.0+Sprint+4+Retrospective",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/retrospectives/crt1.0.0-sprint-4-retrospective.md",
+      "timestamp": "2026-05-08T21:16:00Z"
     },
     {
       "title": "CRT1.0.0 Sprint 5 and Sprint 6 Retrospective",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302815/CRT1.0.0+Sprint+5+and+Sprint+6+Retrospective",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/retrospectives/crt1.0.0-sprint-5-6-retrospective.md",
+      "timestamp": "2026-05-08T21:17:00Z"
     },
     {
       "title": "CRT1.0.0 Sprint 7 Retrospective",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302856/CRT1.0.0+Sprint+7+Retrospective",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/retrospectives/crt1.0.0-sprint-7-retrospective.md",
+      "timestamp": "2026-05-08T21:17:00Z"
     },
     {
       "title": "CRT1.0.0 Sprint 8 Retrospective",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302882/CRT1.0.0+Sprint+8+Retrospective",
-      "status": "pending"
+      "status": "skipped",
+      "reason": "empty",
+      "timestamp": "2026-05-08T21:17:00Z"
     },
     {
       "title": "CRT1.0.0 Sprint 9 Retrospective",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302908/CRT1.0.0+Sprint+9+Retrospective",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/retrospectives/crt1.0.0-sprint-9-retrospective.md",
+      "timestamp": "2026-05-08T21:18:00Z"
     },
     {
       "title": "Governance",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302660/Governance",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/governance/governance.md",
+      "timestamp": "2026-05-08T21:19:00Z"
     },
     {
       "title": "Meeting notes",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302697/Meeting+notes",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/meeting-notes/meeting-notes.md",
+      "timestamp": "2026-05-08T21:20:00Z"
     },
     {
       "title": "2020-11-19 CRT Technical stack",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302678/2020-11-19+CRT+Technical+stack",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/meeting-notes/2020-11-19-crt-technical-stack.md",
+      "timestamp": "2026-05-08T21:20:00Z"
     },
     {
       "title": "2020-12-01 Project kick-off",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302699/2020-12-01+Project+kick-off",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/meeting-notes/2020-12-01-project-kick-off.md",
+      "timestamp": "2026-05-08T21:21:00Z"
     },
     {
       "title": "2020-12-17 Rehabilitation business area tool review",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302732/2020-12-17+Rehabilitation+business+area+tool+review",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/meeting-notes/2020-12-17-rehabilitation-business-area-tool-review.md",
+      "timestamp": "2026-05-08T21:21:00Z"
     },
     {
       "title": "2020-12-22 Spatial requirements",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302760/2020-12-22+Spatial+requirements",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/meeting-notes/2020-12-22-spatial-requirements.md",
+      "timestamp": "2026-05-08T21:22:00Z"
     },
     {
       "title": "2021-05-13 Pre-Production discussion",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302910/2021-05-13+Pre-Production+discussion",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/meeting-notes/2021-05-13-pre-production-discussion.md",
+      "timestamp": "2026-05-08T21:22:00Z"
     },
     {
       "title": "Decision log",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302728/Decision+log",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/governance/decision-log.md",
+      "timestamp": "2026-05-08T21:22:00Z"
     },
     {
       "title": "Go-Live deferred to late June",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302925/Go-Live+deferred+to+late+June",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/governance/go-live-deferred-to-late-june.md",
+      "timestamp": "2026-05-08T21:23:00Z"
     },
     {
       "title": "Archive",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302712/Archive",
-      "status": "pending"
+      "status": "skipped",
+      "reason": "empty",
+      "timestamp": "2026-05-08T21:23:00Z"
     },
     {
       "title": "Code values",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302686/Code+values",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/system-definition/code-values.md",
+      "timestamp": "2026-05-08T21:23:00Z"
     },
     {
       "title": "CRT 1.0.0 Business Go-Live Transition Planning",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302628/CRT+1.0.0+Business+Go-Live+Transition+Planning",
-      "status": "pending"
+      "status": "skipped",
+      "reason": "empty",
+      "timestamp": "2026-05-08T21:23:00Z"
     },
     {
       "title": "Deployment Verification Steps (Please update for HMCR)",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302762/Deployment+Verification+Steps+Please+update+for+HMCR",
-      "status": "pending"
+      "status": "completed",
+      "local_file": "documentation/confluence_pages/production-implementation/deployment-verification-steps.md",
+      "timestamp": "2026-05-08T21:24:00Z"
     },
     {
       "title": "Jira reports",
       "url": "https://moti-imb.atlassian.net/wiki/spaces/CRPDB/pages/102302832/Jira+reports",
-      "status": "pending"
+      "status": "skipped",
+      "reason": "empty",
+      "timestamp": "2026-05-08T21:24:00Z"
     }
   ]
 }
