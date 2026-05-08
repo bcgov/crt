@@ -7,4 +7,11 @@ keycloak.json
 .DS_Store
 client/package-lock.json
 api/Crt.Api/C:/Work/Crt/git/api/Crt.Api/Crt.Api.xml
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
 /.playwright-mcp
