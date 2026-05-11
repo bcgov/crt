@@ -22,23 +22,23 @@ This directory contains documentation extracted from the [CRPDB Confluence Space
 | 14 | Spatial Integration | [technical-documentation/spatial-integration/spatial-integration.md](technical-documentation/spatial-integration/spatial-integration.md) | completed |
 | 15 | 00 - Ratio Calculation Algorithm | [technical-documentation/spatial-integration/ratio-calculation-algorithm.md](technical-documentation/spatial-integration/ratio-calculation-algorithm.md) | completed |
 | 16 | CRT End User's Guide | [user-support/end-user-guide/end-user-guide.md](user-support/end-user-guide/end-user-guide.md) | completed |
-| 17 | 1 Using this guide | [user-support/end-user-guide/using-this-guide.md](user-support/end-user-guide/using-this-guide.md) | completed |
-| 18 | 2 Application components | [user-support/end-user-guide/application-components.md](user-support/end-user-guide/application-components.md) | completed |
-| 19 | 3 Project data entry | [user-support/end-user-guide/project-data-entry.md](user-support/end-user-guide/project-data-entry.md) | completed |
-| 20 | 3.1 Project Details | [user-support/end-user-guide/project-details.md](user-support/end-user-guide/project-details.md) | completed |
-| 21 | 3.2 Status and EMR Comments | [user-support/end-user-guide/status-and-emr-comments.md](user-support/end-user-guide/status-and-emr-comments.md) | completed |
-| 22 | 3.3 Financial Planning Targets | [user-support/end-user-guide/financial-planning-targets.md](user-support/end-user-guide/financial-planning-targets.md) | completed |
-| 23 | 3.4 Public Project Information | [user-support/end-user-guide/public-project-information.md](user-support/end-user-guide/public-project-information.md) | completed |
-| 24 | 3.5 Quantities/Accomplishments | [user-support/end-user-guide/quantities-accomplishments.md](user-support/end-user-guide/quantities-accomplishments.md) | completed |
-| 25 | 3.6 Project Tender Details | [user-support/end-user-guide/project-tender-details.md](user-support/end-user-guide/project-tender-details.md) | completed |
-| 26 | 3.7 Project Segments | [user-support/end-user-guide/project-segments.md](user-support/end-user-guide/project-segments.md) | completed |
-| 27 | 3.8 Project Ratios | [user-support/end-user-guide/project-ratios.md](user-support/end-user-guide/project-ratios.md) | completed |
-| 28 | 4 Administration (Admin) | [user-support/end-user-guide/administration.md](user-support/end-user-guide/administration.md) | completed |
-| 29 | 4.1 Managing Application Users | [user-support/end-user-guide/managing-application-users.md](user-support/end-user-guide/managing-application-users.md) | completed |
-| 30 | 4.2 Managing Code Table values | [user-support/end-user-guide/managing-code-tables.md](user-support/end-user-guide/managing-code-tables.md) | completed |
-| 31 | 4.3 Manage Elements | [user-support/end-user-guide/manage-elements.md](user-support/end-user-guide/manage-elements.md) | completed |
-| 32 | 4.4 Managing user roles | [user-support/end-user-guide/managing-user-roles.md](user-support/end-user-guide/managing-user-roles.md) | completed |
-| 33 | 5 Reports and Dashboards | [user-support/end-user-guide/reports-and-dashboards.md](user-support/end-user-guide/reports-and-dashboards.md) | completed |
+| 17 | 1 Using this guide | [user-support/end-user-guide/01-using-this-guide.md](user-support/end-user-guide/01-using-this-guide.md) | completed |
+| 18 | 2 Application components | [user-support/end-user-guide/02-application-components.md](user-support/end-user-guide/02-application-components.md) | completed |
+| 19 | 3 Project data entry | [user-support/end-user-guide/03.0-project-data-entry.md](user-support/end-user-guide/03.0-project-data-entry.md) | completed |
+| 20 | 3.1 Project Details | [user-support/end-user-guide/03.1-project-details.md](user-support/end-user-guide/03.1-project-details.md) | completed |
+| 21 | 3.2 Status and EMR Comments | [user-support/end-user-guide/03.2-status-and-emr-comments.md](user-support/end-user-guide/03.2-status-and-emr-comments.md) | completed |
+| 22 | 3.3 Financial Planning Targets | [user-support/end-user-guide/03.3-financial-planning-targets.md](user-support/end-user-guide/03.3-financial-planning-targets.md) | completed |
+| 23 | 3.4 Public Project Information | [user-support/end-user-guide/03.4-public-project-information.md](user-support/end-user-guide/03.4-public-project-information.md) | completed |
+| 24 | 3.5 Quantities/Accomplishments | [user-support/end-user-guide/03.5-quantities-accomplishments.md](user-support/end-user-guide/03.5-quantities-accomplishments.md) | completed |
+| 25 | 3.6 Project Tender Details | [user-support/end-user-guide/03.6-project-tender-details.md](user-support/end-user-guide/03.6-project-tender-details.md) | completed |
+| 26 | 3.7 Project Segments | [user-support/end-user-guide/03.7-project-segments.md](user-support/end-user-guide/03.7-project-segments.md) | completed |
+| 27 | 3.8 Project Ratios | [user-support/end-user-guide/03.8-project-ratios.md](user-support/end-user-guide/03.8-project-ratios.md) | completed |
+| 28 | 4 Administration (Admin) | [user-support/end-user-guide/04.0-administration.md](user-support/end-user-guide/04.0-administration.md) | completed |
+| 29 | 4.1 Managing Application Users | [user-support/end-user-guide/04.1-managing-application-users.md](user-support/end-user-guide/04.1-managing-application-users.md) | completed |
+| 30 | 4.2 Managing Code Table values | [user-support/end-user-guide/04.2-managing-code-tables.md](user-support/end-user-guide/04.2-managing-code-tables.md) | completed |
+| 31 | 4.3 Manage Elements | [user-support/end-user-guide/04.3-manage-elements.md](user-support/end-user-guide/04.3-manage-elements.md) | completed |
+| 32 | 4.4 Managing user roles | [user-support/end-user-guide/04.4-managing-user-roles.md](user-support/end-user-guide/04.4-managing-user-roles.md) | completed |
+| 33 | 5 Reports and Dashboards | [user-support/end-user-guide/05-reports-and-dashboards.md](user-support/end-user-guide/05-reports-and-dashboards.md) | completed |
 | 34 | Frequently Asked Questions (FAQ) | [user-support/faq.md](user-support/faq.md) | completed |
 | 35 | Log Monitoring | [user-support/tech-ops/log-monitoring.md](user-support/tech-ops/log-monitoring.md) | completed |
 | 36 | Service Account - Password change procedure | [user-support/tech-ops/service-account-password-change.md](user-support/tech-ops/service-account-password-change.md) | completed |
