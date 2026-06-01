@@ -12,35 +12,9 @@ updates:
     labels:
       - "dependencies"
 
-  # .NET / NuGet Dependencies
-  - package-ecosystem: "nuget"
-    directory: "/api"
-    schedule:
-      interval: "weekly"
-    groups:
-      nuget-packages:
-        patterns:
-          - "*"
-    labels:
-      - "dependencies"
-      - "dotnet"
-
-  # npm Dependencies
-  - package-ecosystem: "npm"
-    directory: "/client"
-    schedule:
-      interval: "weekly"
-    groups:
-      npm-packages:
-        patterns:
-          - "*"
-    labels:
-      - "dependencies"
-      - "npm"
-
-  # Dockerfiles
+  # Maintain dependencies for PHP Dockerfile
   - package-ecosystem: "docker"
-    directory: "/api"
+    directory: "/php"
     schedule:
       interval: "weekly"
     groups:
@@ -49,10 +23,10 @@ updates:
           - "*"
     labels:
       - "dependencies"
-      - "docker"
 
+  # Maintain dependencies for Nginx Dockerfile
   - package-ecosystem: "docker"
-    directory: "/client"
+    directory: "/nginx"
     schedule:
       interval: "weekly"
     groups:
@@ -61,16 +35,3 @@ updates:
           - "*"
     labels:
       - "dependencies"
-      - "docker"
-      
-  - package-ecosystem: "docker"
-    directory: "/twm"
-    schedule:
-      interval: "weekly"
-    groups:
-      docker-images:
-        patterns:
-          - "*"
-    labels:
-      - "dependencies"
-      - "docker"

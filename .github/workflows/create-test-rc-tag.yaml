@@ -1,9 +1,161 @@
+name: Create Test rc Tag
+
+# Manually create an rc_* tag on a specified commit SHA (full, short, sha-xxxxxxx, or latest).
+# ie, Find the commint you want from the code commit history, copy the SHA, and use it as input to this workflow.
+# It will not accept image SHAs, only git SHAs or refs. The workflow will create the rc tag on the commit, retag images, and trigger a TST deployment.
+
 on:
   workflow_dispatch:
+    inputs:
+      build_sha:
+        description: 'Git Commit (not image) SHA/ref to tag (full, short, sha-xxxxxxx, or latest)'
+        required: true
+        type: string
+        default: 'latest'
+      rc_tag:
+        description: 'RC tag name (e.g. rc_0.1.0.5)'
+        required: true
+        type: string
+      deploy_to_tst:
+        description: 'Trigger CD deployment to TST after tagging'
+        required: false
+        type: boolean
+        default: true
+      dry_run:
+        description: 'Validate inputs and resolve SHA only — skip tag creation, image retag, release, and deployment'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  packages: write
+  actions: write
 
 jobs:
-  test:
-    runs-on: ubuntu-slim
+  create-rc-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      target_sha: ${{ steps.resolve_sha.outputs.target_sha }}
+      sha_short: ${{ steps.resolve_sha.outputs.sha_short }}
     steps:
-      - name: Show ref
-        run: echo "===============> Version from $GITHUB_REF"
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Validate inputs
+        id: resolve_sha
+        run: |
+          set -euo pipefail
+
+          # Fetch all branches and tags so any commit reachable from any ref can be resolved.
+          # actions/checkout with ref: main sets a narrow refspec, so we override it explicitly.
+          git fetch --force --prune origin \
+            '+refs/heads/*:refs/remotes/origin/*' \
+            '+refs/tags/*:refs/tags/*' \
+            --quiet
+
+          # Validate RC tag format
+          RC_TAG="${{ inputs.rc_tag }}"
+          if [[ ! $RC_TAG =~ ^rc_[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: RC tag '$RC_TAG' must match format rc_x.x.x.x (e.g. rc_0.1.0.5)"
+            exit 1
+          fi
+
+          # Resolve supported SHA/ref input formats.
+          BUILD_SHA="${{ inputs.build_sha }}"
+          if [[ "$BUILD_SHA" == "latest" ]]; then
+            BUILD_SHA="origin/main"
+          elif [[ "$BUILD_SHA" =~ ^sha-([0-9a-fA-F]{7,40})$ ]]; then
+            BUILD_SHA="${BASH_REMATCH[1]}"
+          elif [[ "$BUILD_SHA" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
+            # plain short or full SHA — accepted as-is
+            :
+          fi
+
+          # If the input is a bare SHA, attempt a direct object fetch as a fallback.
+          # This covers commits not reachable from any branch or tag (e.g. PR heads, force-pushed commits).
+          if [[ "$BUILD_SHA" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
+            echo "Fetching commit $BUILD_SHA directly..."
+            git fetch origin "$BUILD_SHA" --quiet || true
+          fi
+
+          # Resolve and validate: git rev-parse --verify handles short SHAs, full SHAs, and ref names
+          if ! TARGET_SHA="$(git rev-parse --verify "${BUILD_SHA}^{commit}" 2>/dev/null)"; then
+            echo "Error: build_sha '$BUILD_SHA' was not found or is not a commit reachable from fetched refs."
+            echo "Tip: use a full 40-character SHA, a branch name, sha-xxxxxxx format, or 'latest'."
+            exit 1
+          fi
+          SHA_SHORT="sha-${TARGET_SHA:0:7}"
+
+          echo "target_sha=$TARGET_SHA" >> "$GITHUB_OUTPUT"
+          echo "sha_short=$SHA_SHORT" >> "$GITHUB_OUTPUT"
+          echo "Resolved SHA: $TARGET_SHA"
+
+          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+            echo "Dry run: would create tag $RC_TAG -> $TARGET_SHA"
+          fi
+
+      - name: Create and push RC tag
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          RC_TAG="${{ inputs.rc_tag }}"
+          TARGET_SHA="${{ steps.resolve_sha.outputs.target_sha }}"
+
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag "$RC_TAG" "$TARGET_SHA"
+          git push origin "$RC_TAG"
+
+          echo "Created and pushed tag $RC_TAG -> $TARGET_SHA"
+
+  retag-images:
+    name: Retag Images
+    needs: [create-rc-tag]
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.dry_run }}
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        package: [api, twm, client]
+    steps:
+      - uses: shrink/actions-docker-registry-tag@v4
+        with:
+          registry: ghcr.io
+          repository: ${{ github.repository }}/${{ matrix.package }}
+          target: ${{ needs.create-rc-tag.outputs.sha_short }}
+          tags: ${{ inputs.rc_tag }}
+
+  create-release:
+    name: Release
+    needs: [create-rc-tag, retag-images]
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.dry_run }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Create GitHub Pre-release with Release Notes
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.rc_tag }}
+          prerelease: true
+          generate_release_notes: true
+          target_commitish: ${{ needs.create-rc-tag.outputs.target_sha }}
+
+  deploy-test:
+    name: Deploy to Test
+    needs: [create-release]
+    uses: ./.github/workflows/helm-cd.yml
+    if: ${{ !inputs.dry_run && inputs.deploy_to_tst }}
+    with:
+      environment: test
+      tag: ${{ inputs.rc_tag }}
+    secrets: inherit

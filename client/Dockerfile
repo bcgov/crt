@@ -1,16 +1,32 @@
-FROM image-registry.openshift-image-registry.svc:5000/2d982c-tools/node-python:1 AS builder
-LABEL maintainer="young-jin.chung@gov.bc.ca"
+FROM node:18-alpine AS builder
+WORKDIR /app
 
-COPY . ./src
+# Add building tools to mimic the legacy node-python builder
+RUN apk add --no-cache python3 make g++
 
-RUN cd ./src && npm ci && npm run build
+COPY package*.json ./
+RUN npm ci
 
-FROM image-registry.openshift-image-registry.svc:5000/2d982c-tools/nginx-116-rhel8:1
+COPY . .
+RUN npm run build
 
-COPY --from=builder /src/build/. /tmp/src
-COPY --from=builder /src/nginx-start/. /tmp/src/nginx-start
-COPY --from=builder /src/nginx.conf.tmpl /tmp/src/nginx.conf.tmpl
+FROM nginx:1.25-alpine
 
-RUN $STI_SCRIPTS_PATH/assemble
+# Set HOME so ~/js/env.config.js resolves inside the nginx serve root
+ENV HOME=/opt/app-root/src
 
-CMD $STI_SCRIPTS_PATH/run
+RUN apk add --no-cache gettext \
+    && mkdir -p /opt/app-root/src/js \
+    /opt/app-root/etc/nginx.d \
+    /opt/app-root/etc/nginx.default.d
+
+# Copy built React app to the serve root
+COPY --from=builder /app/build /opt/app-root/src
+
+# Copy nginx config template and start script
+COPY nginx.conf.tmpl /tmp/src/nginx.conf.tmpl
+COPY nginx-start/start.sh /docker-entrypoint.d/10-start.sh
+RUN chmod +x /docker-entrypoint.d/10-start.sh
+
+EXPOSE 8080
+CMD ["nginx", "-g", "daemon off;"]

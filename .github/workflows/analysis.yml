@@ -1,9 +1,91 @@
+name: Scan & Validate
+run-name: "Analysis (PR #${{ github.event.pull_request.number || github.run_number }})"
+
 on:
+  merge_group:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review, converted_to_draft]
+#  schedule:
+#    - cron: "0 11 * * 0" # 3 AM PST = 12 PM UDT, runs sundays
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
-    runs-on: ubuntu-slim
+  helm-validate:
+    runs-on: ubuntu-latest
+    name: Validate Helm Templates
     steps:
-      - name: Show ref
-        run: echo "===============> Version from $GITHUB_REF"
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6
+      - name: Update & Build Helm dependencies
+        run: |
+          helm dependency build helm
+          helm dependency update helm
+      - name: Validate Helm Chart
+        run: |
+          helm lint ./helm --values helm/values.yaml --values helm/values-dev.yaml
+          helm lint ./helm --values helm/values.yaml --values helm/values-test.yaml
+          helm lint ./helm --values helm/values.yaml --values helm/values-prod.yaml
+          mkdir ~/rendered-templates
+          helm template --debug ./helm --values helm/values.yaml --values helm/values-dev.yaml --output-dir ~/rendered-templates/dev
+          helm template --debug ./helm --values helm/values.yaml --values helm/values-test.yaml --output-dir ~/rendered-templates/test
+          helm template --debug ./helm --values helm/values.yaml --values helm/values-prod.yaml --output-dir ~/rendered-templates/prod
+
+  codeql:
+    name: CodeQL
+    if: (! github.event.pull_request.draft)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: actions
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:actions"
+
+  # https://github.com/marketplace/actions/aqua-security-trivy
+  trivy:
+    name: Trivy Security Scan
+    if: (! github.event.pull_request.draft)
+    permissions:
+      security-events: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6
+      - name: Update & Build Helm dependencies
+        run: |
+          helm dependency build helm
+          helm dependency update helm
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
+        with:
+          format: "sarif"
+          output: "trivy-results.sarif"
+          ignore-unfixed: true
+          scan-type: "fs"
+          scanners: "vuln,secret,misconfig"
+          severity: "CRITICAL,HIGH"
+#          skip-dirs: '**/charts' # Skips all subchart directories
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: "trivy-results.sarif"
+
+  results:
+    name: Results
+    needs: [codeql, trivy]
+    if: always() && (! failure())
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - run: echo "Success!"

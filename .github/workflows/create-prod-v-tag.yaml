@@ -1,9 +1,104 @@
+name: Create Production v Tag
+# Promote an existing rc_* tag to a v* production tag.
+
 on:
   workflow_dispatch:
+    inputs:
+      rc_tag:
+        description: 'Source RC tag to promote (e.g. rc_0.1.0.5)'
+        required: true
+        type: string
+      deploy_to_prd:
+        description: 'Trigger CD deployment to PRD after tagging'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  packages: write
+  actions: write
 
 jobs:
-  test:
-    runs-on: ubuntu-slim
+  create-prod-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      target_sha: ${{ steps.resolve.outputs.target_sha }}
+      prod_tag: ${{ steps.resolve.outputs.prod_tag }}
     steps:
-      - name: Show ref
-        run: echo "===============> Version from $GITHUB_REF"
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Validate inputs and resolve SHA
+        id: resolve
+        run: |
+          set -euo pipefail
+
+          RC_TAG="${{ inputs.rc_tag }}"
+
+          # Validate RC tag format
+          if [[ ! $RC_TAG =~ ^rc_[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: RC tag '$RC_TAG' must match format rc_x.x.x.x (e.g. rc_0.1.0.5)"
+            exit 1
+          fi
+
+          # Derive production tag by replacing rc_ prefix with v
+          PROD_TAG="v${RC_TAG#rc_}"
+
+          # Verify the RC tag exists
+          if ! git rev-parse "$RC_TAG" >/dev/null 2>&1; then
+            echo "Error: RC tag '$RC_TAG' does not exist in the repository."
+            exit 1
+          fi
+
+          TARGET_SHA=$(git rev-parse "$RC_TAG^{commit}")
+          SHA_SHORT="${TARGET_SHA:0:7}"
+
+          echo "target_sha=$TARGET_SHA" >> $GITHUB_OUTPUT
+          echo "sha_short=$SHA_SHORT" >> $GITHUB_OUTPUT
+          echo "prod_tag=$PROD_TAG" >> $GITHUB_OUTPUT
+          echo "Resolved $RC_TAG -> $TARGET_SHA (prod tag: $PROD_TAG)"
+
+      - name: Create and push production tag
+        run: |
+          set -euo pipefail
+          PROD_TAG="${{ steps.resolve.outputs.prod_tag }}"
+          TARGET_SHA="${{ steps.resolve.outputs.target_sha }}"
+
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag "$PROD_TAG" "$TARGET_SHA"
+          git push origin "$PROD_TAG"
+
+          echo "Created and pushed tag $PROD_TAG -> $TARGET_SHA"
+
+  retag-images:
+    name: Retag Images
+    needs: [create-prod-tag]
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        package: [php, nginx]
+    steps:
+      - uses: shrink/actions-docker-registry-tag@v4
+        with:
+          registry: ghcr.io
+          repository: ${{ github.repository }}/limesurvey-${{ matrix.package }}
+          target: ${{ inputs.rc_tag }}
+          tags: ${{ needs.create-prod-tag.outputs.prod_tag }}
+
+  deploy-prod:
+    name: Deploy to Prod
+    needs: [create-prod-tag, retag-images]
+    if: ${{ inputs.deploy_to_prd }}
+    uses: ./.github/workflows/helm-cd.yml
+    with:
+      environment: prod
+      tag: ${{ needs.create-prod-tag.outputs.prod_tag }}
+    secrets: inherit
