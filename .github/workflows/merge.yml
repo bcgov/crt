@@ -1,0 +1,9 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-slim
+    steps:
+      - name: Show ref
+        run: echo "===============> Version from $GITHUB_REF"
