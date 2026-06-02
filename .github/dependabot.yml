@@ -1,0 +1,76 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+
+  # .NET / NuGet Dependencies
+  - package-ecosystem: "nuget"
+    directory: "/api"
+    schedule:
+      interval: "weekly"
+    groups:
+      nuget-packages:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "dotnet"
+
+  # npm Dependencies
+  - package-ecosystem: "npm"
+    directory: "/client"
+    schedule:
+      interval: "weekly"
+    groups:
+      npm-packages:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "npm"
+
+  # Dockerfiles
+  - package-ecosystem: "docker"
+    directory: "/api"
+    schedule:
+      interval: "weekly"
+    groups:
+      docker-images:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "docker"
+
+  - package-ecosystem: "docker"
+    directory: "/client"
+    schedule:
+      interval: "weekly"
+    groups:
+      docker-images:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "docker"
+      
+  - package-ecosystem: "docker"
+    directory: "/twm"
+    schedule:
+      interval: "weekly"
+    groups:
+      docker-images:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "docker"
