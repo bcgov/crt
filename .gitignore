@@ -16,3 +16,4 @@ api/Crt.Api/C:/Work/Crt/git/api/Crt.Api/Crt.Api.xml
 /playwright/.cache/
 /playwright/.auth/
 /.playwright-mcp
+.env
