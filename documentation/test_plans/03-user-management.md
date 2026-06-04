@@ -35,14 +35,13 @@
 | TS-USER-05 | Add user with invalid IDIR | 1. Click Add User<br>2. Enter `{{IDIR_INVALID}}` | Error displayed: `"Invalid User ID"`; user is not created | High | Negative |
 | TS-USER-06 | Add user with valid IDIR | 1. Click Add User<br>2. Enter `{{IDIR_VALID_USER}}` | Form auto-populates IDIR, First Name, Last Name, Email from the directory lookup | High | Functional |
 | TS-USER-07 | Prevent duplicate IDIR | 1. Add user `{{IDIR_VALID_USER}}`<br>2. Add same IDIR again<br>3. Make the user inactive (set past End Date)<br>4. Add same IDIR again | Steps 2 & 4 both display: `"Username [IDIR] already exists"` and the duplicate is not created | High | Negative |
-| TS-USER-08 | Project Manager checkbox | 1. Check PM checkbox for user<br>2. Verify user appears in PM list | PM checkbox works; user included in PM list | Medium | Functional |
-| TS-USER-09 | Only System Admin can assign System Admin role | 1. Log in as non-system admin<br>2. Attempt to assign System Admin role | Non-system admin cannot assign System Admin role | High | Security |
-| TS-USER-10 | Edit user details popup | 1. Click Edit on existing user | Popup shows User ID, Role, MoTI Region, End Date | Medium | Functional |
-| TS-USER-11 | Multiple region assignment | 1. Edit user<br>2. Select multiple MoTI regions | Multiple regions allowed; format: `<Code>-<Description>`, sorted by code | Medium | Functional |
-| TS-USER-12 | Verify search results columns | 1. Perform user search | Results show: First Name, Last Name, User ID, Email, Region, Status, Edit icon, Disable icon | Low | Functional |
-| TS-USER-13 | Non-admin cannot see admin tabs | 1. Log in as non-administrator | Users and Roles & Permissions tabs not visible | High | Security |
-| TS-USER-14 | Re-enable inactive user via Disable icon | 1. Search for inactive user<br>2. Click greyed-out Disable icon<br>3. Remove End Date or set future End Date<br>4. Click Update | User access restored immediately; user appears as Active in search | Medium | Functional |
-| TS-USER-15 | Re-enable inactive user via Edit | 1. Search for inactive user<br>2. Click Edit icon<br>3. Remove End Date or provide future End Date<br>4. Submit | User access restored; user can log in again | Medium | Functional |
+| TS-USER-08 | Only System Admin can assign System Admin role | 1. Log in as non-system admin<br>2. Attempt to assign System Admin role | Non-system admin cannot assign System Admin role | High | Security |
+| TS-USER-09 | Edit user details popup | 1. Click Edit on existing user | Popup shows User ID, Role, MoTI Region, End Date | Medium | Functional |
+| TS-USER-10 | Multiple region assignment | 1. Edit user<br>2. Select multiple MoTI regions | Multiple regions allowed; format: `<Code>-<Description>`, sorted by code | Medium | Functional |
+| TS-USER-11 | Verify search results columns | 1. Perform user search | Results show: First Name, Last Name, User ID, Email, Region, Status, Edit icon, Disable icon | Low | Functional |
+| TS-USER-12 | Non-admin cannot see admin tabs | 1. Log in as non-administrator | Users and Roles & Permissions tabs not visible | High | Security |
+| TS-USER-13 | Re-enable inactive user via Disable icon | 1. Search for inactive user<br>2. Click greyed-out Disable icon<br>3. Remove End Date or set future End Date<br>4. Click Update | User access restored immediately; user appears as Active in search | Medium | Functional |
+| TS-USER-14 | Re-enable inactive user via Edit | 1. Search for inactive user<br>2. Click Edit icon<br>3. Remove End Date or provide future End Date<br>4. Submit | User access restored; user can log in again | Medium | Functional |
 
 ---
 

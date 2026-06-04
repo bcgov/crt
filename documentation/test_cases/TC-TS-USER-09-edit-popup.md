@@ -1,34 +1,35 @@
 ---
-id: TC-TS-USER-12
-title: Verify search results columns
+id: TC-TS-USER-09
+title: Edit user details popup
 source_plan: 03-user-management
-source_scenario: TS-USER-12
-covers_ac: [AC-user-columns]
+source_scenario: TS-USER-09
+covers_ac: [AC-user-edit-popup]
 persona: Administrator (SYSTEM_ADMIN)
-priority: Low
+priority: Medium
 type: Functional
 level: E2E
 automation_candidate: Yes
 status: SKIPPED — deferred to future sprint
 tags: ["@regression", "@users", "@admin", "@persona-admin", "@deferred"]
-last_updated: 2026-06-03
+last_updated: 2026-06-04
 ---
 
-# TC-TS-USER-12 — Verify search results columns
+# TC-TS-USER-09 — Edit user details popup
 
 > **STATUS: SKIPPED** — This test case is documented for traceability but implementation is deferred to a future date.
 
 ## 1. Context
-Verifies that user search results display all required columns.
+Verifies that clicking Edit on a user opens a popup with User ID, Role, MoTI Region, and End Date.
 
-**Source**: Test Plan 03, scenario TS-USER-12.
+**Source**: Test Plan 03, scenario TS-USER-09.
 
 ## 2. Preconditions
 - **User**: Authenticated as `{{IDIR_VALID_ADMIN}}` (SYSTEM_ADMIN).
+- **Data**: At least one user exists.
 - **Starting URL**: `${BASE_URL}/admin/users`
 
 ## 3. Test Data
-None required.
+Any existing user.
 
 ## 4. Steps (Gherkin)
 
@@ -36,25 +37,22 @@ None required.
 Given I am logged in as "{{IDIR_VALID_ADMIN}}" with SYSTEM_ADMIN role
 And   I am on the "Users" management page
 
-When  I perform a user search
-Then  the results table displays the following columns:
-      | Column      |
-      | First Name  |
-      | Last Name   |
+When  I click the "Edit" icon on an existing user row
+Then  a popup/dialog opens showing:
+      | Field       |
       | User ID     |
-      | Email       |
-      | Region      |
-      | Status      |
-      | Edit icon   |
-      | Disable icon|
+      | Role        |
+      | MoTI Region |
+      | End Date    |
 ```
 
 ## 5. Expected Results
-- All specified columns are visible in search results.
-- Edit and Disable icons appear as action columns.
+- Edit popup shows all expected fields.
+- Fields are editable (Role, Region, End Date).
+- User ID is read-only.
 
 ## 6. Postconditions / Cleanup
-- None.
+- Cancel the dialog without changes.
 
 ## 7. Notes for the Playwright Agent
-- Verify table header text/structure.
+- Edit popup is a modal dialog.

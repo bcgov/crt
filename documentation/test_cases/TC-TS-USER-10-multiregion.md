@@ -1,8 +1,8 @@
 ---
-id: TC-TS-USER-11
+id: TC-TS-USER-10
 title: Multiple region assignment
 source_plan: 03-user-management
-source_scenario: TS-USER-11
+source_scenario: TS-USER-10
 covers_ac: [AC-user-multiregion]
 persona: Administrator (SYSTEM_ADMIN)
 priority: Medium
@@ -11,17 +11,17 @@ level: E2E
 automation_candidate: Yes
 status: SKIPPED — deferred to future sprint
 tags: ["@regression", "@users", "@admin", "@persona-admin", "@deferred"]
-last_updated: 2026-06-03
+last_updated: 2026-06-04
 ---
 
-# TC-TS-USER-11 — Multiple region assignment
+# TC-TS-USER-10 — Multiple region assignment
 
 > **STATUS: SKIPPED** — This test case is documented for traceability but implementation is deferred to a future date.
 
 ## 1. Context
 Verifies that a user can be assigned to multiple MoTI regions, with format `<Code>-<Description>` sorted by code.
 
-**Source**: Test Plan 03, scenario TS-USER-11.
+**Source**: Test Plan 03, scenario TS-USER-10.
 
 ## 2. Preconditions
 - **User**: Authenticated as `{{IDIR_VALID_ADMIN}}` (SYSTEM_ADMIN).

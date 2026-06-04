@@ -1,8 +1,8 @@
 ---
-id: TC-TS-USER-09
+id: TC-TS-USER-08
 title: Only System Admin can assign System Admin role
 source_plan: 03-user-management
-source_scenario: TS-USER-09
+source_scenario: TS-USER-08
 covers_ac: [AC-user-sysadmin-assign]
 persona: Non-admin user
 priority: High
@@ -11,17 +11,17 @@ level: E2E
 automation_candidate: Yes
 status: SKIPPED — deferred to future sprint
 tags: ["@regression", "@users", "@security", "@persona-admin", "@deferred"]
-last_updated: 2026-06-03
+last_updated: 2026-06-04
 ---
 
-# TC-TS-USER-09 — Only System Admin can assign System Admin role
+# TC-TS-USER-08 — Only System Admin can assign System Admin role
 
 > **STATUS: SKIPPED** — This test case is documented for traceability but implementation is deferred to a future date.
 
 ## 1. Context
 Verifies that a non-system admin user cannot assign the System Admin role to any user.
 
-**Source**: Test Plan 03, scenario TS-USER-09.
+**Source**: Test Plan 03, scenario TS-USER-08.
 
 ## 2. Preconditions
 - **User**: Authenticated as a non-system-admin (e.g., DISTRICT_ADMIN).

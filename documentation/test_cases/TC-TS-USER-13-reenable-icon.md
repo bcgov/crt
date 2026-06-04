@@ -1,9 +1,9 @@
 ---
-id: TC-TS-USER-15
-title: Re-enable inactive user via Edit
+id: TC-TS-USER-13
+title: Re-enable inactive user via Disable icon
 source_plan: 03-user-management
-source_scenario: TS-USER-15
-covers_ac: [AC-user-reenable-edit]
+source_scenario: TS-USER-13
+covers_ac: [AC-user-reenable-icon]
 persona: Administrator (SYSTEM_ADMIN)
 priority: Medium
 type: Functional
@@ -11,21 +11,21 @@ level: E2E
 automation_candidate: Yes
 status: SKIPPED — deferred to future sprint
 tags: ["@regression", "@users", "@admin", "@persona-admin", "@deferred"]
-last_updated: 2026-06-03
+last_updated: 2026-06-04
 ---
 
-# TC-TS-USER-15 — Re-enable inactive user via Edit
+# TC-TS-USER-13 — Re-enable inactive user via Disable icon
 
 > **STATUS: SKIPPED** — This test case is documented for traceability but implementation is deferred to a future date.
 
 ## 1. Context
-Verifies that an inactive user can be re-enabled via the Edit icon by removing or extending the End Date.
+Verifies that an inactive user can be re-enabled by clicking the greyed-out Disable icon and removing/extending the End Date.
 
-**Source**: Test Plan 03, scenario TS-USER-15.
+**Source**: Test Plan 03, scenario TS-USER-13.
 
 ## 2. Preconditions
 - **User**: Authenticated as `{{IDIR_VALID_ADMIN}}` (SYSTEM_ADMIN).
-- **Data**: An inactive user exists.
+- **Data**: An inactive user exists (past End Date).
 - **Starting URL**: `${BASE_URL}/admin/users`
 
 ## 3. Test Data
@@ -38,20 +38,21 @@ Given I am logged in as "{{IDIR_VALID_ADMIN}}" with SYSTEM_ADMIN role
 And   I am on the "Users" management page
 
 When  I search for inactive users
-And   I click the "Edit" icon on an inactive user
-And   I remove the End Date or provide a future End Date
-And   I click "Submit"
+And   I click the greyed-out Disable icon on an inactive user
+And   I remove the End Date or set a future End Date
+And   I click "Update"
 
-Then  the user access is restored
-And   the user can log in again
+Then  the user access is restored immediately
+And   the user appears as Active in search results
 ```
 
 ## 5. Expected Results
-- Edit allows modifying End Date to reactivate.
-- User is immediately restored to Active status.
+- Clicking the greyed icon on inactive user opens re-enable dialog.
+- Removing/extending End Date reactivates the user.
+- User can log in again after reactivation.
 
 ## 6. Postconditions / Cleanup
 - Deactivate the user again if it was not a test user.
 
 ## 7. Notes for the Playwright Agent
-- Same outcome as TS-USER-14 but via the Edit icon instead.
+- The Disable icon is greyed-out for inactive users (acts as Enable).

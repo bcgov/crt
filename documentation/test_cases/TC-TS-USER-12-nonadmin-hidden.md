@@ -1,8 +1,8 @@
 ---
-id: TC-TS-USER-13
+id: TC-TS-USER-12
 title: Non-admin cannot see admin tabs
 source_plan: 03-user-management
-source_scenario: TS-USER-13
+source_scenario: TS-USER-12
 covers_ac: [AC-user-nonadmin-hidden]
 persona: Non-admin user
 priority: High
@@ -11,17 +11,17 @@ level: E2E
 automation_candidate: Yes
 status: SKIPPED — deferred to future sprint
 tags: ["@regression", "@users", "@security", "@persona-user", "@deferred"]
-last_updated: 2026-06-03
+last_updated: 2026-06-04
 ---
 
-# TC-TS-USER-13 — Non-admin cannot see admin tabs
+# TC-TS-USER-12 — Non-admin cannot see admin tabs
 
 > **STATUS: SKIPPED** — This test case is documented for traceability but implementation is deferred to a future date.
 
 ## 1. Context
 Verifies that non-administrator users cannot see Users and Roles & Permissions tabs.
 
-**Source**: Test Plan 03, scenario TS-USER-13.
+**Source**: Test Plan 03, scenario TS-USER-12.
 
 ## 2. Preconditions
 - **User**: Authenticated as a non-administrator (e.g., `{{IDIR_VALID_USER}}` with MANAGER or READ_ONLY role).

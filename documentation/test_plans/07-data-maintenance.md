@@ -47,9 +47,20 @@
 
 | ID | Test Scenario | Steps | Expected Result | Priority | Type |
 |----|---------------|-------|-----------------|----------|------|
-| TS-PM-01 | Add PM via Code Tables | 1. Navigate to Admin → Code Tables<br>2. Select "Project Manager"<br>3. Click Add New<br>4. Enter Code Name (PM name)<br>5. Submit<br>6. Refresh and verify | New PM appears in code table search and Project Details PM dropdown | High | Functional |
-| TS-PM-02 | Disable PM | 1. Disable a PM in Code Tables | Disabled PM: not available in Project Details Add/Edit PM dropdown; still searchable on Project Search screen | Medium | Functional |
-| TS-PM-03 | Delete PM (unassigned) | 1. Delete PM not assigned to any project<br>2. Confirm "Are you sure?" | PM removed from all dropdown lists | Medium | Functional |
+| TS-PM-01 | Navigate to Project Manager code table | 1. Navigate to Admin → Code Tables<br>2. Select "Project Manager" from Code Value Set dropdown | Project Manager list displayed with columns: Code Value, Code Name, Order, Status; Active filter default | High | Functional |
+| TS-PM-02 | Search PM by name | 1. Select "Project Manager" code set<br>2. Enter partial PM name in search field | Matching PMs displayed; search covers both Code Value and Code Name fields | Medium | Functional |
+| TS-PM-03 | Add new PM | 1. Select "Project Manager" code set<br>2. Click Add New<br>3. Enter Code Name (PM full name)<br>4. Optionally enter Code Value and Order<br>5. Submit | New PM appears in code table list and in Project Details PM dropdown | High | Functional |
+| TS-PM-04 | Add PM - Code Name required | 1. Select "Project Manager" code set<br>2. Click Add New<br>3. Leave Code Name blank<br>4. Submit | Validation error; at least Code Value or Code Name must be provided | High | Negative |
+| TS-PM-05 | Add PM - duplicate prevention | 1. Add PM with same Code Name as existing active PM | Error: uniqueness violation; duplicate PM not created | High | Negative |
+| TS-PM-06 | Edit existing PM | 1. Click Edit on existing PM<br>2. Modify Code Name or Order<br>3. Submit | PM updated; changes reflected in Project Details PM dropdown | Medium | Functional |
+| TS-PM-07 | Disable PM assigned to projects | 1. Click Disable icon on PM currently assigned to one or more projects<br>2. Confirm "This value will be disabled. Are you sure?" | PM disabled; not available in Project Details Add/Edit PM dropdown; existing project assignments unchanged; PM still searchable on Project Search screen | High | Functional |
+| TS-PM-08 | Delete PM (unassigned) | 1. Click Delete (trash) icon on PM not assigned to any project<br>2. Confirm "This value will be deleted. Are you sure?" | PM permanently removed from code table and all dropdown lists | Medium | Functional |
+| TS-PM-09 | Cannot delete PM assigned to project | 1. Attempt to delete PM currently assigned to a project | Delete icon not shown; only Disable icon available | High | Negative |
+| TS-PM-10 | Re-enable disabled PM | 1. Switch to Inactive filter<br>2. Click Enable icon on disabled PM<br>3. Confirm "This value will be enabled. Are you sure?" | PM re-activated; available again in Project Details PM dropdown | Medium | Functional |
+| TS-PM-11 | PM appears in Project Details dropdown | 1. Add or enable a PM in Code Tables<br>2. Navigate to Project Details → Edit<br>3. Open PM dropdown | Newly added/enabled PM appears in the PM selection list | High | Functional |
+| TS-PM-12 | Disabled PM not in Project Details dropdown | 1. Disable a PM in Code Tables<br>2. Navigate to Project Details → Edit<br>3. Open PM dropdown | Disabled PM does not appear in PM selection list for new assignments | High | Functional |
+| TS-PM-13 | PM still searchable on Project Search after disable | 1. Disable a PM assigned to existing projects<br>2. Navigate to Project Search<br>3. Search by the disabled PM name | Projects previously assigned to disabled PM still appear in search results | Medium | Functional |
+| TS-PM-14 | Permission boundary - Code Read only cannot modify PMs | 1. Log in with role having Code Read but NOT Code Write<br>2. Navigate to Code Tables → Project Manager | PM list visible but Add/Edit/Disable/Delete actions not available | High | Security |
 
 ---
 
