@@ -1,0 +1,65 @@
+name: Deploy to Dev - PR Merge
+run-name: "Deploy to DEV - PR Merge - ${{ github.event.head_commit.message }}"
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '*.md'
+      - '.github/**'
+      - '!.github/workflows/**'
+
+concurrency:
+  # Do not interrupt previous workflows
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  vars:
+    name: Set Variables
+    outputs:
+      pr: ${{ steps.pr.outputs.pr }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      # Get PR number for squash merges to main
+      - name: Get PR Number From Event
+        if: github.event_name == 'push'
+        id: pr_no
+        uses: bcgov/action-get-pr@bf6c85d0ed23a151f2829956c140fde87979bbf2 #v0.2.0
+      - name: PR Number
+        id: pr
+        run: echo pr=${{ steps.pr_no.outputs.pr || inputs.pr}} >> $GITHUB_OUTPUT
+
+  deploy-dev:
+    name: Deploy (DEV)
+    uses: ./.github/workflows/argo-cd.yml
+    secrets: inherit
+    needs: [vars]
+    permissions:
+      contents: read
+      packages: write
+    with:
+      environment: dev
+      tag: pr-${{ needs.vars.outputs.pr }}
+
+  tag-sha:
+    name: Tag Images with Commit SHA
+    needs: [vars]
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        package: [php, nginx]
+    steps:
+      - id: sha
+        run: echo "short=sha-${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
+      - uses: shrink/actions-docker-registry-tag@v4
+        with:
+          registry: ghcr.io
+          repository: ${{ github.repository }}/${{ matrix.package }}
+          target: pr-${{ needs.vars.outputs.pr }}
+          tags: ${{ steps.sha.outputs.short }}

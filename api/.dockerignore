@@ -1,0 +1,10 @@
+**/.DS_Store
+**/.git
+**/.gitignore
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/TestResults
+api/Dockerfile
+api/.s2i
