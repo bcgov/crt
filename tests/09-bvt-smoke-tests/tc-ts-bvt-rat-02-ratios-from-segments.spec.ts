@@ -1,0 +1,201 @@
+/**
+ * ============================================================================
+ * 09-BVT-Smoke-Tests - TC-TS-BVT-RAT-02: Determine ratios from segments
+ * ============================================================================
+ * Based on: documentation/test_cases/TC-TS-BVT-RAT-02-ratios-from-segments.md
+ *
+ * EXECUTION COMMANDS:
+ * Headed:                 npx playwright test tests/09-bvt-smoke-tests/tc-ts-bvt-rat-02-ratios-from-segments.spec.ts --headed
+ * Headless:               npx playwright test tests/09-bvt-smoke-tests/tc-ts-bvt-rat-02-ratios-from-segments.spec.ts
+ * Debug:                  npx playwright test tests/09-bvt-smoke-tests/tc-ts-bvt-rat-02-ratios-from-segments.spec.ts --debug
+ * Specific Test:          npx playwright test tests/09-bvt-smoke-tests/tc-ts-bvt-rat-02-ratios-from-segments.spec.ts -g "Determine ratios from segments" --headed
+ *
+ * OVERVIEW:
+ * Build Verification Test confirming that the "Determine Ratios Using Segments"
+ * button appears when a project has segments, and that clicking it triggers the
+ * spatial calculation flow. Creates a segment via API, verifies the button
+ * appears, clicks it, and handles either success or error (spatial service may
+ * be unavailable in dev).
+ *
+ * WHAT THE TEST VALIDATES:
+ * 1. Button Visibility:
+ *    ✅ "Determine Ratios Using Segments" button is hidden when no segments exist
+ *    ✅ Button appears after a segment is added
+ *
+ * 2. Modal Interaction:
+ *    ✅ Clicking button opens confirmation modal
+ *    ✅ Modal shows warning about overwriting ratios
+ *    ✅ "Proceed" button triggers the calculation
+ *    ✅ Modal shows either success or error result
+ *
+ * 3. Cleanup:
+ *    ✅ Segment is deleted after test
+ * ============================================================================
+ */
+
+import { test, expect } from '@playwright/test';
+
+test.describe('TC-TS-BVT-RAT-02 — BVT: Determine ratios from segments', () => {
+  test.setTimeout(180_000);
+
+  const projectId = 81;
+
+  test('Determine ratios from segments', async ({ page }) => {
+    let authToken: string | null = null;
+
+    page.on('request', (req) => {
+      if (req.url().includes('/api/') && !authToken) {
+        authToken = req.headers()['authorization'] || null;
+      }
+    });
+
+    page.on('dialog', async (dialog) => {
+      await dialog.accept();
+    });
+
+    await test.step('Step 1: Navigate to segments page and verify button is hidden', async () => {
+      await page.goto(`/projects/${projectId}/segments`);
+      await page.waitForTimeout(3000);
+
+      expect(authToken).not.toBeNull();
+
+      // Verify "Determine Ratios Using Segments" button is NOT visible (no segments)
+      const determineBtn = page.locator('button:has-text("Determine Ratios Using Segments"):visible');
+      expect(await determineBtn.count()).toBe(0);
+    });
+
+    await test.step('Step 2: Create a segment via API', async () => {
+      const response = await page.evaluate(
+        async ({ auth, projId }) => {
+          const res = await fetch(`/api/projects/${projId}/segments`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: auth,
+            },
+            body: JSON.stringify({
+              route: [
+                [-123.7181, 48.8169],
+                [-123.6989, 48.7694],
+              ],
+              description: 'BVT Segment for Ratio Determination',
+            }),
+          });
+          return { status: res.status };
+        },
+        { auth: authToken!, projId: projectId }
+      );
+
+      expect(response.status).toBe(201);
+    });
+
+    await test.step('Step 3: Reload and verify "Determine Ratios Using Segments" button appears', async () => {
+      await page.reload();
+      await page.waitForTimeout(3000);
+
+      const determineBtn = page.locator('button:has-text("Determine Ratios Using Segments"):visible');
+      await expect(determineBtn).toBeVisible();
+    });
+
+    await test.step('Step 4: Click button and verify modal triggers calculation', async () => {
+      const determineBtn = page.locator('button:has-text("Determine Ratios Using Segments"):visible');
+      await determineBtn.click();
+      await page.waitForTimeout(2000);
+
+      // The modal opens and may auto-proceed (when no existing ratios, dirty=false)
+      // or show a confirmation with "Proceed" button (when ratios already exist).
+      const modal = page.getByRole('dialog').filter({ hasText: 'Determine Ratios Using Segments' });
+      await expect(modal).toBeVisible();
+
+      // If "Proceed" button is visible (ratios already exist), click it
+      const proceedBtn = modal.getByRole('button', { name: 'Proceed' });
+      if (await proceedBtn.isVisible().catch(() => false)) {
+        const modalText = await modal.textContent();
+        expect(modalText).toContain('overwrite');
+        await proceedBtn.click();
+      }
+
+      // Wait for the spatial service response (may succeed or fail)
+      await page.waitForTimeout(15000);
+    });
+
+    await test.step('Step 5: Verify result (success or error handled gracefully)', async () => {
+      // The modal should show either "Ratios determined" or "Operation Failed"
+      const successAlert = page.locator('.alert-success:has-text("Ratios determined")');
+      const failAlert = page.locator('.alert-danger:has-text("Operation Failed")');
+      const errorDialog = page.getByRole('dialog').filter({ hasText: 'Server Error' });
+
+      const succeeded = (await successAlert.count()) > 0;
+      const failedInModal = (await failAlert.count()) > 0;
+      const serverError = await errorDialog.isVisible().catch(() => false);
+
+      // At least one outcome should be present
+      expect(succeeded || failedInModal || serverError).toBeTruthy();
+
+      // Close any open modals/dialogs
+      if (serverError) {
+        await errorDialog.locator('button:has-text("Close")').click().catch(() => {});
+        await page.waitForTimeout(500);
+      }
+
+      const determineModal = page.getByRole('dialog').filter({ hasText: 'Determine Ratios' });
+      if (await determineModal.isVisible().catch(() => false)) {
+        await determineModal.locator('.modal-footer button:has-text("Close")').click();
+        await page.waitForTimeout(500);
+      }
+    });
+
+    await test.step('Step 6: Cleanup - delete the segment and any auto-generated ratios', async () => {
+      // Reload to get fresh state
+      await page.reload();
+      await page.waitForTimeout(3000);
+
+      // Delete any ratios that were auto-generated in the Electoral Districts table
+      const edTable = page.locator('table').nth(1);
+      let edRows = await edTable.locator('tbody tr').count();
+      while (edRows > 0) {
+        await edTable.locator('tbody tr').first().locator('button[title="Delete Record"]').evaluate((el) => el.click());
+        await page.waitForTimeout(500);
+        await page.evaluate(() => {
+          const popovers = document.querySelectorAll('.popover');
+          for (const p of popovers) {
+            const btns = p.querySelectorAll('button');
+            for (const btn of btns) {
+              if (btn.textContent && btn.textContent.trim() === 'Delete') {
+                btn.click();
+                return;
+              }
+            }
+          }
+        });
+        await page.waitForTimeout(2000);
+        edRows = await edTable.locator('tbody tr').count();
+      }
+
+      // Delete the segment
+      const segTable = page.locator('table').first();
+      let segRows = await segTable.locator('tbody tr').count();
+      while (segRows > 0) {
+        await segTable.locator('tbody tr').first().locator('button[title="Delete Record"]').first().evaluate((el) => el.click());
+        await page.waitForTimeout(500);
+        await page.evaluate(() => {
+          const popovers = document.querySelectorAll('.popover');
+          for (const p of popovers) {
+            const btns = p.querySelectorAll('button');
+            for (const btn of btns) {
+              if (btn.textContent && btn.textContent.trim() === 'Delete') {
+                btn.click();
+                return;
+              }
+            }
+          }
+        });
+        await page.waitForTimeout(2000);
+        segRows = await segTable.locator('tbody tr').count();
+      }
+
+      // Verify segment table is empty
+      await expect(segTable.locator('tbody tr')).toHaveCount(0);
+    });
+  });
+});
