@@ -1,4 +1,4 @@
-FROM node:18-alpine AS builder
+FROM node:26-alpine AS builder
 WORKDIR /app
 
 # Add building tools to mimic the legacy node-python builder
@@ -10,7 +10,7 @@ RUN npm ci --ignore-scripts
 COPY . .
 RUN npm run build
 
-FROM nginx:1.25-alpine
+FROM nginx:1.31-alpine
 
 # Set HOME so ~/js/env.config.js resolves inside the nginx serve root
 ENV HOME=/opt/app-root/src
