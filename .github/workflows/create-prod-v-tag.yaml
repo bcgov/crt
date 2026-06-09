@@ -97,7 +97,7 @@ jobs:
     name: Deploy to Prod
     needs: [create-prod-tag, retag-images]
     if: ${{ inputs.deploy_to_prd }}
-    uses: ./.github/workflows/helm-cd.yml
+    uses: ./.github/workflows/argo-cd.yml
     with:
       environment: prod
       tag: ${{ needs.create-prod-tag.outputs.prod_tag }}
