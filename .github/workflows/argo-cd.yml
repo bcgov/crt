@@ -39,6 +39,8 @@ concurrency:
   group: deploy-${{ inputs.environment || github.event.inputs.environment || 'dev' }}
   cancel-in-progress: false
 
+permissions:
+  contents: read
 
 jobs:
   update-gitops:

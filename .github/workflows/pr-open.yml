@@ -39,6 +39,7 @@ jobs:
     outputs:
       pr: ${{ steps.pr.outputs.pr }}
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - name: PR Number
         id: pr

@@ -43,6 +43,7 @@ jobs:
     name: Results
     needs: [trivy]
     if: always() && (! failure())
+    permissions: {}
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
