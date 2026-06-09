@@ -31,7 +31,7 @@ jobs:
             Thanks for the PR!
 
             After merge, new images are deployed and promoted to DEV:
-            - [DEV Homepage](https://limesurvey-dev.${{ env.DOMAIN }})
+            - [DEV Homepage](https://${{ env.PREFIX }}.${{ env.DOMAIN }})
 
   # Get PR number for merge queues, otherwise jusr use github.event.nuber
   vars:

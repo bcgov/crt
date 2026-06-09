@@ -38,6 +38,10 @@ jobs:
     outputs:
       target_sha: ${{ steps.resolve_sha.outputs.target_sha }}
       sha_short: ${{ steps.resolve_sha.outputs.sha_short }}
+    env:
+      RC_TAG: ${{ inputs.rc_tag }}
+      BUILD_SHA: ${{ inputs.build_sha }}
+      DRY_RUN: ${{ inputs.dry_run }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -48,8 +52,6 @@ jobs:
 
       - name: Validate inputs
         id: resolve_sha
-        env:
-          RC_TAG: ${{ inputs.rc_tag }}
         run: |
           set -euo pipefail
 
@@ -67,7 +69,6 @@ jobs:
           fi
 
           # Resolve supported SHA/ref input formats.
-          BUILD_SHA="${{ inputs.build_sha }}"
           if [[ "$BUILD_SHA" == "latest" ]]; then
             BUILD_SHA="origin/main"
           elif [[ "$BUILD_SHA" =~ ^sha-([0-9a-fA-F]{7,40})$ ]]; then
@@ -96,7 +97,7 @@ jobs:
           echo "sha_short=$SHA_SHORT" >> "$GITHUB_OUTPUT"
           echo "Resolved SHA: $TARGET_SHA"
 
-          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+          if [[ "$DRY_RUN" == "true" ]]; then
             echo "Dry run: would create tag $RC_TAG -> $TARGET_SHA"
           fi
 
@@ -104,7 +105,6 @@ jobs:
         if: ${{ !inputs.dry_run }}
         run: |
           set -euo pipefail
-          RC_TAG="${{ inputs.rc_tag }}"
           TARGET_SHA="${{ steps.resolve_sha.outputs.target_sha }}"
 
           git config user.name "GitHub Actions"
