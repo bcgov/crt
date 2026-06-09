@@ -111,7 +111,7 @@ test.describe('TC-TS-BVT-LOC-01 — BVT: Add project location segment', () => {
       const row = segTable.locator('tbody tr:has-text("BVT Test Segment")');
 
       // Click Delete Record
-      await row.locator('button[title="Delete Record"]').evaluate((el) => el.click());
+      await row.locator('button[title="Delete Record"]').evaluate((el) => (el as HTMLElement).click());
       await page.waitForTimeout(500);
 
       // Confirm deletion in popover
