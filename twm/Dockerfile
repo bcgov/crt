@@ -1,4 +1,4 @@
-FROM nginx:1-alpine
+FROM nginx:1.25-alpine
 
 # Set HOME so ~/js/ and ~/keycloak.json resolve inside the nginx serve root
 ENV HOME=/opt/app-root/src

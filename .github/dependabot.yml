@@ -12,9 +12,9 @@ updates:
     labels:
       - "dependencies"
 
-  # Maintain dependencies for PHP Dockerfile
+  # Maintain dependencies for API Dockerfile
   - package-ecosystem: "docker"
-    directory: "/php"
+    directory: "/api"
     schedule:
       interval: "weekly"
     groups:
@@ -24,9 +24,21 @@ updates:
     labels:
       - "dependencies"
 
-  # Maintain dependencies for Nginx Dockerfile
+  # Maintain dependencies for client Dockerfile
   - package-ecosystem: "docker"
-    directory: "/nginx"
+    directory: "/client"
+    schedule:
+      interval: "weekly"
+    groups:
+      docker-images:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+
+  # Maintain dependencies for TWM Dockerfile
+  - package-ecosystem: "docker"
+    directory: "/twm"
     schedule:
       interval: "weekly"
     groups:
