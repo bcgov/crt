@@ -56,7 +56,7 @@ http {
 
             # proxy_hide_header WWW-Authenticate;
 
-            proxy_pass http://crt-api${CRT_DEPLOY_SUFFIX}:8080;
+            proxy_pass http://crt-${ENV}-api:8080;
         }
 
         location /ogs-internal/ {
@@ -64,7 +64,7 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
             proxy_set_header X-Real-IP $remote_addr;
 
-            proxy_pass http://crt-api${CRT_DEPLOY_SUFFIX}:8080/ogs-internal/ogs-geoV06/;
+            proxy_pass http://crt-${ENV}-api:8080/ogs-internal/ogs-geoV06/;
         }
 
         location / {
