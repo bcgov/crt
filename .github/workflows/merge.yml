@@ -28,7 +28,7 @@ jobs:
       - name: Get PR Number From Event
         if: github.event_name == 'push'
         id: pr_no
-        uses: bcgov/action-get-pr@bf6c85d0ed23a151f2829956c140fde87979bbf2 #v0.2.0
+        uses: bcgov/action-get-pr@3931962bf13b3f4702d0013ec7c836f752ff1a3b #v0.3.0
       - name: PR Number
         id: pr
         run: echo pr=${{ steps.pr_no.outputs.pr || inputs.pr}} >> $GITHUB_OUTPUT
@@ -57,7 +57,7 @@ jobs:
     steps:
       - id: sha
         run: echo "short=sha-${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
-      - uses: shrink/actions-docker-registry-tag@v4
+      - uses: shrink/actions-docker-registry-tag@v5
         with:
           registry: ghcr.io
           repository: ${{ github.repository }}/${{ matrix.package }}
