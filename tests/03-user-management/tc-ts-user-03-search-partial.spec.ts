@@ -45,8 +45,9 @@ test.describe('TC-TS-USER-03 — Partial text search for users', () => {
       await page.getByRole('textbox', { name: 'IDIR/Name/Email' }).fill('Pet');
       await page.getByRole('button', { name: 'Search' }).click();
 
-      // Wait for results
-      await expect(page.locator('table')).toBeVisible();
+      // Wait for search results to load
+      await page.waitForURL('**/users?**searchText=Pet**');
+      await expect(page.locator('table tbody tr').first()).toBeVisible();
       const rows = page.locator('table tbody tr');
       const rowCount = await rows.count();
 
@@ -75,8 +76,9 @@ test.describe('TC-TS-USER-03 — Partial text search for users', () => {
       await page.getByRole('textbox', { name: 'IDIR/Name/Email' }).fill('Wang');
       await page.getByRole('button', { name: 'Search' }).click();
 
-      // Wait for results
-      await expect(page.locator('table')).toBeVisible();
+      // Wait for search results to load
+      await page.waitForURL('**/users?**searchText=Wang**');
+      await expect(page.locator('table tbody tr').first()).toBeVisible();
       const rows = page.locator('table tbody tr');
       const rowCount = await rows.count();
 
@@ -105,8 +107,9 @@ test.describe('TC-TS-USER-03 — Partial text search for users', () => {
       await page.getByRole('textbox', { name: 'IDIR/Name/Email' }).fill('BWANG');
       await page.getByRole('button', { name: 'Search' }).click();
 
-      // Wait for results
-      await expect(page.locator('table')).toBeVisible();
+      // Wait for search results to load
+      await page.waitForURL('**/users?**searchText=BWANG**');
+      await expect(page.locator('table tbody tr').first()).toBeVisible();
       const rows = page.locator('table tbody tr');
       const rowCount = await rows.count();
 
