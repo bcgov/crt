@@ -59,17 +59,17 @@ test.describe('TC-TS-ELEM-09 — Cannot delete element used in data entry', () =
       await expect(page.getByRole('heading', { name: 'Elements Management' })).toBeVisible();
     });
 
-    await test.step('Step 2: Find element never used in data entry (Bike BC)', async () => {
-      await page.locator('input[placeholder="Search"]').fill('Bike BC');
+    await test.step('Step 2: Find element never used in data entry (Climate Adaptation)', async () => {
+      await page.locator('input[placeholder="Search"]').fill('Climate Adaptation');
       await page.getByRole('button', { name: 'Search' }).click();
       await page.waitForTimeout(1000);
 
-      const row = page.locator('table tbody tr', { hasText: 'Bike BC' });
+      const row = page.locator('table tbody tr', { hasText: 'Climate Adaptation' });
       await expect(row).toBeVisible();
     });
 
     await test.step('Step 3: Verify "Delete Record" is shown, "Disable Record" is NOT', async () => {
-      const row = page.locator('table tbody tr', { hasText: 'Bike BC' });
+      const row = page.locator('table tbody tr', { hasText: 'Climate Adaptation' });
       await expect(row.locator('button[title="Delete Record"]')).toBeVisible();
       await expect(row.locator('button[title="Disable Record"]')).toHaveCount(0);
     });

@@ -73,6 +73,9 @@ async function selectDropdownByLabel(page: import('@playwright/test').Page, forA
 test.describe('TC-TS-DETAIL-12: Save and Continue navigates to next screen', () => {
   test.setTimeout(180_000);
 
+  const uniqueId = Date.now().toString().slice(-6);
+  const projectNumber = `SAV${uniqueId}`;
+
   test('Create project and navigate to Financial Plan', async ({ page }) => {
     let projectUrl = '';
 
@@ -85,7 +88,7 @@ test.describe('TC-TS-DETAIL-12: Save and Continue navigates to next screen', () 
     });
 
     await test.step('Step 2: Fill project form and submit', async () => {
-      await page.locator('input#projectNumber').fill('CRT-AUTO-SAV-001');
+      await page.locator('input#projectNumber').fill(projectNumber);
       await page.locator('input#projectName').fill('Save Continue Test');
       await selectDropdownByLabel(page, 'regionId', '1-South Coast');
       await selectDropdownByLabel(page, 'rcLkupId', '55750');
@@ -98,12 +101,12 @@ test.describe('TC-TS-DETAIL-12: Save and Continue navigates to next screen', () 
 
     await test.step('Step 3: Find and navigate to the new project', async () => {
       // Search for the new project
-      await page.locator('input[name="searchText"]').fill('CRT-AUTO-SAV-001');
+      await page.locator('input[name="searchText"]').fill(projectNumber);
       await page.locator('button:text("Search")').click();
       await page.waitForTimeout(1000);
 
       // Click on the project link
-      const projectLink = page.locator('a:text("CRT-AUTO-SAV-001")');
+      const projectLink = page.locator(`a:text("${projectNumber}")`);
       await expect(projectLink).toBeVisible();
       await projectLink.click();
 
