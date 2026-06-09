@@ -1,0 +1,49 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+
+  # Maintain dependencies for API Dockerfile
+  - package-ecosystem: "docker"
+    directory: "/api"
+    schedule:
+      interval: "weekly"
+    groups:
+      docker-images:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+
+  # Maintain dependencies for client Dockerfile
+  - package-ecosystem: "docker"
+    directory: "/client"
+    schedule:
+      interval: "weekly"
+    groups:
+      docker-images:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+
+  # Maintain dependencies for TWM Dockerfile
+  - package-ecosystem: "docker"
+    directory: "/twm"
+    schedule:
+      interval: "weekly"
+    groups:
+      docker-images:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"

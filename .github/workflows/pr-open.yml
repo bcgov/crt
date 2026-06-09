@@ -1,0 +1,68 @@
+name: Build - PR Open
+run-name: "Build (PR #${{ github.event.pull_request.number }})"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  # Cancel in progress for PR open and close, but not merge_group
+  group: ${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  pr-description-add:
+    name: PR Description Add
+    if: github.event_name == 'pull_request'
+    env:
+      DOMAIN: apps.silver.devops.gov.bc.ca
+      PREFIX: ${{ github.event.repository.name }}-${{ github.event.number }}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    timeout-minutes: 1
+    steps:
+      - uses: bcgov/action-pr-description-add@d79a5c3b49d3b3b3215495afac3ae599cef191bb #v2.0.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          add_markdown: |
+            ---
+
+            Thanks for the PR!
+
+            After merge, new images are deployed and promoted to DEV:
+            - [DEV Homepage](https://${{ env.PREFIX }}.${{ env.DOMAIN }})
+
+  # Get PR number for merge queues, otherwise jusr use github.event.nuber
+  vars:
+    name: Set Variables
+    outputs:
+      pr: ${{ steps.pr.outputs.pr }}
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: PR Number
+        id: pr
+        uses: bcgov/action-get-pr@bfa713a9ab410c0f0c13126c35983934fc80d15b #v0.1.1
+
+  # https://github.com/bcgov/action-builder-ghcr
+  builds:
+    name: Builds
+    needs: [vars]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        package: [api, client, twm]
+    timeout-minutes: 10
+    steps:
+      - uses: bcgov/action-builder-ghcr@2b24ac7f95e6a019064151498660437cca3202c5 #v4.2.1
+        with:
+          package: '${{ matrix.package }}'
+          build_context: ${{ matrix.package }}
+          build_file: '${{ matrix.package }}/Dockerfile'
+          tags: pr-${{ needs.vars.outputs.pr }}
+          tag_fallback: latest
+          triggers: '${{ matrix.package }}/' #omit to build everything
