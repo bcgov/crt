@@ -31,7 +31,7 @@
 
 import { test, expect } from '@playwright/test';
 
-// Target user: PSPRY currently has regions 1-South Coast and 2-Southern Interior (codes "1,2")
+// Target user: PSPRY has multiple regions assigned (varies by environment)
 const TARGET_USER_IDIR = 'PSPRY';
 
 test.describe('TC-TS-USER-10 — Multiple region assignment', () => {
@@ -66,9 +66,16 @@ test.describe('TC-TS-USER-10 — Multiple region assignment', () => {
       await expect(dialog).not.toBeVisible();
     });
 
+    // Capture original regions before making changes
+    let originalRegions = '';
+
     await test.step('Step 2: Add a new region (0-Headquarters) to existing regions', async () => {
-      // Re-open edit dialog
+      // Capture original region state from the table
       const targetRow = page.locator('table tbody tr', { hasText: TARGET_USER_IDIR });
+      const regionsCell = targetRow.locator('td:nth-child(5)');
+      originalRegions = (await regionsCell.textContent())!.trim();
+
+      // Open edit dialog
       await targetRow.getByRole('button', { name: 'Edit Record' }).click();
 
       const dialog = page.locator('[role="dialog"]');
@@ -93,15 +100,17 @@ test.describe('TC-TS-USER-10 — Multiple region assignment', () => {
       const targetRow = page.locator('table tbody tr', { hasText: TARGET_USER_IDIR });
       await expect(targetRow).toBeVisible();
       const regionsCell = targetRow.locator('td:nth-child(5)');
-      const regionsText = await regionsCell.textContent();
+      const regionsText = (await regionsCell.textContent())!.trim();
 
-      // Should contain 0 (HQ), 1 (South Coast), and 2 (Southern Interior) sorted
-      expect(regionsText).toContain('0');
-      expect(regionsText).toContain('1');
-      expect(regionsText).toContain('2');
+      // Should contain 0 (HQ) plus all original regions
+      const codes = regionsText.split(',').map((c) => parseInt(c.trim()));
+      expect(codes).toContain(0);
+      const originalCodes = originalRegions.split(',').map((c) => parseInt(c.trim()));
+      for (const code of originalCodes) {
+        expect(codes).toContain(code);
+      }
 
-      // Verify they are sorted ascending (parse the comma-separated codes)
-      const codes = regionsText!.split(',').map((c) => parseInt(c.trim()));
+      // Verify they are sorted ascending
       const sorted = [...codes].sort((a, b) => a - b);
       expect(codes).toEqual(sorted);
     });
@@ -124,9 +133,9 @@ test.describe('TC-TS-USER-10 — Multiple region assignment', () => {
       await dialog.getByRole('button', { name: 'Submit' }).click();
       await expect(dialog).not.toBeVisible();
 
-      // Verify restored
+      // Verify restored to original state
       const regionsCell = targetRow.locator('td:nth-child(5)');
-      await expect(regionsCell).toHaveText('1,2');
+      await expect(regionsCell).toHaveText(originalRegions);
     });
   });
 });

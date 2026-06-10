@@ -41,7 +41,12 @@ test.describe('TC-TS-FIN-04 — Element field look-ahead shows code and descript
   test.setTimeout(60_000);
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/projects/79/projectplan');
+    // Navigate to the first project's financial plan dynamically
+    await page.goto('/projects');
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+    const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+    const projectUrl = await projectLink.getAttribute('href');
+    await page.goto(`${projectUrl}/projectplan`);
     await expect(page.locator('h1', { hasText: 'Financial Planning Targets' })).toBeVisible();
   });
 
@@ -100,11 +105,14 @@ test.describe('TC-TS-FIN-04 — Element field look-ahead shows code and descript
       expect(selectedText.trim()).toBe('Sp - Safety Program');
     });
 
-    await test.step('Step 5: Verify table shows only code', async () => {
-      // The existing row in the table shows "Sp" (code only) in the Element column
+    await test.step('Step 5: Verify table shows only code (not full description)', async () => {
+      // The existing row in the table shows only the code (e.g. "Sp") in the Element column, not "Sp - Safety Program"
       const existingRow = page.locator('table').first().locator('tbody tr').first();
       const elementCell = existingRow.locator('td').nth(2);
-      await expect(elementCell).toHaveText('Sp');
+      const elementText = (await elementCell.textContent())!.trim();
+      // Code should be short (2-4 chars) and not contain " - " (which would indicate full description)
+      expect(elementText).not.toContain(' - ');
+      expect(elementText.length).toBeLessThanOrEqual(5);
     });
 
     await test.step('Cleanup: Close dialog', async () => {

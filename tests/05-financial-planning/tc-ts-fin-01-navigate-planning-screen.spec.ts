@@ -17,7 +17,7 @@
  *
  * WHAT THE TEST VALIDATES:
  * 1. Navigation:
- *    ✅ Clicking "Financial Plan" link navigates to /projects/79/projectplan
+ *    ✅ Clicking "Financial Plan" link navigates to the projectplan page
  *    ✅ "Financial Planning Targets" heading is visible
  *    ✅ "Show All Fiscal Years" button is visible
  * ============================================================================
@@ -29,8 +29,11 @@ test.describe('TC-TS-FIN-01 — Navigate to Financial Planning screen', () => {
   test.setTimeout(60_000);
 
   test('Navigate from Project Details to Financial Planning', async ({ page }) => {
-    await test.step('Step 1: Start on project details page', async () => {
-      await page.goto('/projects/79');
+    await test.step('Step 1: Navigate to a project details page', async () => {
+      // Go to the projects list and click the first project link
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      await page.locator('table tbody tr').first().locator('td:nth-child(2) a').click();
       await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible();
     });
 
@@ -40,7 +43,7 @@ test.describe('TC-TS-FIN-01 — Navigate to Financial Planning screen', () => {
     });
 
     await test.step('Step 3: Verify Financial Planning page loaded', async () => {
-      await expect(page).toHaveURL(/\/projects\/79\/projectplan/);
+      await expect(page).toHaveURL(/\/projects\/\d+\/projectplan/);
       await expect(page.locator('h1', { hasText: 'Financial Planning Targets' })).toBeVisible();
       await expect(page.getByRole('button', { name: 'Show All Fiscal Years' })).toBeVisible();
     });

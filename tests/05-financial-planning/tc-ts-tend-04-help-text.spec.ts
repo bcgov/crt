@@ -34,7 +34,11 @@ test.describe('TC-TS-TEND-04 — Tender form hover-over help text', () => {
 
   test('Help icons display descriptive popover text on hover', async ({ page }) => {
     await test.step('Step 1: Navigate and open Add Tender dialog', async () => {
-      await page.goto('/projects/79/projecttender');
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+      const projectUrl = await projectLink.getAttribute('href');
+      await page.goto(`${projectUrl}/projecttender`);
       await page.locator('button[title="Add Tender"]').click();
       const dialog = page.locator('[role="dialog"]').filter({ hasText: 'Add Tender Details' });
       await expect(dialog).toBeVisible();
@@ -93,7 +97,10 @@ test.describe('TC-TS-TEND-04 — Tender form hover-over help text', () => {
     });
 
     await test.step('Cleanup: Close dialog', async () => {
-      await page.goto('/projects/79/projecttender');
+      const dialog = page.locator('[role="dialog"]');
+      if (await dialog.isVisible()) {
+        await dialog.getByRole('button', { name: 'Close' }).click().catch(() => {});
+      }
     });
   });
 });

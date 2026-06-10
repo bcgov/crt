@@ -37,17 +37,25 @@ test.describe('TC-TS-FIN-06 — Edit financial planning entry with negative amou
   test.setTimeout(120_000);
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/projects/79/projectplan');
+    // Navigate to the first project's financial plan dynamically
+    await page.goto('/projects');
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+    const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+    const projectUrl = await projectLink.getAttribute('href');
+    await page.goto(`${projectUrl}/projectplan`);
     await expect(page.locator('h1', { hasText: 'Financial Planning Targets' })).toBeVisible();
   });
 
   test('Edit financial planning entry with negative amount', async ({ page }) => {
+    let originalAmount: string;
+    let originalDescription: string;
+
     await test.step('Step 1: Click Edit Record on the first entry row', async () => {
       const row = page.locator('table').first().locator('tbody tr').first();
       await expect(row).toBeVisible();
 
-      // Verify original amount is $100,000
-      await expect(row.locator('td').nth(4)).toHaveText('$100,000');
+      // Capture original amount for cleanup
+      originalAmount = (await row.locator('td').nth(4).textContent())!.trim();
 
       await row.locator('button[title="Edit Record"]').click();
     });
@@ -57,9 +65,10 @@ test.describe('TC-TS-FIN-06 — Edit financial planning entry with negative amou
       await expect(dialog).toBeVisible();
       await expect(dialog.locator('.modal-title')).toHaveText('Edit Financial Planning Targets');
 
-      // Verify pre-filled values
-      await expect(dialog.getByRole('textbox', { name: 'Amount' })).toHaveValue('$100,000');
-      await expect(dialog.getByRole('textbox', { name: 'Description' })).toHaveValue('Test financial planning target');
+      // Verify fields are pre-filled (capture description for reference)
+      const amountInput = dialog.getByRole('textbox', { name: 'Amount' });
+      await expect(amountInput).toHaveValue(originalAmount);
+      originalDescription = await dialog.getByRole('textbox', { name: 'Description' }).inputValue();
     });
 
     await test.step('Step 3: Change amount to negative value -25000', async () => {
@@ -96,13 +105,15 @@ test.describe('TC-TS-FIN-06 — Edit financial planning entry with negative amou
 
       const amountInput = dialog.getByRole('textbox', { name: 'Amount' });
       await amountInput.fill('');
-      await amountInput.fill('100000');
+      // Extract numeric value from formatted original (e.g., "$100,000" -> "100000")
+      const numericOriginal = originalAmount.replace(/[$,]/g, '');
+      await amountInput.fill(numericOriginal);
 
       await dialog.getByRole('button', { name: 'Submit' }).click();
       await expect(dialog).not.toBeVisible();
 
       // Verify reverted
-      await expect(row.locator('td').nth(4)).toHaveText('$100,000');
+      await expect(row.locator('td').nth(4)).toHaveText(originalAmount);
     });
   });
 });

@@ -35,35 +35,42 @@ import { test, expect } from '@playwright/test';
 test.describe('TC-TS-QTY-09 — Navigation Back/Continue/Close from Qty page', () => {
   test.setTimeout(60_000);
 
-  test('Navigate Back to Financial Plan', async ({ page }) => {
-    await page.goto('/projects/79/projecttender');
+  /** Helper: navigate to the first project's tender page */
+  async function goToProjectTender(page: any) {
+    await page.goto('/projects');
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+    const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+    const projectUrl = await projectLink.getAttribute('href');
+    await page.goto(`${projectUrl}/projecttender`);
     await expect(page.locator('h1', { hasText: 'Quantities/Accomplishments' })).toBeVisible();
+  }
+
+  test('Navigate Back to Financial Plan', async ({ page }) => {
+    await goToProjectTender(page);
 
     await test.step('Click Financial Plan link and verify navigation', async () => {
       await page.getByRole('link', { name: 'Financial Plan' }).click();
       await page.waitForURL('**/projectplan');
 
-      await expect(page).toHaveURL(/\/projects\/79\/projectplan/);
+      await expect(page).toHaveURL(/\/projects\/\d+\/projectplan/);
       await expect(page.locator('h1', { hasText: 'Financial Planning Targets' })).toBeVisible();
     });
   });
 
   test('Navigate Forward to Segment', async ({ page }) => {
-    await page.goto('/projects/79/projecttender');
-    await expect(page.locator('h1', { hasText: 'Quantities/Accomplishments' })).toBeVisible();
+    await goToProjectTender(page);
 
     await test.step('Click Segment link and verify navigation', async () => {
       await page.getByRole('link', { name: 'Segment' }).click();
       await page.waitForURL('**/segments');
 
-      await expect(page).toHaveURL(/\/projects\/79\/segments/);
+      await expect(page).toHaveURL(/\/projects\/\d+\/segments/);
       await expect(page.locator('h1', { hasText: 'Project Segments' })).toBeVisible();
     });
   });
 
   test('Navigate Close to Project Search', async ({ page }) => {
-    await page.goto('/projects/79/projecttender');
-    await expect(page.locator('h1', { hasText: 'Quantities/Accomplishments' })).toBeVisible();
+    await goToProjectTender(page);
 
     await test.step('Click Close link and verify navigation', async () => {
       await page.getByRole('link', { name: 'Close' }).click();

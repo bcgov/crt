@@ -41,7 +41,11 @@ test.describe('TC-TS-QTY-06 — Switch category clears data with confirmation', 
   test('Switch category clears data with confirmation', async ({ page }) => {
     test.skip(true, 'Feature not implemented: No confirmation prompt appears when switching categories. The app switches immediately without warning.');
 
-    await page.goto('/projects/79/projecttender');
+    await page.goto('/projects');
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+    const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+    const projectUrl = await projectLink.getAttribute('href');
+    await page.goto(`${projectUrl}/projecttender`);
     await expect(page.locator('h1', { hasText: 'Quantities/Accomplishments' })).toBeVisible();
 
     await page.locator('button[title="Add Quantity or Accomplishment"]').click();

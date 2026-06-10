@@ -17,7 +17,7 @@
  *
  * WHAT THE TEST VALIDATES:
  * 1. Navigation Without Tender:
- *    ✅ Clicking "Segment" link navigates to /projects/79/segments
+ *    ✅ Clicking "Segment" link navigates to the project's segments page
  *    ✅ "Project Segments" heading is visible
  *    ✅ No error message or validation alert is displayed
  * ============================================================================
@@ -30,7 +30,11 @@ test.describe('TC-TS-TEND-06 — Continue without adding tender', () => {
 
   test('Navigate to Segments without adding tender records', async ({ page }) => {
     await test.step('Step 1: Navigate to tender page', async () => {
-      await page.goto('/projects/79/projecttender');
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+      const projectUrl = await projectLink.getAttribute('href');
+      await page.goto(`${projectUrl}/projecttender`);
       await expect(page.locator('text=Project Tender Details')).toBeVisible();
     });
 
@@ -40,7 +44,7 @@ test.describe('TC-TS-TEND-06 — Continue without adding tender', () => {
     });
 
     await test.step('Step 3: Verify Segments page loaded without errors', async () => {
-      await expect(page).toHaveURL(/\/projects\/79\/segments/);
+      await expect(page).toHaveURL(/\/projects\/\d+\/segments/);
       await expect(page.getByRole('heading', { name: /Project Segments/ })).toBeVisible();
 
       // Verify no error messages are displayed

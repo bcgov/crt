@@ -20,7 +20,7 @@
  *    ✅ All 4 active roles are displayed
  *
  * 2. Partial Name Search:
- *    ✅ Searching "REGION" returns REGION_ADMIN
+ *    ✅ Searching a unique partial name (e.g. "REGION" or "DISTRICT") returns only the matching role
  *    ✅ Other roles are filtered out
  * ============================================================================
  */
@@ -45,14 +45,20 @@ test.describe('TC-TS-ROLE-02 — Search roles with partial name', () => {
       expect(await rows.count()).toBeGreaterThanOrEqual(4);
     });
 
-    await test.step('Step 2: Search with partial name "REGION"', async () => {
-      await page.locator('input[name="searchText"]').fill('REGION');
-      await page.getByRole('button', { name: 'Search' }).click();
-      await page.waitForTimeout(2000);
+    await test.step('Step 2: Search with partial name unique to one role', async () => {
+      // Determine search term based on environment (DEV has REGION_ADMIN, TST has DISTRICT_ADMIN)
+      const roleNames = await page.locator('table tbody tr td:first-child').allTextContents();
+      const hasRegionAdmin = roleNames.some(name => name.includes('REGION'));
+      const searchTerm = hasRegionAdmin ? 'REGION' : 'DISTRICT';
+      const expectedRole = hasRegionAdmin ? 'REGION_ADMIN' : 'DISTRICT_ADMIN';
 
-      // Only REGION_ADMIN appears
-      await expect(page.locator('table tbody tr')).toHaveCount(1);
-      await expect(page.locator('table tbody tr').first().locator('td').first()).toHaveText('REGION_ADMIN');
+      await page.locator('input[name="searchText"]').fill(searchTerm);
+      await page.getByRole('button', { name: 'Search' }).click();
+
+      // Only the matching role appears
+      const rows = page.locator('table tbody tr');
+      await expect(rows).toHaveCount(1);
+      await expect(rows.first().locator('td').first()).toHaveText(expectedRole);
     });
   });
 });

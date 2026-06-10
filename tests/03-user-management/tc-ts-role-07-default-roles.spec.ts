@@ -11,15 +11,15 @@
  * Specific Test:          npx playwright test tests/03-user-management/tc-ts-role-07-default-roles.spec.ts -g "default roles" --headed
  *
  * OVERVIEW:
- * Verifies that the four default seeded roles (SYSTEM_ADMIN, REGION_ADMIN,
- * MANAGER, READ_ONLY) have the correct permissions as per requirements.
+ * Verifies that the four default seeded roles (SYSTEM_ADMIN, REGION_ADMIN or
+ * DISTRICT_ADMIN, MANAGER, READ_ONLY) have the correct permissions as per requirements.
  * This is a read-only verification test.
  *
  * WHAT THE TEST VALIDATES:
  * 1. SYSTEM_ADMIN:
  *    ✅ Has all 10 permissions assigned
  *
- * 2. REGION_ADMIN:
+ * 2. REGION_ADMIN / DISTRICT_ADMIN (environment-dependent):
  *    ✅ Has expected subset (Code Table Read, Export Read, Project Read/Write, Role Read, User Read/Write)
  *
  * 3. MANAGER:
@@ -48,17 +48,18 @@ test.describe('TC-TS-ROLE-07 — Verify default roles match requirements', () =>
     'API Access Client',
   ];
 
-  const EXPECTED_PERMISSIONS: Record<string, string[]> = {
+  const REGION_ADMIN_PERMISSIONS = [
+    'Code Table Read',
+    'Export Read',
+    'Project Read',
+    'Project Write',
+    'Role Read',
+    'User Read',
+    'User Write',
+  ];
+
+  const STATIC_EXPECTED_PERMISSIONS: Record<string, string[]> = {
     SYSTEM_ADMIN: ALL_PERMISSIONS,
-    REGION_ADMIN: [
-      'Code Table Read',
-      'Export Read',
-      'Project Read',
-      'Project Write',
-      'Role Read',
-      'User Read',
-      'User Write',
-    ],
     MANAGER: ['Code Table Read', 'Export Read', 'Project Read', 'Project Write'],
     READ_ONLY: ['Code Table Read', 'Project Read', 'Role Read', 'User Read'],
   };
@@ -102,6 +103,15 @@ test.describe('TC-TS-ROLE-07 — Verify default roles match requirements', () =>
   }
 
   test('Default roles have correct permissions', async ({ page }) => {
+    // Detect environment: DEV has REGION_ADMIN, TST has DISTRICT_ADMIN
+    const roleNames = await page.locator('table tbody tr td:first-child').allTextContents();
+    const adminRoleName = roleNames.find(name => name.includes('REGION')) ? 'REGION_ADMIN' : 'DISTRICT_ADMIN';
+
+    const EXPECTED_PERMISSIONS: Record<string, string[]> = {
+      ...STATIC_EXPECTED_PERMISSIONS,
+      [adminRoleName]: REGION_ADMIN_PERMISSIONS,
+    };
+
     for (const [roleName, expectedPerms] of Object.entries(EXPECTED_PERMISSIONS)) {
       await test.step(`Verify ${roleName} permissions`, async () => {
         const actual = await getPermissions(page, roleName);

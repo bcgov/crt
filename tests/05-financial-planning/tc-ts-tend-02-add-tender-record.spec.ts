@@ -37,7 +37,11 @@ test.describe('TC-TS-TEND-02 — Add tender record with all fields', () => {
 
   test('Add tender record with all fields populated', async ({ page }) => {
     await test.step('Step 1: Navigate to tender page', async () => {
-      await page.goto('/projects/79/projecttender');
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+      const projectUrl = await projectLink.getAttribute('href');
+      await page.goto(`${projectUrl}/projecttender`);
       await expect(page.locator('button[title="Add Tender"]')).toBeVisible();
     });
 

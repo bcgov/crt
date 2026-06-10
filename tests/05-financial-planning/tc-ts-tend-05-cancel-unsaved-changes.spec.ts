@@ -38,7 +38,11 @@ test.describe('TC-TS-TEND-05 — Tender cancel with unsaved changes prompt', () 
 
   test('Cancel with unsaved changes shows prompt with Go Back and Leave', async ({ page }) => {
     await test.step('Step 1: Navigate and open Add Tender dialog', async () => {
-      await page.goto('/projects/79/projecttender');
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+      const projectUrl = await projectLink.getAttribute('href');
+      await page.goto(`${projectUrl}/projecttender`);
       await page.locator('button[title="Add Tender"]').click();
       const dialog = page.locator('[role="dialog"]').filter({ hasText: 'Add Tender Details' });
       await expect(dialog).toBeVisible();

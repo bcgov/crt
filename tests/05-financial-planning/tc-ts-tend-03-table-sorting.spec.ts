@@ -36,7 +36,11 @@ test.describe('TC-TS-TEND-03 — Tender table display and default sorting', () =
 
   test('Tender table shows correct columns, sort order, and row actions', async ({ page }) => {
     await test.step('Step 1: Navigate to tender page', async () => {
-      await page.goto('/projects/79/projecttender');
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+      const projectUrl = await projectLink.getAttribute('href');
+      await page.goto(`${projectUrl}/projecttender`);
       await expect(page.locator('button[title="Add Tender"]')).toBeVisible();
     });
 

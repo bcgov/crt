@@ -40,7 +40,11 @@ test.describe('TC-TS-TEND-01 — Verify tender form fields', () => {
 
   test('Add Tender form contains all expected fields', async ({ page }) => {
     await test.step('Step 1: Navigate to tender page and open Add dialog', async () => {
-      await page.goto('/projects/79/projecttender');
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+      const projectUrl = await projectLink.getAttribute('href');
+      await page.goto(`${projectUrl}/projecttender`);
       await expect(page.locator('button[title="Add Tender"]')).toBeVisible();
       await page.locator('button[title="Add Tender"]').click();
     });

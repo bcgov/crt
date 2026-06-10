@@ -35,7 +35,12 @@ test.describe('TC-TS-FIN-05 — Amount field accepts negative values without dec
   test.setTimeout(180_000);
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/projects/79/projectplan');
+    // Navigate to the first project's financial plan dynamically
+    await page.goto('/projects');
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+    const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+    const projectUrl = await projectLink.getAttribute('href');
+    await page.goto(`${projectUrl}/projectplan`);
     await expect(page.locator('h1', { hasText: 'Financial Planning Targets' })).toBeVisible();
   });
 

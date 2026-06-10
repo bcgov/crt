@@ -39,7 +39,12 @@ test.describe('TC-TS-QTY-05 — Add Quantity record with Schedule 7 field', () =
   test.setTimeout(180_000);
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/projects/79/projecttender');
+    // Navigate to the first project's tender page dynamically
+    await page.goto('/projects');
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+    const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+    const projectUrl = await projectLink.getAttribute('href');
+    await page.goto(`${projectUrl}/projecttender`);
     await expect(page.locator('h1', { hasText: 'Quantities/Accomplishments' })).toBeVisible();
   });
 
