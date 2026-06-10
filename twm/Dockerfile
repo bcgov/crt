@@ -8,6 +8,8 @@ RUN apk add --no-cache gettext \
     /opt/app-root/etc/nginx.d \
     /opt/app-root/etc/nginx.default.d
 
+RUN chmod -R 770 /var/cache/nginx /var/run /run /var/log/nginx
+
 # Copy all static app files to the nginx serve root
 COPY application/ /opt/app-root/src/application/
 COPY index.html /opt/app-root/src/
