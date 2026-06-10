@@ -28,5 +28,9 @@ COPY nginx.conf.tmpl /tmp/src/nginx.conf.tmpl
 COPY nginx-start/start.sh /docker-entrypoint.d/10-start.sh
 RUN chmod +x /docker-entrypoint.d/10-start.sh
 
+RUN chmod -R 770 /var/cache/nginx /var/run /run /var/log/nginx
+RUN chmod 0770 /etc/nginx/nginx.conf
+RUN touch /opt/app-root/src/js/env.config.js && chmod 0770 /opt/app-root/src/js/env.config.js
+
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
