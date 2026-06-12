@@ -10,7 +10,7 @@ on:
 
 concurrency:
   # Cancel in progress for PR open and close, but not merge_group
-  group: ${{ github.event.number }}
+  group: ci-${{ github.event.pull_request.number || github.ref_name || github.run_id }}
   cancel-in-progress: true
 
 jobs:
@@ -40,19 +40,37 @@ jobs:
   vars:
     name: Set Variables
     outputs:
-      pr: ${{ steps.pr.outputs.pr }}
-      branch: ${{ github.head_ref}}
+      pr: ${{ steps.vars.outputs.pr }}
+      branch: ${{ steps.vars.outputs.branch }}
+      primary_tag: ${{ steps.vars.outputs.primary_tag }}
     runs-on: ubuntu-latest
     permissions: {}
     steps:
-      - name: PR Number
-        id: pr
-        if: github.event_name == 'pull_request'
-        uses: bcgov/action-get-pr@bfa713a9ab410c0f0c13126c35983934fc80d15b #v0.1.1
+      - name: Resolve variables
+        id: vars
+        run: |
+          set -euo pipefail
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            PR="${{ github.event.pull_request.number }}"
+            BRANCH="${{ github.head_ref }}"
+            PRIMARY_TAG="pr-${PR}"
+          else
+            PR=""
+            BRANCH="${{ github.ref_name }}"
+            PRIMARY_TAG="${BRANCH//\//-}"
+          fi
+
+          BRANCH="${BRANCH//\//-}"
+
+          echo "pr=${PR}" >> "$GITHUB_OUTPUT"
+          echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
+          echo "primary_tag=${PRIMARY_TAG}" >> "$GITHUB_OUTPUT"
 
   # https://github.com/bcgov/action-builder-ghcr
   builds:
     name: Builds
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     needs: [vars]
     runs-on: ubuntu-latest
     permissions:
@@ -70,12 +88,69 @@ jobs:
           package: '${{ matrix.package }}'
           build_context: ${{ matrix.package }}
           build_file: '${{ matrix.package }}/Dockerfile'
-          tags: pr-${{ needs.vars.outputs.pr }}
+          tags: ${{ needs.vars.outputs.primary_tag }}
           tag_fallback: latest
           triggers: '${{ matrix.package }}/' #omit to build everything
           metadata_tags: 'true'
           metadata_tag_rules: |
-            type=raw,value=pr-${{ needs.vars.outputs.pr }}-${{ needs.vars.outputs.branch }},enable=${{ github.event_name == 'pull_request' }}
+            type=raw,value=pr-${{ needs.vars.outputs.pr }}-${{ needs.vars.outputs.branch }},enable=${{ github.event_name == 'pull_request' && needs.vars.outputs.pr != '' }}
             type=ref,event=tag
             type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
+
+  retag-merged-commit:
+    name: Retag Merged Commit
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: read
+    strategy:
+      matrix:
+        package: [api, client, twm]
+    timeout-minutes: 5
+    steps:
+      - name: Resolve source and target tags
+        id: tags
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          TARGET_SHA="${{ github.sha }}"
+          TARGET_TAG="sha-${TARGET_SHA:0:7}"
+
+          PR_NUMBER="$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${{ github.repository }}/commits/${TARGET_SHA}/pulls" \
+            --jq '.[0].number // empty')"
+
+          if [ -z "$PR_NUMBER" ]; then
+            echo "No associated PR found for ${TARGET_SHA}; skipping retag."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          PR_HEAD_SHA="$(gh api \
+            "/repos/${{ github.repository }}/pulls/${PR_NUMBER}" \
+            --jq '.head.sha')"
+
+          SOURCE_TAG="sha-${PR_HEAD_SHA:0:7}"
+
+          echo "source_tag=${SOURCE_TAG}" >> "$GITHUB_OUTPUT"
+          echo "target_tag=${TARGET_TAG}" >> "$GITHUB_OUTPUT"
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
+          echo "PR: ${PR_NUMBER}"
+          echo "Source image tag: ${SOURCE_TAG}"
+          echo "Target image tag: ${TARGET_TAG}"
+
+      - name: Retag PR image as merged commit image
+        if: steps.tags.outputs.skip != 'true'
+        uses: shrink/actions-docker-registry-tag@v4
+        with:
+          registry: ghcr.io
+          repository: ${{ github.repository }}/${{ matrix.package }}
+          target: ${{ steps.tags.outputs.source_tag }}
+          tags: ${{ steps.tags.outputs.target_tag }}
