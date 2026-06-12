@@ -11,4 +11,4 @@ echo "window.RUNTIME_REACT_APP_DWPBI_URL='${REACT_APP_DWPBI_URL}';" >> $JS_PATH
 echo "window.RUNTIME_OPENSHIFT_BUILD_COMMIT='${OPENSHIFT_BUILD_COMMIT}';" >> $JS_PATH
 
 echo "---> Creating nginx.conf ..."
-envsubst '${CRT_DEPLOY_SUFFIX}' < /tmp/src/nginx.conf.tmpl > /etc/nginx/nginx.conf
+envsubst '${ENVIRONMENT}' < /tmp/src/nginx.conf.tmpl > /etc/nginx/nginx.conf

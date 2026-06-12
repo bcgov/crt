@@ -8,12 +8,12 @@ on:
   workflow_dispatch:
     inputs:
       build_sha:
-        description: 'Git Commit (not image) SHA/ref to tag (full, short, sha-xxxxxxx, or latest)'
+        description: 'Git Commit (not image) SHA/ref to tag (full, short, sha-xxxxxxx, or latest). Must be on main branch.'
         required: true
         type: string
         default: 'latest'
       rc_tag:
-        description: 'RC tag name (e.g. rc_0.1.0.5)'
+        description: 'RC tag name (e.g. rc_0.1.5)'
         required: true
         type: string
       deploy_to_tst:
@@ -42,11 +42,12 @@ jobs:
       RC_TAG: ${{ inputs.rc_tag }}
       BUILD_SHA: ${{ inputs.build_sha }}
       DRY_RUN: ${{ inputs.dry_run }}
+      BRANCH: "main"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          ref: main
+          ref: ${{ env.BRANCH }}
           fetch-depth: 0
           fetch-tags: true
 
@@ -63,14 +64,14 @@ jobs:
             --quiet
 
           # Validate RC tag format
-          if [[ ! $RC_TAG =~ ^rc_[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Error: RC tag '$RC_TAG' must match format rc_x.x.x.x (e.g. rc_0.1.0.5)"
+          if [[ ! $RC_TAG =~ ^rc_[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: RC tag '$RC_TAG' must match format rc_x.x.x (e.g. rc_0.1.0)"
             exit 1
           fi
 
           # Resolve supported SHA/ref input formats.
           if [[ "$BUILD_SHA" == "latest" ]]; then
-            BUILD_SHA="origin/main"
+            BUILD_SHA="origin/${BRANCH}"
           elif [[ "$BUILD_SHA" =~ ^sha-([0-9a-fA-F]{7,40})$ ]]; then
             BUILD_SHA="${BASH_REMATCH[1]}"
           elif [[ "$BUILD_SHA" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
