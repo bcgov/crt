@@ -38,6 +38,7 @@ jobs:
     name: Set Variables
     outputs:
       pr: ${{ steps.pr.outputs.pr }}
+      branch: ${{ github.head_ref}}
     runs-on: ubuntu-latest
     permissions: {}
     steps:
@@ -66,3 +67,10 @@ jobs:
           tags: pr-${{ needs.vars.outputs.pr }}
           tag_fallback: latest
           triggers: '${{ matrix.package }}/' #omit to build everything
+          metadata_tags: 'true'
+          metadata_tag_rules: |
+            type=raw,value=pr-${{ needs.vars.outputs.pr }}-${{ needs.vars.outputs.branch }},enable=${{ github.event_name == 'pull_request' }}
+            type=ref,event=tag
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+            
