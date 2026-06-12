@@ -42,7 +42,7 @@ jobs:
       RC_TAG: ${{ inputs.rc_tag }}
       BUILD_SHA: ${{ inputs.build_sha }}
       DRY_RUN: ${{ inputs.dry_run }}
-      BRANCH: "main"
+      BRANCH: master
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
