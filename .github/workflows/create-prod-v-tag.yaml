@@ -25,24 +25,25 @@ jobs:
     outputs:
       target_sha: ${{ steps.resolve.outputs.target_sha }}
       prod_tag: ${{ steps.resolve.outputs.prod_tag }}
+    env:
+      RC_TAG: ${{ inputs.rc_tag }}
+      BRANCH: ${{ github.ref_name }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          ref: main
+          ref: ${{ env.BRANCH }}
           fetch-depth: 0
           fetch-tags: true
 
       - name: Validate inputs and resolve SHA
         id: resolve
-        env:
-          RC_TAG: ${{ inputs.rc_tag }}
         run: |
           set -euo pipefail
 
           # Validate RC tag format
-          if [[ ! $RC_TAG =~ ^rc_[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Error: RC tag '$RC_TAG' must match format rc_x.x.x.x (e.g. rc_0.1.0.5)"
+          if [[ ! $RC_TAG =~ ^rc_[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: RC tag '$RC_TAG' must match format rc_x.x.x (e.g. rc_0.1.0)"
             exit 1
           fi
 
