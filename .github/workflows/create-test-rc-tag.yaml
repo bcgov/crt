@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       build_sha:
-        description: 'Git Commit (not image) SHA/ref to tag (full, short, sha-xxxxxxx, or latest)'
+        description: 'Git Commit (not image) SHA/ref to tag (full, short, sha-xxxxxxx, or latest). Must be on main branch.'
         required: true
         type: string
         default: 'latest'
@@ -42,7 +42,7 @@ jobs:
       RC_TAG: ${{ inputs.rc_tag }}
       BUILD_SHA: ${{ inputs.build_sha }}
       DRY_RUN: ${{ inputs.dry_run }}
-      BRANCH: ${{ github.ref_name }}
+      BRANCH: "main"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
