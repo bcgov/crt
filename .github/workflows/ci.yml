@@ -127,27 +127,29 @@ jobs:
             --jq '.[0].number // empty')"
 
           if [ -z "$PR_NUMBER" ]; then
-            echo "No associated PR found for ${TARGET_SHA}; skipping retag."
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            exit 0
+            echo "Error: no associated PR found for ${TARGET_SHA}; cannot retag merged commit."
+            exit 1
           fi
 
           PR_HEAD_SHA="$(gh api \
             "/repos/${{ github.repository }}/pulls/${PR_NUMBER}" \
             --jq '.head.sha')"
 
+          if [ -z "$PR_HEAD_SHA" ]; then
+            echo "Error: PR ${PR_NUMBER} does not have a head SHA; cannot retag merged commit."
+            exit 1
+          fi
+
           SOURCE_TAG="sha-${PR_HEAD_SHA:0:7}"
 
           echo "source_tag=${SOURCE_TAG}" >> "$GITHUB_OUTPUT"
           echo "target_tag=${TARGET_TAG}" >> "$GITHUB_OUTPUT"
-          echo "skip=false" >> "$GITHUB_OUTPUT"
 
           echo "PR: ${PR_NUMBER}"
           echo "Source image tag: ${SOURCE_TAG}"
           echo "Target image tag: ${TARGET_TAG}"
 
       - name: Retag PR image as merged commit image
-        if: steps.tags.outputs.skip != 'true'
         uses: shrink/actions-docker-registry-tag@v4
         with:
           registry: ghcr.io
