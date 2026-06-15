@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       rc_tag:
-        description: 'Source RC tag to promote (e.g. rc_0.1.0.5)'
+        description: 'Source RC tag to promote (e.g. rc_0.1.0)'
         required: true
         type: string
       deploy_to_prd:
@@ -85,7 +85,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        package: [php, nginx]
+        package: [api, twm, client]
     steps:
       - uses: shrink/actions-docker-registry-tag@v4
         with:

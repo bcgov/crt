@@ -86,8 +86,67 @@ Use the following steps to run the local development environment
    npm start
    ```
 
-## OpenShift Deployment
+## GitHub Actions Deployment
 
-Refer to [this document](openshift/README.md) for OpenShift Deployment and Pipeline related topics
+Deployments are managed through GitHub Actions and the CRT GitOps repository (`bcgov-c/tenant-gitops-2d982c`). The current deploy workflow is **CD - Update GitOps repository**, defined in `.github/workflows/argo-cd.yml`.
 
+The deploy workflow updates the image tag in the target GitOps values file:
 
+- `argocd/env-apps/values-dev.yaml`
+- `argocd/env-apps/values-test.yaml`
+- `argocd/env-apps/values-uat.yaml`
+- `argocd/env-apps/values-prod.yaml`
+
+It then promotes the `api`, `client`, and `twm` GHCR images by adding the environment tag.
+
+### Standard Flow
+
+1. Create a branch and open a pull request against `master`.
+2. The **Build and Push to GHCR** workflow builds PR images for `api`, `client`, and `twm`.
+3. To deploy an existing image tag, run **CD - Update GitOps repository**.
+4. After testing and merge, use **Create Test rc Tag** to create an `rc_*` tag and optionally deploy it to `test`.
+5. To promote a release candidate to production, use **Create Production v Tag** and optionally deploy it to `prod`.
+
+### Deploy an Existing Image Tag
+
+Use **CD - Update GitOps repository** to deploy an existing image tag to `dev`, `test`, `uat`, or `prod`.
+
+1. Open **Actions** in GitHub.
+2. Select **CD - Update GitOps repository**.
+3. Select **Run workflow**.
+4. Choose the target `environment`: `dev`, `test`, `uat`, or `prod`.
+5. Enter the `tag` to deploy.
+6. Run the workflow.
+
+Accepted `tag` inputs include:
+
+- `sha-xxxxxxx`, such as `sha-a1b2c3d`
+- A full or short git commit SHA, which the workflow normalizes to `sha-xxxxxxx`
+- An existing image tag, such as `pr-123`, `rc_1.2.3`, or `v1.2.3`
+
+The tag should already exist in GHCR for `api`, `client`, and `twm` before deploying.
+
+### Create a Test Release Candidate
+
+Use **Create Test rc Tag** to create a release candidate tag from a git commit and optionally deploy it to `test`.
+
+1. Open **Actions** in GitHub.
+2. Select **Create Test rc Tag**.
+3. Select **Run workflow**.
+4. Enter `build_sha` as `latest`, a git ref, a full SHA, a short SHA, or `sha-xxxxxxx`.
+5. Enter `rc_tag` in the format `rc_x.y.z`, such as `rc_1.2.3`.
+6. Leave `deploy_to_tst` enabled to deploy the RC tag to `test`, or disable it to only create the tag and GitHub pre-release.
+7. Optionally enable `dry_run` to validate the inputs without creating tags or deploying.
+
+This workflow creates the RC git tag, retags the `api`, `client`, and `twm` images from the matching `sha-xxxxxxx` image tag to the RC tag, creates a GitHub pre-release, and calls **CD - Update GitOps repository** when deployment is enabled.
+
+### Promote a Production Release
+
+Use **Create Production v Tag** to promote an existing `rc_*` tag to a production `v*` tag and optionally deploy it to `prod`.
+
+1. Open **Actions** in GitHub.
+2. Select **Create Production v Tag**.
+3. Select **Run workflow**.
+4. Enter the source `rc_tag`, such as `rc_1.2.3`.
+5. Enable `deploy_to_prd` if the production tag should be deployed immediately.
+6. Run the workflow.
