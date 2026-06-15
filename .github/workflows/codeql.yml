@@ -8,15 +8,19 @@ on:
 #  schedule:
 #    - cron: "0 11 * * 0" # 3 AM PST = 12 PM UDT, runs sundays
   workflow_dispatch:
+  push:
+    branches: ["master"]
+  schedule:
+    - cron: "19 1 * * 5"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  analyze:
+  analyze-no-build:
     name: Analyze (${{ matrix.language }})
-    if: (! github.event.pull_request.draft)
+    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -27,32 +31,50 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - language: actions
-            build-mode: none
-          - language: javascript-typescript
-            build-mode: none
-          - language: csharp
-            build-mode: manual
+        language: [actions, javascript-typescript]
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6
 
-      - uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d #v5
-        if: matrix.language == 'csharp'
-        with:
-          dotnet-version: 7.0.x
-
       - uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
-          build-mode: ${{ matrix.build-mode }}
-
-      - name: Build .NET
-        if: matrix.language == 'csharp'
-        run: dotnet build api/Crt.sln --configuration Release
+          build-mode: none
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
         with:
           category: "/language:${{ matrix.language }}"
+
+  analyze-csharp:
+    name: Analyze (csharp)
+    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6
+
+      - uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d #v5
+        with:
+          dotnet-version: 7.0.x
+
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: csharp
+          build-mode: manual
+
+      - name: Restore .NET
+        run: dotnet restore api/Crt.sln
+
+      - name: Build .NET
+        run: dotnet build api/Crt.sln --configuration Release --no-restore
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:csharp"
