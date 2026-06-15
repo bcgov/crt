@@ -103,9 +103,28 @@ It then promotes the `api`, `client`, and `twm` GHCR images by adding the enviro
 
 1. Create a branch and open a pull request against `master`.
 2. The **Build and Push to GHCR** workflow builds PR images for `api`, `client`, and `twm`.
-3. To deploy an existing image tag, run **CD - Update GitOps repository**.
+3. To deploy the pull request to `dev`, comment `/deploy` on the pull request.
 4. After testing and merge, use **Create Test rc Tag** to create an `rc_*` tag and optionally deploy it to `test`.
 5. To promote a release candidate to production, use **Create Production v Tag** and optionally deploy it to `prod`.
+
+### Merge Requirements
+
+Pull requests should not be merged until the **Builds Required** status check passes. This check waits for the full **Builds** matrix in the **Build and Push to GHCR** workflow and fails if any component image build fails, is cancelled, or is skipped unexpectedly.
+
+Configure the `master` branch protection rule or ruleset in GitHub to require the **Builds Required** status check before merging.
+
+### Deploy a Pull Request to Dev
+
+Comment `/deploy` on an open pull request to deploy that pull request's images to `dev`.
+
+The **CD - Deploy PR Comment** workflow listens for pull request comments, verifies that the commenter has repository write, maintain, or admin access, checks that `api`, `client`, and `twm` images exist for the PR tag, and then calls **CD - Update GitOps repository** with:
+
+- `environment`: `dev`
+- `tag`: `pr-<pull-request-number>`
+
+`/deploy dev` is also accepted. Other `/deploy ...` variants are ignored by this workflow.
+
+After the workflow updates GitOps, Argo CD must sync the change before it reaches OpenShift.
 
 ### Deploy an Existing Image Tag
 
