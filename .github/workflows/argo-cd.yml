@@ -1,12 +1,12 @@
-name: Update GitOps repository
-run-name: "Helm Deploy (${{ inputs.environment || github.event.inputs.environment || 'dev' }})"
+name: CD - Update GitOps repository
+run-name: "GitOps Update to ${{ inputs.environment || github.event.inputs.environment || 'dev' }}"
 
 on:
   workflow_call:
     inputs:
       tag:
-        description: "Specify a tag to deploy; defaults to PR number"
-        required: false
+        description: "Specify a tag to deploy. Required."
+        required: true
         type: string
       environment:
         description: "Target environment to deploy"
@@ -30,8 +30,8 @@ on:
           - uat
           - prod
       tag:
-        description: Specify a tag to deploy
-        required: false
+        description: Specify a tag to deploy (commit sha, sha-xxxxxxx, branch name, or pr-123). Required.
+        required: true
         type: string
 
 concurrency:
@@ -48,13 +48,29 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.vars.outputs.tag }}
+      environment: ${{ steps.vars.outputs.environment }}
     steps:
        # Variables
       - if: ${{ ! inputs.tag }}
         id: pr
         uses: bcgov/action-get-pr@bfa713a9ab410c0f0c13126c35983934fc80d15b # v0.1.1
       - id: vars
+        env:
+          RAW_ENVIRONMENT: ${{ inputs.environment || github.event.inputs.environment || 'dev' }}
+          RAW_TAG: ${{ inputs.tag || github.event.inputs.tag }}
         run: |
+          set -euo pipefail
+
+          ENVIRONMENT="$RAW_ENVIRONMENT"
+
+          case "$ENVIRONMENT" in
+            dev|test|uat|prod) ;;
+            *)
+              echo "Error: unsupported environment '$RAW_ENVIRONMENT'. Expected one of: dev, test, uat, prod."
+              exit 1
+              ;;
+          esac
+
           # Tag defaults to explicitly provided input, then PR number, then the branch name
           PR=${{ steps.pr.outputs.pr }}
           if [ -n "$PR" ]; then
@@ -63,12 +79,23 @@ jobs:
              PR_TAG=""
           fi
           
-          tag=${{ inputs.tag || github.event.inputs.tag }}
-          tag=${tag:-$PR_TAG}
-          tag=${tag:-${{ github.ref_name }}}
+          TAG="$RAW_TAG"
+          TAG=${TAG:-$PR_TAG}
+          TAG=${TAG:-${{ github.ref_name }}}
+
+          if [[ "$TAG" =~ ^sha-([0-9a-fA-F]{7,40})$ ]]; then
+            SHA="${BASH_REMATCH[1]}"
+            TAG="sha-${SHA:0:7}"
+          elif [[ "$TAG" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
+            TAG="sha-${TAG:0:7}"
+          fi
 
           # Output
-          echo "tag=${tag}" >> $GITHUB_OUTPUT
+          echo "environment=${ENVIRONMENT}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+          echo "Environment: ${ENVIRONMENT}"
+          echo "Tag: ${TAG}"
       - name: Checkout GitOps repository
         uses: actions/checkout@v4
         with:
@@ -78,16 +105,24 @@ jobs:
 
       - name: Update Helm values
         run: |
+          set -euo pipefail
+
           cd gitops-repo
-          ENV="${{ inputs.environment || github.event.inputs.environment || 'dev' }}"
+          ENV="${{ steps.vars.outputs.environment }}"
           TAG="${{ steps.vars.outputs.tag }}"
+          VALUES_FILE="argocd/env-apps/values-${ENV}.yaml"
+
+          if [ ! -f "$VALUES_FILE" ]; then
+            echo "Error: GitOps values file '$VALUES_FILE' does not exist."
+            exit 1
+          fi
           
           # Use yq to update the tag in the values file
-          yq -i ".global.image.tag = \"${TAG}\"" argocd/env-apps/values-${ENV}.yaml
+          yq -i ".global.image.tag = \"${TAG}\"" "$VALUES_FILE"
           
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add argocd/env-apps/values-${ENV}.yaml
+          git add "$VALUES_FILE"
           git commit -m "Deploy CRT to ${ENV} with tag ${TAG}" || echo "No changes to commit"
           git push origin main
           
@@ -107,4 +142,4 @@ jobs:
           registry: ghcr.io
           repository: ${{ github.repository }}/${{ matrix.package }}
           target: ${{ needs.update-gitops.outputs.tag }}
-          tags: ${{ inputs.environment || github.event.inputs.environment || 'dev' }}  # Promote images AFTER successful deploy
+          tags: ${{ needs.update-gitops.outputs.environment }}
