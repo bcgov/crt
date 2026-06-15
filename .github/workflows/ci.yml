@@ -98,6 +98,24 @@ jobs:
             type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
 
+  builds-required:
+    name: Builds Required
+    if: ${{ always() && github.event_name == 'pull_request' }}
+    needs: [builds]
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Require successful builds
+        run: |
+          set -euo pipefail
+
+          if [ "${{ needs.builds.result }}" != "success" ]; then
+            echo "Builds job result was '${{ needs.builds.result }}'. Pull requests must pass Builds before merging."
+            exit 1
+          fi
+
+          echo "Builds completed successfully."
+
   retag-merged-commit:
     name: Retag Merged Commit
     if: github.event_name == 'push'
