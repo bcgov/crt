@@ -39,7 +39,7 @@
   },
   "overrides": {
     "autoprefixer": "10.4.5",
-    "@babel/traverse": ">=7.23.2"
+    "@babel/traverse": "^7.23.2"
   },
   "devDependencies": {
     "concurrently": "^6.0.0",
