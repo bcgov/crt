@@ -126,7 +126,7 @@ jobs:
       matrix:
         package: [api, twm, client]
     steps:
-      - uses: shrink/actions-docker-registry-tag@v4
+      - uses: shrink/actions-docker-registry-tag@v5
         with:
           registry: ghcr.io
           repository: ${{ github.repository }}/${{ matrix.package }}
@@ -145,7 +145,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Create GitHub Pre-release with Release Notes
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ inputs.rc_tag }}
           prerelease: true
