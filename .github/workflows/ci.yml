@@ -139,10 +139,21 @@ jobs:
           TARGET_SHA="${{ github.sha }}"
           TARGET_TAG="sha-${TARGET_SHA:0:7}"
 
-          PR_NUMBER="$(gh api \
-            -H "Accept: application/vnd.github+json" \
-            "/repos/${{ github.repository }}/commits/${TARGET_SHA}/pulls" \
-            --jq '.[0].number // empty')"
+          # GitHub API lags sometimes after a push, so retry once with a delay to find the associated PR
+          PR_NUMBER=""
+          for attempt in 1 2; do
+            PR_NUMBER="$(gh api \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/${{ github.repository }}/commits/${TARGET_SHA}/pulls" \
+              --jq '.[0].number // empty')"
+
+            if [ -n "$PR_NUMBER" ] || [ "$attempt" -eq 2 ]; then
+              break
+            fi
+
+            echo "No associated PR found yet for ${TARGET_SHA}. Retrying in 10 seconds..."
+            sleep 10
+          done
 
           if [ -z "$PR_NUMBER" ]; then
             echo "Error: no associated PR found for ${TARGET_SHA}; cannot retag merged commit."
