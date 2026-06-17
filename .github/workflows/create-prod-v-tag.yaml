@@ -30,7 +30,7 @@ jobs:
       BRANCH: ${{ github.ref_name }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           ref: ${{ env.BRANCH }}
           fetch-depth: 0
@@ -87,7 +87,7 @@ jobs:
       matrix:
         package: [api, twm, client]
     steps:
-      - uses: shrink/actions-docker-registry-tag@v5
+      - uses: shrink/actions-docker-registry-tag@e6aaef25c595b6e0edd18bf4c7dbfea3abd43299 # v5
         with:
           registry: ghcr.io
           repository: ${{ github.repository }}/${{ matrix.package }}

@@ -25,7 +25,7 @@ jobs:
       pull-requests: write
     timeout-minutes: 1
     steps:
-      - uses: bcgov/action-pr-description-add@d79a5c3b49d3b3b3215495afac3ae599cef191bb #v2.0.1
+      - uses: bcgov/action-pr-description-add@d79a5c3b49d3b3b3215495afac3ae599cef191bb # v2.0.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           add_markdown: |
@@ -81,7 +81,7 @@ jobs:
         package: [api, client, twm]
     timeout-minutes: 10
     steps:
-      - uses: bcgov/action-builder-ghcr@cb2629351c87dd1c2130073e4ebb7233a9653a63 #v4.4.1
+      - uses: bcgov/action-builder-ghcr@cb2629351c87dd1c2130073e4ebb7233a9653a63 # v4.4.1
         env:
           DOCKER_METADATA_PR_HEAD_SHA: true
         with:
@@ -168,7 +168,7 @@ jobs:
           echo "Target image tag: ${TARGET_TAG}"
 
       - name: Retag PR image as merged commit image
-        uses: shrink/actions-docker-registry-tag@v5
+        uses: shrink/actions-docker-registry-tag@e6aaef25c595b6e0edd18bf4c7dbfea3abd43299 # v5
         with:
           registry: ghcr.io
           repository: ${{ github.repository }}/${{ matrix.package }}
