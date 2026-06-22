@@ -39,15 +39,19 @@ test.describe('TC-TS-CODE-07 — Disable active used code value', () => {
     await expect(page.locator('table tbody tr').first()).toBeVisible();
   });
 
-  test('Disable "Culvert <3m" and verify it moves to Inactive', async ({ page }) => {
-    await test.step('Step 1: Verify Culvert <3m has Disable button', async () => {
-      const row = page.locator('table tbody tr', { hasText: 'Culvert <3m' });
-      await expect(row).toBeVisible();
-      await expect(row.getByRole('button', { name: 'Disable Record' })).toBeVisible();
+  test('Disable an active used code value and verify it moves to Inactive', async ({ page }) => {
+    let entryName: string;
+
+    await test.step('Step 1: Find an active entry with a Disable button', async () => {
+      // An entry with "Disable Record" is one referenced by project data (cannot be deleted outright)
+      const row = page.locator('table tbody tr:has(button[title="Disable Record"])').first();
+      await expect(row).toBeVisible({ timeout: 10_000 });
+      entryName = ((await row.locator('td').nth(1).textContent()) ?? '').trim();
+      expect(entryName.length).toBeGreaterThan(0);
     });
 
     await test.step('Step 2: Click Disable and verify confirmation popover', async () => {
-      const row = page.locator('table tbody tr', { hasText: 'Culvert <3m' });
+      const row = page.locator('table tbody tr').filter({ hasText: entryName }).first();
       await row.getByRole('button', { name: 'Disable Record' }).click();
 
       const popover = page.locator('[role="tooltip"]');
@@ -62,7 +66,7 @@ test.describe('TC-TS-CODE-07 — Disable active used code value', () => {
       await popover.getByRole('button', { name: 'Disable' }).click();
 
       // Entry should disappear from Active view
-      await expect(page.locator('table tbody tr', { hasText: 'Culvert <3m' })).toBeHidden({ timeout: 10_000 });
+      await expect(page.locator('table tbody tr').filter({ hasText: entryName })).toBeHidden({ timeout: 10_000 });
     });
 
     await test.step('Step 4: Switch to Inactive and verify entry is there', async () => {
@@ -71,18 +75,18 @@ test.describe('TC-TS-CODE-07 — Disable active used code value', () => {
       await page.getByRole('checkbox', { name: 'Active', exact: true }).uncheck();
       await page.getByRole('button', { name: 'Search' }).click();
 
-      await expect(page.locator('table tbody tr', { hasText: 'Culvert <3m' })).toBeVisible();
+      await expect(page.locator('table tbody tr').filter({ hasText: entryName }).first()).toBeVisible();
     });
 
-    await test.step('Cleanup: Re-enable Culvert <3m', async () => {
-      const row = page.locator('table tbody tr', { hasText: 'Culvert <3m' });
+    await test.step('Cleanup: Re-enable the entry', async () => {
+      const row = page.locator('table tbody tr').filter({ hasText: entryName }).first();
       await row.getByRole('button', { name: 'Disable Record' }).click();
 
       const popover = page.locator('[role="tooltip"]');
       await expect(popover).toBeVisible();
       await popover.getByRole('button', { name: 'Activate' }).click();
 
-      // Verify it's gone from Inactive
+      // Verify it's gone from Inactive view
       await expect(row).toBeHidden({ timeout: 10_000 });
     });
   });

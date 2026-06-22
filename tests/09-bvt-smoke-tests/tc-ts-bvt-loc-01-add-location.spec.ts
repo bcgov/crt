@@ -38,11 +38,12 @@ import { test, expect } from '@playwright/test';
 test.describe('TC-TS-BVT-LOC-01 — BVT: Add project location segment', () => {
   test.setTimeout(120_000);
 
-  // Use project 81 (existing BVT test project)
-  const projectId = 81;
+  // projectId discovered dynamically at runtime
 
   test('Add project location segment', async ({ page }) => {
     let authToken: string | null = null;
+    let projectId = 0;
+    let segmentsUrl = '';
 
     // Capture Bearer token from app's API requests
     page.on('request', (req) => {
@@ -57,11 +58,34 @@ test.describe('TC-TS-BVT-LOC-01 — BVT: Add project location segment', () => {
     });
 
     await test.step('Step 1: Navigate to segments page and capture auth token', async () => {
-      await page.goto(`/projects/${projectId}/segments`);
-      await page.waitForTimeout(3000);
+      // Discover first project dynamically
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const href = await page.locator('table tbody tr td:nth-child(2) a').first().getAttribute('href');
+      const match = href?.match(/\/projects\/(\d+)/);
+      projectId = match ? parseInt(match[1]) : 0;
+      expect(projectId).toBeGreaterThan(0);
+      segmentsUrl = `${href}/segments`;
 
-      // Ensure auth token is captured
+      // Navigate to segments page — triggers API calls that capture the auth token
+      const responsePromise = page.waitForResponse(
+        resp => resp.url().includes('/api/projects/') && resp.status() === 200,
+        { timeout: 30000 }
+      );
+      await page.goto(segmentsUrl);
+      await responsePromise;
       expect(authToken).not.toBeNull();
+
+      // Defensive cleanup: remove any leftover BVT Test Segment from a prior run
+      const segTable = page.locator('table').first();
+      const leftover = segTable.locator('tbody tr:has-text("BVT Test Segment")');
+      if (await leftover.isVisible()) {
+        await leftover.locator('button[title="Delete Record"]').click();
+        const popover = page.locator('[role="tooltip"]');
+        await expect(popover).toBeVisible();
+        await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+        await expect(leftover).toBeHidden({ timeout: 10_000 });
+      }
     });
 
     await test.step('Step 2: Create segment via API', async () => {
@@ -91,11 +115,10 @@ test.describe('TC-TS-BVT-LOC-01 — BVT: Add project location segment', () => {
 
     await test.step('Step 3: Reload and verify segment appears in table', async () => {
       await page.reload();
-      await page.waitForTimeout(3000);
 
       const segTable = page.locator('table').first();
       const row = segTable.locator('tbody tr:has-text("BVT Test Segment")');
-      await expect(row).toBeVisible();
+      await expect(row).toBeVisible({ timeout: 15_000 });
 
       // Verify start coordinates
       const rowText = await row.textContent();
@@ -110,27 +133,12 @@ test.describe('TC-TS-BVT-LOC-01 — BVT: Add project location segment', () => {
       const segTable = page.locator('table').first();
       const row = segTable.locator('tbody tr:has-text("BVT Test Segment")');
 
-      // Click Delete Record
-      await row.locator('button[title="Delete Record"]').evaluate((el) => (el as HTMLElement).click());
-      await page.waitForTimeout(500);
+      await row.locator('button[title="Delete Record"]').click();
 
-      // Confirm deletion in popover
-      await page.evaluate(() => {
-        const popovers = document.querySelectorAll('.popover');
-        for (const p of popovers) {
-          const btns = p.querySelectorAll('button');
-          for (const btn of btns) {
-            if (btn.textContent && btn.textContent.trim() === 'Delete') {
-              btn.click();
-              return;
-            }
-          }
-        }
-      });
-      await page.waitForTimeout(2000);
-
-      // Verify deleted
-      await expect(segTable.locator('tbody tr:has-text("BVT Test Segment")')).not.toBeVisible();
+      const popover = page.locator('[role="tooltip"]');
+      await expect(popover).toBeVisible();
+      await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+      await expect(segTable.locator('tbody tr:has-text("BVT Test Segment")')).toBeHidden({ timeout: 10_000 });
     });
   });
 });

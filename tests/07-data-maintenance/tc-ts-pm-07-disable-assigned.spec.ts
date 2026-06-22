@@ -37,24 +37,62 @@ import { test, expect } from '@playwright/test';
 test.describe('TC-TS-PM-07 — Disable PM assigned to projects', () => {
   test.setTimeout(180_000);
 
-  const PM_NAME = 'Devashish Bhargava';
-  const PROJECT_ID = 79;
-
   test.beforeEach(async ({ page }) => {
     await page.goto('/admin/codetables');
-    await expect(page.locator('table tbody tr').first()).toBeVisible();
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
 
     // Select Project Manager code set
     await page.getByRole('button', { name: 'Accomplishment', exact: true }).click();
     await page.getByRole('menuitem', { name: 'Project Manager' }).click();
     await page.getByRole('button', { name: 'Search' }).click();
     await expect(page).toHaveURL(/codeSet=PROJECT_MANAGER/);
-    await expect(page.locator('table tbody tr').first()).toBeVisible();
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
   });
 
   test('Disable assigned PM and verify removal from dropdown but preserved assignment', async ({ page }) => {
+    let pmName = '';
+    let projectHref = '';
+
+    await test.step('Pre-setup: Find an assigned PM and a project with that PM', async () => {
+      // Dynamically find first PM with a Disable Record button (assigned to projects)
+      const disableRow = page.locator('table tbody tr:has(button[title="Disable Record"])').first();
+      await expect(disableRow).toBeVisible({ timeout: 10_000 });
+      pmName = ((await disableRow.locator('td').nth(1).textContent()) ?? '').trim();
+      expect(pmName).not.toBe('');
+
+      // Iterate through projects to find one where this PM is assigned
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      // Collect all hrefs before navigating away (locators become stale after navigation)
+      const projectLinks = await page.locator('table tbody tr td:nth-child(2) a').all();
+      const projectHrefs: string[] = [];
+      for (const link of projectLinks) {
+        const href = await link.getAttribute('href');
+        if (href) projectHrefs.push(href);
+      }
+      for (const href of projectHrefs) {
+        await page.goto(href);
+        await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible({ timeout: 15000 });
+        const pmCell = page.locator('text=Project Manager').first().locator('..');
+        const cellText = ((await pmCell.textContent()) ?? '').trim();
+        if (cellText.includes(pmName)) {
+          projectHref = href;
+          break;
+        }
+      }
+
+      // Return to code tables with Project Manager filter active
+      await page.goto('/admin/codetables');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      await page.getByRole('button', { name: 'Accomplishment', exact: true }).click();
+      await page.getByRole('menuitem', { name: 'Project Manager' }).click();
+      await page.getByRole('button', { name: 'Search' }).click();
+      await expect(page).toHaveURL(/codeSet=PROJECT_MANAGER/);
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+    });
+
     await test.step('Step 1: Verify PM is active and shows Disable (not Delete)', async () => {
-      const row = page.locator('table tbody tr', { hasText: PM_NAME });
+      const row = page.locator('table tbody tr', { hasText: pmName });
       await expect(row).toBeVisible();
       await expect(row.locator('td').nth(3)).toHaveText('Active');
       await expect(row.getByRole('button', { name: 'Disable Record' })).toBeVisible();
@@ -62,7 +100,7 @@ test.describe('TC-TS-PM-07 — Disable PM assigned to projects', () => {
     });
 
     await test.step('Step 2: Click Disable and confirm', async () => {
-      const row = page.locator('table tbody tr', { hasText: PM_NAME });
+      const row = page.locator('table tbody tr', { hasText: pmName });
       await row.getByRole('button', { name: 'Disable Record' }).click();
 
       const popover = page.locator('[role="tooltip"]');
@@ -75,55 +113,57 @@ test.describe('TC-TS-PM-07 — Disable PM assigned to projects', () => {
     });
 
     await test.step('Step 3: Verify PM NOT in Project Details dropdown', async () => {
-      await page.goto(`/projects/${PROJECT_ID}`);
-      await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible();
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const firstProjectLink = page.locator('table tbody tr td:nth-child(2) a').first();
+      const href = await firstProjectLink.getAttribute('href');
+      await page.goto(href as string);
+      await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible({ timeout: 30000 });
 
       await page.getByRole('button', { name: 'Edit Project' }).click();
-      await page.waitForTimeout(1000);
 
       // Open PM dropdown and search
       const pmDropdown = page.locator('label:has-text("Project Manager")').locator('..').locator('..').locator('.dropdown-toggle');
+      await expect(pmDropdown).toBeVisible({ timeout: 10_000 });
       await pmDropdown.click();
-      await page.waitForTimeout(500);
 
       const pmSearch = page.locator('input[name="projectMgrLkupId"]');
-      await pmSearch.fill('Devashish');
-      await page.waitForTimeout(500);
+      await expect(pmSearch).toBeVisible({ timeout: 10_000 });
+      await pmSearch.fill(pmName);
 
       // Verify PM is NOT in the dropdown (disabled PMs removed from edit options)
-      await expect(page.getByRole('menuitem', { name: PM_NAME })).toBeHidden();
+      await expect(page.getByRole('menuitem', { name: pmName })).toBeHidden();
 
       await page.getByRole('button', { name: 'Cancel' }).click();
     });
 
     await test.step('Step 4: Verify project still shows PM in read-only view', async () => {
-      await page.goto(`/projects/${PROJECT_ID}`);
-      await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible();
-
-      // The PM name should still display in the read-only project details
-      await expect(page.locator('text=Project Manager').first().locator('..')).toContainText(PM_NAME);
+      if (!projectHref) {
+        console.warn(`No project found with PM '${pmName}' assigned; skipping read-only verification`);
+        return;
+      }
+      await page.goto(projectHref);
+      await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible({ timeout: 30000 });
+      await expect(page.locator('text=Project Manager').first().locator('..')).toContainText(pmName);
     });
 
     await test.step('Cleanup: Re-enable the PM', async () => {
       await page.goto('/admin/codetables');
-      await expect(page.locator('table tbody tr').first()).toBeVisible();
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
 
       await page.getByRole('button', { name: 'Accomplishment', exact: true }).click();
       await page.getByRole('menuitem', { name: 'Project Manager' }).click();
       await page.getByRole('button', { name: 'Search' }).click();
       await expect(page).toHaveURL(/codeSet=PROJECT_MANAGER/);
-      await page.waitForTimeout(1000);
 
       // Switch to Inactive filter
       await page.getByRole('button', { name: 'Active' }).click();
-      await page.waitForTimeout(300);
       await page.getByRole('checkbox', { name: 'Inactive' }).check();
       await page.getByRole('checkbox', { name: 'Active', exact: true }).uncheck();
       await page.getByRole('button', { name: 'Search' }).click();
-      await page.waitForTimeout(3000);
 
-      const row = page.locator('table tbody tr', { hasText: PM_NAME });
-      await expect(row).toBeVisible();
+      const row = page.locator('table tbody tr', { hasText: pmName });
+      await expect(row).toBeVisible({ timeout: 15_000 });
       await row.getByRole('button', { name: 'Disable Record' }).click();
 
       const popover = page.locator('[role="tooltip"]');

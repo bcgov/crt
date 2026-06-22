@@ -37,48 +37,56 @@ import { test, expect } from '@playwright/test';
 test.describe('TC-TS-BVT-TEND-02 — BVT: Add tender details to existing project', () => {
   test.setTimeout(120_000);
 
-  const projectId = 81;
   const tenderNumber = `BVT-T${Date.now().toString().slice(-6)}`;
 
   test('Add tender details to existing project', async ({ page }) => {
+    let projectTenderUrl = '';
+    let initialTenderCount = 0;
+
     page.on('dialog', async (dialog) => {
       await dialog.accept();
     });
 
-    await test.step('Step 1: Navigate to project Tender tab and verify empty', async () => {
-      await page.goto(`/projects/${projectId}/projecttender`);
-      await page.waitForTimeout(3000);
+    await test.step('Step 1: Navigate to project Tender tab and capture initial state', async () => {
+      // Discover first project dynamically
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30_000 });
+      const firstLink = page.locator('table tbody tr td:nth-child(2) a').first();
+      const href = await firstLink.getAttribute('href');
+      projectTenderUrl = `${href}/projecttender`;
 
-      // Verify tender table shows no data
+      await page.goto(projectTenderUrl);
+
+      // Verify tender table is visible with expected headers
       const tenderTable = page.locator('table').first();
-      await expect(tenderTable.locator('th:has-text("Tender #")')).toBeVisible();
-      expect(await tenderTable.locator('tbody tr').count()).toBe(0);
+      await expect(tenderTable.locator('th:has-text("Tender #")')).toBeVisible({ timeout: 30_000 });
+
+      // Capture initial row count (project may have pre-existing tenders)
+      initialTenderCount = await tenderTable.locator('tbody tr').count();
     });
 
     await test.step('Step 2: Add tender entry (Tender Number, Bid Value)', async () => {
       // Click "+ Add" for Tender
-      await page.locator('button:has-text("+ Add"):visible').first().click();
-      await page.waitForTimeout(1000);
+      await page.locator('button:has-text("+ Add")').first().dispatchEvent('click');
 
       const dialog = page.getByRole('dialog');
-      await expect(dialog).toBeVisible();
+      await expect(dialog).toBeVisible({ timeout: 15_000 });
 
       // Fill Tender Number
       await dialog.locator('input[name="tenderNumber"]').fill(tenderNumber);
 
-      // Fill Bid Value ($500,000) - use visible textbox
+      // Fill Bid Value ($500,000)
       await dialog.getByRole('textbox', { name: 'Winning Bid' }).fill('500000');
-      await page.waitForTimeout(200);
 
       // Submit
       await dialog.getByRole('button', { name: 'Submit' }).click();
-      await page.waitForTimeout(3000);
+      await expect(dialog).toBeHidden({ timeout: 10_000 });
     });
 
     await test.step('Step 3: Verify tender entry appears in table', async () => {
       const tenderTable = page.locator('table').first();
       const tenderRow = tenderTable.locator(`tbody tr:has-text("${tenderNumber}")`);
-      await expect(tenderRow).toBeVisible();
+      await expect(tenderRow).toBeVisible({ timeout: 15_000 });
 
       const rowText = await tenderRow.textContent();
       expect(rowText).toContain(tenderNumber);
@@ -87,25 +95,16 @@ test.describe('TC-TS-BVT-TEND-02 — BVT: Add tender details to existing project
 
     await test.step('Step 4: Cleanup - delete the tender entry', async () => {
       const tenderTable = page.locator('table').first();
-      await tenderTable.locator(`tbody tr:has-text("${tenderNumber}")`).locator('button[title="Delete Record"]').evaluate((el) => el.click());
-      await page.waitForTimeout(500);
+      const tenderRow = tenderTable.locator(`tbody tr:has-text("${tenderNumber}")`);
 
-      await page.evaluate(() => {
-        const popovers = document.querySelectorAll('.popover');
-        for (const p of popovers) {
-          const btns = p.querySelectorAll('button');
-          for (const btn of btns) {
-            if (btn.textContent && btn.textContent.trim() === 'Delete') {
-              btn.click();
-              return;
-            }
-          }
-        }
-      });
-      await page.waitForTimeout(2000);
+      await tenderRow.locator('button[title="Delete Record"]').click();
+      const popover = page.locator('[role="tooltip"]');
+      await expect(popover).toBeVisible({ timeout: 5_000 });
+      await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+      await expect(tenderRow).toBeHidden({ timeout: 10_000 });
 
-      // Verify deleted
-      expect(await tenderTable.locator(`tbody tr:has-text("${tenderNumber}")`).count()).toBe(0);
+      // Verify row count is back to initial
+      await expect(tenderTable.locator('tbody tr')).toHaveCount(initialTenderCount, { timeout: 10_000 });
     });
   });
 });

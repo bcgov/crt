@@ -35,12 +35,16 @@ import { test, expect } from '@playwright/test';
 test.describe('TC-TS-CLONE-01 — Clone record in Qty/Accomplishment', () => {
   test.setTimeout(120_000);
 
-  const PROJECT_ID = 79;
+  let projectPath: string;
 
   test.beforeEach(async ({ page }) => {
-    // Navigate to the Tender/Qty page (Qty table is the 2nd table on the Tender page)
-    await page.goto(`/projects/${PROJECT_ID}/projecttender`);
-    await expect(page.locator('table').first()).toBeVisible();
+    // Dynamically pick the first project from the list
+    await page.goto('/projects');
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+    const firstLink = page.locator('table tbody tr td:nth-child(2) a').first();
+    projectPath = (await firstLink.getAttribute('href')) as string;
+    await page.goto(`${projectPath}/projecttender`);
+    await expect(page.locator('table').first()).toBeVisible({ timeout: 30000 });
   });
 
   test('Clone Qty record with modified fiscal year and forecast', async ({ page }) => {

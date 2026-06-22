@@ -36,87 +36,96 @@ import { test, expect } from '@playwright/test';
 test.describe('TC-TS-BVT-RAT-01 — BVT: Add ratios manually', () => {
   test.setTimeout(120_000);
 
-  const projectId = 81;
+  // projectId discovered dynamically at runtime
 
   test('Add ratios manually', async ({ page }) => {
+    let projectId = 0;
+    let initialRowCount = 0;
+
     page.on('dialog', async (dialog) => {
       await dialog.accept();
     });
 
     await test.step('Step 1: Navigate to segments/ratios page', async () => {
-      await page.goto(`/projects/${projectId}/segments`);
-      await page.waitForTimeout(3000);
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const href = await page.locator('table tbody tr td:nth-child(2) a').first().getAttribute('href');
+      const match = href?.match(/\/projects\/(\d+)/);
+      projectId = match ? parseInt(match[1]) : 0;
+      expect(projectId).toBeGreaterThan(0);
+
+      await page.goto(`${href}/segments`);
+      await expect(page.locator('h1, h2, h3').first()).toBeVisible({ timeout: 30000 });
+
+      // Defensive cleanup: remove any leftover ratio rows with values 0.6 or 0.4 from a prior run
+      const edTable = page.locator('table').nth(1);
+      for (const ratioText of ['0.6', '0.4']) {
+        const leftover = edTable.locator(`tbody tr:has-text("${ratioText}")`);
+        if (await leftover.isVisible()) {
+          await leftover.locator('button[title="Delete Record"]').click();
+          const popover = page.locator('[role="tooltip"]');
+          await expect(popover).toBeVisible();
+          await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+          await expect(leftover).toBeHidden({ timeout: 10_000 });
+        }
+      }
+      initialRowCount = await edTable.locator('tbody tr').count();
     });
 
     await test.step('Step 2: Add first Electoral District ratio (0.60)', async () => {
       // Click "+ Add" for Electoral Districts (index 1 among visible "+ Add" buttons)
       const addBtns = page.locator('button:has-text("+ Add"):visible');
       await addBtns.nth(1).click();
-      await page.waitForTimeout(1000);
 
       const dialog = page.getByRole('dialog');
       await expect(dialog).toBeVisible();
 
-      // Select first Electoral District option
-      await page.evaluate(() => {
-        const dlg = document.querySelector('[role="dialog"]');
-        const dds = dlg!.querySelectorAll('button.dropdown-toggle');
-        (dds[0] as HTMLElement).click();
-      });
-      await page.waitForTimeout(500);
-      await page.evaluate(() => {
-        const items = document.querySelectorAll('.dropdown-menu.show button.dropdown-item');
-        if (items.length > 0) (items[0] as HTMLElement).click();
-      });
-      await page.waitForTimeout(300);
+      // Open district dropdown and select first option
+      const ddToggle = dialog.locator('button.dropdown-toggle').first();
+      await ddToggle.click();
+      const ddMenu = page.locator('.dropdown-menu.show');
+      await expect(ddMenu).toBeVisible({ timeout: 5000 });
+      await ddMenu.locator('button.dropdown-item').first().click();
 
       // Fill ratio value
       await dialog.locator('input[name="ratio"]').fill('0.60');
 
       // Submit
       await dialog.getByRole('button', { name: 'Submit' }).click();
-      await page.waitForTimeout(2000);
+      await expect(dialog).toBeHidden({ timeout: 10_000 });
 
       // Verify entry appears in Electoral Districts table
       const edTable = page.locator('table').nth(1);
-      const row = edTable.locator('tbody tr').first();
-      await expect(row).toBeVisible();
-      const rowText = await row.textContent();
-      expect(rowText).toContain('0.6');
+      await expect(edTable.locator('tbody tr').first()).toBeVisible({ timeout: 10_000 });
+      const allText = await edTable.locator('tbody').textContent();
+      expect(allText).toContain('0.6');
     });
 
     await test.step('Step 3: Add second Electoral District ratio (0.40)', async () => {
       const addBtns = page.locator('button:has-text("+ Add"):visible');
       await addBtns.nth(1).click();
-      await page.waitForTimeout(1000);
 
       const dialog = page.getByRole('dialog');
       await expect(dialog).toBeVisible();
 
-      // Select second Electoral District option
-      await page.evaluate(() => {
-        const dlg = document.querySelector('[role="dialog"]');
-        const dds = dlg!.querySelectorAll('button.dropdown-toggle');
-        (dds[0] as HTMLElement).click();
-      });
-      await page.waitForTimeout(500);
-      await page.evaluate(() => {
-        const items = document.querySelectorAll('.dropdown-menu.show button.dropdown-item');
-        if (items.length > 1) (items[1] as HTMLElement).click();
-      });
-      await page.waitForTimeout(300);
+      // Open district dropdown and select second option
+      const ddToggle = dialog.locator('button.dropdown-toggle').first();
+      await ddToggle.click();
+      const ddMenu = page.locator('.dropdown-menu.show');
+      await expect(ddMenu).toBeVisible({ timeout: 5000 });
+      await ddMenu.locator('button.dropdown-item').nth(1).click();
 
       // Fill ratio value
       await dialog.locator('input[name="ratio"]').fill('0.40');
 
       // Submit
       await dialog.getByRole('button', { name: 'Submit' }).click();
-      await page.waitForTimeout(2000);
+      await expect(dialog).toBeHidden({ timeout: 10_000 });
 
-      // Verify both entries appear
+      // Verify both ratio values are present in the table
       const edTable = page.locator('table').nth(1);
-      const rows = edTable.locator('tbody tr');
-      expect(await rows.count()).toBe(2);
+      const rowCount = await edTable.locator('tbody tr').count();
+      expect(rowCount).toBe(initialRowCount + 2);
     });
 
     await test.step('Step 4: Verify ratios sum to 1.00 (no warning displayed)', async () => {
@@ -134,43 +143,24 @@ test.describe('TC-TS-BVT-RAT-01 — BVT: Add ratios manually', () => {
     await test.step('Step 5: Cleanup - delete both ratio entries', async () => {
       const edTable = page.locator('table').nth(1);
 
-      // Delete second entry
-      await edTable.locator('tbody tr').nth(1).locator('button[title="Delete Record"]').evaluate((el) => el.click());
-      await page.waitForTimeout(500);
-      await page.evaluate(() => {
-        const popovers = document.querySelectorAll('.popover');
-        for (const p of popovers) {
-          const btns = p.querySelectorAll('button');
-          for (const btn of btns) {
-            if (btn.textContent && btn.textContent.trim() === 'Delete') {
-              btn.click();
-              return;
-            }
-          }
-        }
-      });
-      await page.waitForTimeout(2000);
+      // Delete by ratio value to avoid affecting pre-existing rows
+      const row40 = edTable.locator('tbody tr:has-text("0.4")');
+      await row40.locator('button[title="Delete Record"]').click();
+      const popover40 = page.locator('[role="tooltip"]');
+      await expect(popover40).toBeVisible();
+      await popover40.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+      await expect(row40).toBeHidden({ timeout: 10_000 });
 
-      // Delete first entry
-      await edTable.locator('tbody tr').first().locator('button[title="Delete Record"]').evaluate((el) => el.click());
-      await page.waitForTimeout(500);
-      await page.evaluate(() => {
-        const popovers = document.querySelectorAll('.popover');
-        for (const p of popovers) {
-          const btns = p.querySelectorAll('button');
-          for (const btn of btns) {
-            if (btn.textContent && btn.textContent.trim() === 'Delete') {
-              btn.click();
-              return;
-            }
-          }
-        }
-      });
-      await page.waitForTimeout(2000);
+      const row60 = edTable.locator('tbody tr:has-text("0.6")');
+      await row60.locator('button[title="Delete Record"]').click();
+      const popover60 = page.locator('[role="tooltip"]');
+      await expect(popover60).toBeVisible();
+      await popover60.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+      await expect(row60).toBeHidden({ timeout: 10_000 });
 
-      // Verify table is empty
+      // Verify row count returned to initial
       const finalRows = await edTable.locator('tbody tr').count();
-      expect(finalRows).toBe(0);
+      expect(finalRows).toBe(initialRowCount);
     });
   });
 });

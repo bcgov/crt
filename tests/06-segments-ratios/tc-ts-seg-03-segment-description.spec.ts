@@ -36,9 +36,29 @@ test.describe('TC-TS-SEG-03 — Segment description auto-generates and is editab
   test.setTimeout(120_000);
 
   test('Verify existing segment has auto-generated description', async ({ page }) => {
-    await test.step('Step 1: Navigate to segments page', async () => {
-      await page.goto('/projects/79/segments');
-      await expect(page.getByText('Project Segments')).toBeVisible();
+    await test.step('Step 1: Navigate to segments page for a project with segments', async () => {
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+
+      const projectLinks = page.locator('table tbody tr td:nth-child(2) a');
+      const count = await projectLinks.count();
+      const hrefs: (string | null)[] = [];
+      for (let i = 0; i < count; i++) {
+        hrefs.push(await projectLinks.nth(i).getAttribute('href'));
+      }
+
+      let found = false;
+      for (let i = 0; i < hrefs.length && !found; i++) {
+        await page.goto(`${hrefs[i]}/segments`);
+        await expect(page.getByText('Project Segments')).toBeVisible();
+        const segTable = page.locator('table').first();
+        const segRows = await segTable.locator('tbody tr').count();
+        if (segRows > 0) {
+          found = true;
+        }
+      }
+
+      expect(found, 'Could not find a project with segments').toBe(true);
     });
 
     await test.step('Step 2: Verify existing segment has a non-empty description', async () => {
@@ -47,8 +67,6 @@ test.describe('TC-TS-SEG-03 — Segment description auto-generates and is editab
       await expect(descriptionCell).toBeVisible();
       const text = await descriptionCell.textContent();
       expect(text?.trim().length).toBeGreaterThan(0);
-      // Known value from exploration
-      expect(text).toContain('Duncan bypass improvements');
     });
   });
 
@@ -60,9 +78,29 @@ test.describe('TC-TS-SEG-03 — Segment description auto-generates and is editab
       await dialog.accept();
     });
 
-    await test.step('Step 1: Navigate to segments page', async () => {
-      await page.goto('/projects/79/segments');
-      await expect(page.getByText('Project Segments')).toBeVisible();
+    await test.step('Step 1: Navigate to segments page for a project with segments', async () => {
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+
+      const projectLinks = page.locator('table tbody tr td:nth-child(2) a');
+      const count = await projectLinks.count();
+      const hrefs: (string | null)[] = [];
+      for (let i = 0; i < count; i++) {
+        hrefs.push(await projectLinks.nth(i).getAttribute('href'));
+      }
+
+      let found = false;
+      for (let i = 0; i < hrefs.length && !found; i++) {
+        await page.goto(`${hrefs[i]}/segments`);
+        await expect(page.getByText('Project Segments')).toBeVisible();
+        const segTable = page.locator('table').first();
+        const segRows = await segTable.locator('tbody tr').count();
+        if (segRows > 0) {
+          found = true;
+        }
+      }
+
+      expect(found, 'Could not find a project with segments').toBe(true);
     });
 
     await test.step('Step 2: Click Edit Record on existing segment', async () => {

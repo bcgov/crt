@@ -34,19 +34,29 @@ test.describe('TC-TS-PM-12 — Disabled PM not in Project Details dropdown', () 
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/admin/codetables');
-    await expect(page.locator('table tbody tr').first()).toBeVisible();
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
 
     // Select Project Manager code set
     await page.getByRole('button', { name: 'Accomplishment', exact: true }).click();
     await page.getByRole('menuitem', { name: 'Project Manager' }).click();
     await page.getByRole('button', { name: 'Search' }).click();
     await expect(page).toHaveURL(/codeSet=PROJECT_MANAGER/);
-    await expect(page.locator('table tbody tr').first()).toBeVisible();
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
   });
 
   test('Disabled PM does not appear in Project Details dropdown', async ({ page }) => {
+    let pmName = '';
+
+    await test.step('Pre-setup: Capture an assigned PM name', async () => {
+      // Dynamically find first PM with a Disable Record button (assigned to projects)
+      const disableRow = page.locator('table tbody tr:has(button[title="Disable Record"])').first();
+      await expect(disableRow).toBeVisible({ timeout: 10_000 });
+      pmName = ((await disableRow.locator('td').nth(1).textContent()) ?? '').trim();
+      expect(pmName).not.toBe('');
+    });
+
     await test.step('Step 1: Disable PM', async () => {
-      const row = page.locator('table tbody tr', { hasText: PM_NAME });
+      const row = page.locator('table tbody tr', { hasText: pmName });
       await expect(row).toBeVisible();
       await row.getByRole('button', { name: 'Disable Record' }).click();
 
@@ -57,47 +67,47 @@ test.describe('TC-TS-PM-12 — Disabled PM not in Project Details dropdown', () 
     });
 
     await test.step('Step 2: Navigate to Project Details and open edit form', async () => {
-      await page.goto('/projects/79');
-      await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible();
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const firstProjectLink = page.locator('table tbody tr td:nth-child(2) a').first();
+      const href = await firstProjectLink.getAttribute('href');
+      await page.goto(href as string);
+      await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible({ timeout: 30000 });
       await page.getByRole('button', { name: 'Edit Project' }).click();
-      await page.waitForTimeout(1000);
     });
 
     await test.step('Step 3: Verify disabled PM NOT in dropdown', async () => {
       const pmDropdown = page.locator('label:has-text("Project Manager")').locator('..').locator('..').locator('.dropdown-toggle');
+      await expect(pmDropdown).toBeVisible({ timeout: 10_000 });
       await pmDropdown.click();
-      await page.waitForTimeout(500);
 
       const pmSearch = page.locator('input[name="projectMgrLkupId"]');
-      await pmSearch.fill('Devashish');
-      await page.waitForTimeout(500);
+      await expect(pmSearch).toBeVisible({ timeout: 10_000 });
+      await pmSearch.fill(pmName);
 
       // Verify PM does NOT appear in the dropdown
-      await expect(page.getByRole('menuitem', { name: PM_NAME })).toBeHidden();
+      await expect(page.getByRole('menuitem', { name: pmName })).toBeHidden();
 
       await page.getByRole('button', { name: 'Cancel' }).click();
     });
 
     await test.step('Cleanup: Re-enable the PM', async () => {
       await page.goto('/admin/codetables');
-      await expect(page.locator('table tbody tr').first()).toBeVisible();
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
 
       await page.getByRole('button', { name: 'Accomplishment', exact: true }).click();
       await page.getByRole('menuitem', { name: 'Project Manager' }).click();
       await page.getByRole('button', { name: 'Search' }).click();
       await expect(page).toHaveURL(/codeSet=PROJECT_MANAGER/);
-      await page.waitForTimeout(1000);
 
       // Switch to Inactive filter
       await page.getByRole('button', { name: 'Active' }).click();
-      await page.waitForTimeout(300);
       await page.getByRole('checkbox', { name: 'Inactive' }).check();
       await page.getByRole('checkbox', { name: 'Active', exact: true }).uncheck();
       await page.getByRole('button', { name: 'Search' }).click();
-      await page.waitForTimeout(3000);
 
-      const row = page.locator('table tbody tr', { hasText: PM_NAME });
-      await expect(row).toBeVisible();
+      const row = page.locator('table tbody tr', { hasText: pmName });
+      await expect(row).toBeVisible({ timeout: 15_000 });
       await row.getByRole('button', { name: 'Disable Record' }).click();
 
       const popover = page.locator('[role="tooltip"]');

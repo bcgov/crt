@@ -62,107 +62,125 @@ test.describe('TC-TS-RAT-01 — Add ratios for each boundary category', () => {
     await page.waitForTimeout(500);
   }
 
-  // Helper to delete a ratio entry
-  async function deleteRatio(page: import('@playwright/test').Page, tableIndex: number, rowText: string) {
+  // Helper to delete the last ratio entry in a table
+  async function deleteLastRatio(page: import('@playwright/test').Page, tableIndex: number) {
     const table = page.locator('table').nth(tableIndex);
-    const row = table.locator('tbody tr', { hasText: rowText });
-    if (await row.isVisible()) {
-      await row.locator('button[title="Delete Record"]').click();
-      const popover = page.locator('.popover.show');
-      await popover.waitFor({ state: 'visible', timeout: 5000 });
-      await popover.getByRole('button', { name: 'Delete' }).click();
-      await page.waitForTimeout(500);
-    }
+    const lastRow = table.locator('tbody tr').last();
+    await lastRow.locator('button[title="Delete Record"]').click();
+    const popover = page.locator('.popover.show');
+    await popover.waitFor({ state: 'visible', timeout: 5000 });
+    await popover.getByRole('button', { name: 'Delete' }).click();
+    await page.waitForTimeout(500);
   }
 
   test.beforeEach(async ({ page }) => {
     page.on('dialog', async (d) => { await d.accept(); });
-    await page.goto('/projects/79/segments');
+    // Navigate to the first project's segments page dynamically
+    await page.goto('/projects');
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+    const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+    const projectUrl = await projectLink.getAttribute('href');
+    await page.goto(`${projectUrl}/segments`);
     await expect(page.getByText('Project Segments')).toBeVisible();
   });
 
   test('Add Electoral Districts ratio', async ({ page }) => {
+    const table = page.locator('table').nth(1);
+    const countBefore = await table.locator('tbody tr').count();
+
     await test.step('Add ratio entry', async () => {
       await addRatio(page, 'Add Electoral Districts', 'Abbotsford-Mission', '0.5', 1);
     });
 
     await test.step('Verify row in table', async () => {
-      const table = page.locator('table').nth(1);
-      const row = table.locator('tbody tr', { hasText: 'Abbotsford-Mission' });
-      await expect(row).toBeVisible();
-      await expect(row).toContainText('0.5');
+      await expect(table.locator('tbody tr')).toHaveCount(countBefore + 1);
+      const lastRow = table.locator('tbody tr').last();
+      await expect(lastRow).toContainText('Abbotsford-Mission');
+      await expect(lastRow).toContainText('0.5');
     });
 
     await test.step('Cleanup', async () => {
-      await deleteRatio(page, 1, 'Abbotsford-Mission');
+      await deleteLastRatio(page, 1);
     });
   });
 
   test('Add Highways ratio', async ({ page }) => {
+    const table = page.locator('table').nth(2);
+    const countBefore = await table.locator('tbody tr').count();
+
     await test.step('Add ratio entry', async () => {
       await addRatio(page, 'Add Highways', '3-Hwy 3', '0.5', 2);
     });
 
     await test.step('Verify row in table', async () => {
-      const table = page.locator('table').nth(2);
-      const row = table.locator('tbody tr', { hasText: 'Hwy 3' });
-      await expect(row).toBeVisible();
-      await expect(row).toContainText('0.5');
+      await expect(table.locator('tbody tr')).toHaveCount(countBefore + 1);
+      const lastRow = table.locator('tbody tr').last();
+      await expect(lastRow).toContainText('Hwy 3');
+      await expect(lastRow).toContainText('0.5');
     });
 
     await test.step('Cleanup', async () => {
-      await deleteRatio(page, 2, 'Hwy 3');
+      await deleteLastRatio(page, 2);
     });
   });
 
   test('Add Service Areas ratio', async ({ page }) => {
+    const table = page.locator('table').nth(3);
+    const countBefore = await table.locator('tbody tr').count();
+
     await test.step('Add ratio entry', async () => {
       await addRatio(page, 'Add Service Areas', '2-Central Island', '0.5', 3);
     });
 
     await test.step('Verify row in table', async () => {
-      const table = page.locator('table').nth(3);
-      const row = table.locator('tbody tr', { hasText: 'Central Island' });
-      await expect(row).toBeVisible();
-      await expect(row).toContainText('0.5');
+      await expect(table.locator('tbody tr')).toHaveCount(countBefore + 1);
+      const lastRow = table.locator('tbody tr').last();
+      await expect(lastRow).toContainText('Central Island');
+      await expect(lastRow).toContainText('0.5');
     });
 
     await test.step('Cleanup', async () => {
-      await deleteRatio(page, 3, 'Central Island');
+      await deleteLastRatio(page, 3);
     });
   });
 
   test('Add Districts ratio', async ({ page }) => {
+    const table = page.locator('table').nth(4);
+    const countBefore = await table.locator('tbody tr').count();
+
     await test.step('Add ratio entry', async () => {
       await addRatio(page, 'Add Districts', '1-Lower Mainland', '0.5', 4);
     });
 
     await test.step('Verify row in table', async () => {
-      const table = page.locator('table').nth(4);
-      const row = table.locator('tbody tr', { hasText: 'Lower Mainland' });
-      await expect(row).toBeVisible();
-      await expect(row).toContainText('0.5');
+      await expect(table.locator('tbody tr')).toHaveCount(countBefore + 1);
+      const lastRow = table.locator('tbody tr').last();
+      await expect(lastRow).toContainText('Lower Mainland');
+      await expect(lastRow).toContainText('0.5');
     });
 
     await test.step('Cleanup', async () => {
-      await deleteRatio(page, 4, 'Lower Mainland');
+      await deleteLastRatio(page, 4);
     });
   });
 
   test('Add Economic Regions ratio', async ({ page }) => {
+    const table = page.locator('table').nth(5);
+    const countBefore = await table.locator('tbody tr').count();
+
     await test.step('Add ratio entry', async () => {
-      await addRatio(page, 'Add Economic Regions', '5920-Lower Mainland/Southwest', '0.5', 5);
+      await addRatio(page, 'Add Economic Regions', 'Lower Mainland', '0.5', 5);
     });
 
     await test.step('Verify row in table', async () => {
-      const table = page.locator('table').nth(5);
-      const row = table.locator('tbody tr', { hasText: 'Lower Mainland/Southwest' });
-      await expect(row).toBeVisible();
-      await expect(row).toContainText('0.5');
+      await expect(table.locator('tbody tr')).toHaveCount(countBefore + 1);
+      const lastRow = table.locator('tbody tr').last();
+      await expect(lastRow).toContainText('Lower Mainland');
+      await expect(lastRow).toContainText('0.5');
     });
 
     await test.step('Cleanup', async () => {
-      await deleteRatio(page, 5, 'Lower Mainland/Southwest');
+      await deleteLastRatio(page, 5);
     });
   });
 });

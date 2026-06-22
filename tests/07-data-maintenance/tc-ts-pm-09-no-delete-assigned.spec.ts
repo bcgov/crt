@@ -35,21 +35,32 @@ test.describe('TC-TS-PM-09 — Cannot delete PM assigned to project', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/admin/codetables');
-    await expect(page.locator('table tbody tr').first()).toBeVisible();
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
 
     // Select Project Manager code set
     await page.getByRole('button', { name: 'Accomplishment', exact: true }).click();
     await page.getByRole('menuitem', { name: 'Project Manager' }).click();
     await page.getByRole('button', { name: 'Search' }).click();
     await expect(page).toHaveURL(/codeSet=PROJECT_MANAGER/);
-    await expect(page.locator('table tbody tr').first()).toBeVisible();
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
   });
 
   test('Assigned PM shows Disable only; unassigned PM shows Delete only', async ({ page }) => {
+    await test.step('Setup: Delete any leftover unassigned test PM from a prior run', async () => {
+      const leftover = page.locator('table tbody tr', { hasText: 'CRT-AUTO Unassigned PM' });
+      if (await leftover.isVisible()) {
+        await leftover.getByRole('button', { name: 'Delete Record' }).click();
+        const popover = page.locator('[role="tooltip"]');
+        await expect(popover).toBeVisible();
+        await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+        await expect(leftover).toBeHidden({ timeout: 10_000 });
+      }
+    });
+
     await test.step('Step 1: Verify assigned PM has Edit + Disable but NO Delete', async () => {
-      // "Devashish Bhargava" is assigned to project(s)
-      const assignedRow = page.locator('table tbody tr', { hasText: 'Devashish Bhargava' });
-      await expect(assignedRow).toBeVisible();
+      // Dynamically find first PM with a Disable Record button (assigned to projects)
+      const assignedRow = page.locator('table tbody tr:has(button[title="Disable Record"])').first();
+      await expect(assignedRow).toBeVisible({ timeout: 10_000 });
       await expect(assignedRow.getByRole('button', { name: 'Edit Record' })).toBeVisible();
       await expect(assignedRow.getByRole('button', { name: 'Disable Record' })).toBeVisible();
       await expect(assignedRow.getByRole('button', { name: 'Delete Record' })).toBeHidden();
@@ -58,7 +69,7 @@ test.describe('TC-TS-PM-09 — Cannot delete PM assigned to project', () => {
     await test.step('Step 2: Verify unassigned PM has Edit + Delete but NO Disable', async () => {
       // Create a fresh unassigned PM for comparison
       await page.getByRole('button', { name: 'Add New Project Manager' }).click();
-      const dialog = page.locator('[role="dialog"]');
+      const dialog = page.getByRole('dialog').filter({ hasText: 'Add Project Manager' });
       await expect(dialog).toBeVisible();
       await dialog.locator('input[name="codeName"]').fill('CRT-AUTO Unassigned PM');
       await dialog.getByRole('button', { name: 'Submit' }).click();

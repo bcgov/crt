@@ -39,20 +39,31 @@ test.describe('TC-TS-PM-03 — Add new PM', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/admin/codetables');
-    await expect(page.locator('table tbody tr').first()).toBeVisible();
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
 
     // Select Project Manager code set
     await page.getByRole('button', { name: 'Accomplishment', exact: true }).click();
     await page.getByRole('menuitem', { name: 'Project Manager' }).click();
     await page.getByRole('button', { name: 'Search' }).click();
     await expect(page).toHaveURL(/codeSet=PROJECT_MANAGER/);
-    await expect(page.locator('table tbody tr').first()).toBeVisible();
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
   });
 
   test('Add new PM and verify in code table and project dropdown', async ({ page }) => {
+    await test.step('Setup: Delete any leftover test PM from a prior run', async () => {
+      const leftover = page.locator('table tbody tr', { hasText: PM_NAME });
+      if (await leftover.isVisible()) {
+        await leftover.getByRole('button', { name: 'Delete Record' }).click();
+        const popover = page.locator('[role="tooltip"]');
+        await expect(popover).toBeVisible();
+        await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+        await expect(leftover).toBeHidden({ timeout: 10_000 });
+      }
+    });
+
     await test.step('Step 1: Open Add dialog and verify fields', async () => {
       await page.getByRole('button', { name: 'Add New Project Manager' }).click();
-      const dialog = page.locator('[role="dialog"]');
+      const dialog = page.getByRole('dialog').filter({ hasText: 'Add Project Manager' });
       await expect(dialog).toBeVisible();
       await expect(dialog.locator('.modal-title, h5').first()).toHaveText('Add Project Manager');
 
@@ -68,7 +79,7 @@ test.describe('TC-TS-PM-03 — Add new PM', () => {
     });
 
     await test.step('Step 2: Fill Code Name and submit', async () => {
-      const dialog = page.locator('[role="dialog"]');
+      const dialog = page.getByRole('dialog').filter({ hasText: 'Add Project Manager' });
       await dialog.locator('input[name="codeName"]').fill(PM_NAME);
       await expect(dialog.getByRole('button', { name: 'Submit' })).toBeEnabled();
       await dialog.getByRole('button', { name: 'Submit' }).click();
@@ -83,7 +94,11 @@ test.describe('TC-TS-PM-03 — Add new PM', () => {
     });
 
     await test.step('Step 4: Verify PM appears in Project Details dropdown', async () => {
-      await page.goto('/projects/79');
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const firstProjectLink = page.locator('table tbody tr td:nth-child(2) a').first();
+      const href = await firstProjectLink.getAttribute('href');
+      await page.goto(href as string);
       await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible();
 
       // Enter edit mode
@@ -107,7 +122,7 @@ test.describe('TC-TS-PM-03 — Add new PM', () => {
 
     await test.step('Cleanup: Delete the test PM', async () => {
       await page.goto('/admin/codetables');
-      await expect(page.locator('table tbody tr').first()).toBeVisible();
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
 
       // Select PM code set
       await page.getByRole('button', { name: 'Accomplishment', exact: true }).click();

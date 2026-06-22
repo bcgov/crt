@@ -38,15 +38,26 @@ test.describe('TC-TS-RAT-07 — Determine ratios with existing data — overwrit
 
   test.beforeEach(async ({ page }) => {
     page.on('dialog', async (d) => { await d.accept(); });
-    await page.goto('/projects/79/segments');
+    await page.goto('/projects');
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+    const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+    const projectUrl = await projectLink.getAttribute('href');
+    await page.goto(`${projectUrl}/segments`);
     await expect(page.getByText('Project Segments')).toBeVisible();
   });
 
   test('Warning dialog appears and Cancel preserves existing ratios', async ({ page }) => {
+    let existingRowTexts: string[] = [];
+
     await test.step('Step 1: Record existing ratio values', async () => {
       const hwTable = page.locator('table').nth(2);
-      const hwy1Row = hwTable.locator('tbody tr', { hasText: 'Hwy 1' }).first();
-      await expect(hwy1Row).toBeVisible();
+      const rows = hwTable.locator('tbody tr');
+      await expect(rows.first()).toBeVisible();
+      const count = await rows.count();
+      for (let i = 0; i < count; i++) {
+        existingRowTexts.push(await rows.nth(i).innerText());
+      }
+      expect(existingRowTexts.length).toBeGreaterThan(0);
     });
 
     await test.step('Step 2: Click "Determine Ratios Using Segments"', async () => {
@@ -76,13 +87,14 @@ test.describe('TC-TS-RAT-07 — Determine ratios with existing data — overwrit
 
     await test.step('Step 5: Verify existing ratios are unchanged', async () => {
       const hwTable = page.locator('table').nth(2);
-      const hwy1Row = hwTable.locator('tbody tr', { hasText: 'Hwy 1' }).first();
-      await expect(hwy1Row).toBeVisible();
-      await expect(hwy1Row).toContainText('0.99');
-
-      const hwy18Row = hwTable.locator('tbody tr', { hasText: 'Hwy 18' });
-      await expect(hwy18Row).toBeVisible();
-      await expect(hwy18Row).toContainText('0.01');
+      const rows = hwTable.locator('tbody tr');
+      await expect(rows.first()).toBeVisible();
+      const count = await rows.count();
+      expect(count).toBe(existingRowTexts.length);
+      for (let i = 0; i < count; i++) {
+        const currentText = await rows.nth(i).innerText();
+        expect(currentText).toBe(existingRowTexts[i]);
+      }
     });
   });
 

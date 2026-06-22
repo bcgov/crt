@@ -43,75 +43,70 @@ import { test, expect } from '@playwright/test';
 test.describe('TC-TS-BVT-USER-02 — BVT: Update users', () => {
   test.setTimeout(120_000);
 
-  // Target user: PDEWITH - has only REGION_ADMIN, does NOT have MANAGER
-  const targetUsername = 'PDEWITH';
-
   test('Update user role and revert', async ({ page }) => {
+    let targetUsername = '';
+
     page.on('dialog', async (dialog) => {
       await dialog.accept();
     });
 
-    await test.step('Step 1: Navigate to User Management page', async () => {
+    await test.step('Step 1: Navigate to User Management page and find target user', async () => {
       await page.goto('/admin/users');
-      await page.waitForTimeout(3000);
+      await expect(page.locator('table th:has-text("IDIR")')).toBeVisible({ timeout: 30_000 });
 
-      // Verify we're on the user management page
-      await expect(page.locator('table th:has-text("IDIR")')).toBeVisible();
+      // Find the first user who does NOT already have MANAGER role
+      const rows = page.locator('table tbody tr');
+      const rowCount = await rows.count();
+      expect(rowCount).toBeGreaterThan(0);
+
+      for (let i = 0; i < Math.min(rowCount, 10); i++) {
+        await rows.nth(i).locator('button[title="Edit Record"]').click();
+        const dialog = page.getByRole('dialog');
+        await expect(dialog).toBeVisible({ timeout: 10_000 });
+
+        // Find the MANAGER checkbox by its label text (order varies by environment)
+        const managerCb = dialog.getByLabel('MANAGER');
+        const isChecked = await managerCb.isChecked();
+
+        if (!isChecked) {
+          targetUsername = await dialog.locator('input[name="username"]').inputValue();
+          await dialog.locator('button[aria-label="Close"]').click();
+          await expect(dialog).toBeHidden({ timeout: 5_000 });
+          break;
+        }
+        await dialog.locator('button[aria-label="Close"]').click();
+        await expect(dialog).toBeHidden({ timeout: 5_000 });
+      }
+
+      expect(targetUsername).toBeTruthy();
     });
 
     await test.step('Step 2: Open Edit dialog for target user and verify initial state', async () => {
       const table = page.locator('table').first();
       const targetRow = table.locator(`tbody tr:has-text("${targetUsername}")`);
-      await expect(targetRow).toBeVisible();
+      await expect(targetRow).toBeVisible({ timeout: 10_000 });
 
-      // Click Edit Record
       await targetRow.locator('button[title="Edit Record"]').click();
-      await page.waitForTimeout(1000);
-
       const dialog = page.getByRole('dialog');
-      await expect(dialog).toBeVisible();
+      await expect(dialog).toBeVisible({ timeout: 10_000 });
 
       // Verify the dialog is for the right user
-      const usernameInput = dialog.locator('input[name="username"]');
-      await expect(usernameInput).toHaveValue(targetUsername);
+      await expect(dialog.locator('input[name="username"]')).toHaveValue(targetUsername);
 
-      // Verify MANAGER is NOT currently checked (checkbox index 0)
-      const managerChecked = await page.evaluate(() => {
-        const dlg = document.querySelector('[role="dialog"]');
-        const checks = dlg!.querySelectorAll('input[type="checkbox"]');
-        return (checks[0] as HTMLInputElement).checked;
-      });
-      expect(managerChecked).toBe(false);
+      // Verify MANAGER is NOT currently checked
+      await expect(dialog.getByLabel('MANAGER')).not.toBeChecked();
     });
 
     await test.step('Step 3: Add MANAGER role and submit', async () => {
-      // Click MANAGER checkbox to enable it
-      await page.evaluate(() => {
-        const dlg = document.querySelector('[role="dialog"]');
-        const checks = dlg!.querySelectorAll('input[type="checkbox"]');
-        (checks[0] as HTMLElement).click(); // MANAGER
-      });
-      await page.waitForTimeout(300);
+      const dialog = page.getByRole('dialog');
 
-      // Verify checkbox is now checked
-      const nowChecked = await page.evaluate(() => {
-        const dlg = document.querySelector('[role="dialog"]');
-        const checks = dlg!.querySelectorAll('input[type="checkbox"]');
-        return (checks[0] as HTMLInputElement).checked;
-      });
-      expect(nowChecked).toBe(true);
+      // Click the MANAGER label to toggle its checkbox (Bootstrap custom-control pattern)
+      await dialog.locator('label').filter({ hasText: 'MANAGER' }).click();
+      await expect(dialog.getByLabel('MANAGER')).toBeChecked();
 
       // Submit
-      await page.evaluate(() => {
-        const dlg = document.querySelector('[role="dialog"]');
-        const submit = dlg!.querySelector('button[type="submit"]');
-        if (submit) (submit as HTMLElement).click();
-      });
-      await page.waitForTimeout(3000);
-
-      // Verify dialog closed
-      const dialog = page.getByRole('dialog');
-      await expect(dialog).not.toBeVisible();
+      await dialog.getByRole('button', { name: 'Submit' }).dispatchEvent('click');
+      await expect(dialog).toBeHidden({ timeout: 10_000 });
     });
 
     await test.step('Step 4: Re-open edit and verify MANAGER role is saved', async () => {
@@ -119,37 +114,23 @@ test.describe('TC-TS-BVT-USER-02 — BVT: Update users', () => {
       const targetRow = table.locator(`tbody tr:has-text("${targetUsername}")`);
 
       await targetRow.locator('button[title="Edit Record"]').click();
-      await page.waitForTimeout(1000);
+      const dialog = page.getByRole('dialog');
+      await expect(dialog).toBeVisible({ timeout: 10_000 });
 
       // Verify MANAGER is now checked
-      const managerSaved = await page.evaluate(() => {
-        const dlg = document.querySelector('[role="dialog"]');
-        const checks = dlg!.querySelectorAll('input[type="checkbox"]');
-        return (checks[0] as HTMLInputElement).checked;
-      });
-      expect(managerSaved).toBe(true);
+      await expect(dialog.getByLabel('MANAGER')).toBeChecked();
     });
 
     await test.step('Step 5: Revert - remove MANAGER role', async () => {
-      // Uncheck MANAGER
-      await page.evaluate(() => {
-        const dlg = document.querySelector('[role="dialog"]');
-        const checks = dlg!.querySelectorAll('input[type="checkbox"]');
-        (checks[0] as HTMLElement).click(); // Uncheck MANAGER
-      });
-      await page.waitForTimeout(300);
+      const dialog = page.getByRole('dialog');
+
+      // Click the MANAGER label to uncheck it
+      await dialog.locator('label').filter({ hasText: 'MANAGER' }).click();
+      await expect(dialog.getByLabel('MANAGER')).not.toBeChecked();
 
       // Submit revert
-      await page.evaluate(() => {
-        const dlg = document.querySelector('[role="dialog"]');
-        const submit = dlg!.querySelector('button[type="submit"]');
-        if (submit) (submit as HTMLElement).click();
-      });
-      await page.waitForTimeout(3000);
-
-      // Verify dialog closed
-      const dialog = page.getByRole('dialog');
-      await expect(dialog).not.toBeVisible();
+      await dialog.getByRole('button', { name: 'Submit' }).dispatchEvent('click');
+      await expect(dialog).toBeHidden({ timeout: 10_000 });
     });
 
     await test.step('Step 6: Verify revert - MANAGER role is removed', async () => {
@@ -157,20 +138,15 @@ test.describe('TC-TS-BVT-USER-02 — BVT: Update users', () => {
       const targetRow = table.locator(`tbody tr:has-text("${targetUsername}")`);
 
       await targetRow.locator('button[title="Edit Record"]').click();
-      await page.waitForTimeout(1000);
+      const dialog = page.getByRole('dialog');
+      await expect(dialog).toBeVisible({ timeout: 10_000 });
 
       // Verify MANAGER is back to unchecked
-      const managerReverted = await page.evaluate(() => {
-        const dlg = document.querySelector('[role="dialog"]');
-        const checks = dlg!.querySelectorAll('input[type="checkbox"]');
-        return (checks[0] as HTMLInputElement).checked;
-      });
-      expect(managerReverted).toBe(false);
+      await expect(dialog.getByLabel('MANAGER')).not.toBeChecked();
 
       // Close dialog
-      const dialog = page.getByRole('dialog');
       await dialog.locator('button[aria-label="Close"]').click();
-      await page.waitForTimeout(500);
+      await expect(dialog).toBeHidden({ timeout: 5_000 });
     });
   });
 });

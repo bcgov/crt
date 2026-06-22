@@ -30,8 +30,16 @@ test.describe('TC-TS-SEG-01 — Navigate to Project Segments screen', () => {
   test.setTimeout(60_000);
 
   test('Navigate from Project Details to Segments page', async ({ page }) => {
+    let projectHref: string;
+
     await test.step('Step 1: Start on project details page', async () => {
-      await page.goto('/projects/79');
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+
+      // Pick the first project from the list dynamically
+      const firstProjectLink = page.locator('table tbody tr td:nth-child(2) a').first();
+      projectHref = await firstProjectLink.getAttribute('href') as string;
+      await page.goto(projectHref);
       await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible();
     });
 
@@ -41,7 +49,7 @@ test.describe('TC-TS-SEG-01 — Navigate to Project Segments screen', () => {
     });
 
     await test.step('Step 3: Verify Segments page loaded correctly', async () => {
-      await expect(page).toHaveURL(/\/projects\/79\/segments/);
+      await expect(page).toHaveURL(new RegExp(`${projectHref}/segments`));
       await expect(page.getByText('Project Segments')).toBeVisible();
       await expect(page.getByRole('button', { name: '+ Add Segment / View Map' })).toBeVisible();
       await expect(page.getByText('Project Ratios')).toBeVisible();

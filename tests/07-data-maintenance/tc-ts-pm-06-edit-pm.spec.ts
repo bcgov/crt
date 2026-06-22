@@ -41,20 +41,33 @@ test.describe('TC-TS-PM-06 — Edit existing PM', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/admin/codetables');
-    await expect(page.locator('table tbody tr').first()).toBeVisible();
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
 
     // Select Project Manager code set
     await page.getByRole('button', { name: 'Accomplishment', exact: true }).click();
     await page.getByRole('menuitem', { name: 'Project Manager' }).click();
     await page.getByRole('button', { name: 'Search' }).click();
     await expect(page).toHaveURL(/codeSet=PROJECT_MANAGER/);
-    await expect(page.locator('table tbody tr').first()).toBeVisible();
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
   });
 
   test('Edit PM Code Name and verify in dropdown', async ({ page }) => {
+    await test.step('Setup: Delete any leftover test PMs from a prior run', async () => {
+      for (const name of [ORIGINAL_NAME, UPDATED_NAME]) {
+        const leftover = page.locator('table tbody tr', { hasText: name });
+        if (await leftover.isVisible()) {
+          await leftover.getByRole('button', { name: 'Delete Record' }).click();
+          const popover = page.locator('[role="tooltip"]');
+          await expect(popover).toBeVisible();
+          await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+          await expect(leftover).toBeHidden({ timeout: 10_000 });
+        }
+      }
+    });
+
     await test.step('Step 1: Create a test PM', async () => {
       await page.getByRole('button', { name: 'Add New Project Manager' }).click();
-      const dialog = page.locator('[role="dialog"]');
+      const dialog = page.getByRole('dialog').filter({ hasText: 'Add Project Manager' });
       await expect(dialog).toBeVisible();
       await dialog.locator('input[name="codeName"]').fill(ORIGINAL_NAME);
       await dialog.getByRole('button', { name: 'Submit' }).click();
@@ -95,27 +108,31 @@ test.describe('TC-TS-PM-06 — Edit existing PM', () => {
     });
 
     await test.step('Step 5: Verify updated name in Project Details dropdown', async () => {
-      await page.goto('/projects/79');
-      await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible();
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const firstProjectLink = page.locator('table tbody tr td:nth-child(2) a').first();
+      const href = await firstProjectLink.getAttribute('href');
+      await page.goto(href as string);
+      await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible({ timeout: 30000 });
 
       await page.getByRole('button', { name: 'Edit Project' }).click();
 
       // Open PM dropdown
       const pmDropdown = page.locator('label:has-text("Project Manager")').locator('..').locator('..').locator('.dropdown-toggle');
       await pmDropdown.click();
-      await page.waitForTimeout(500);
 
-      await page.locator('input[name="projectMgrLkupId"]').fill('CRT-AUTO');
-      await page.waitForTimeout(500);
+      const pmInput = page.locator('input[name="projectMgrLkupId"]');
+      await expect(pmInput).toBeVisible({ timeout: 10_000 });
+      await pmInput.fill('CRT-AUTO');
 
-      await expect(page.getByRole('menuitem', { name: UPDATED_NAME })).toBeVisible();
+      await expect(page.getByRole('menuitem', { name: UPDATED_NAME })).toBeVisible({ timeout: 10_000 });
 
       await page.getByRole('button', { name: 'Cancel' }).click();
     });
 
     await test.step('Cleanup: Delete the test PM', async () => {
       await page.goto('/admin/codetables');
-      await expect(page.locator('table tbody tr').first()).toBeVisible();
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
 
       await page.getByRole('button', { name: 'Accomplishment', exact: true }).click();
       await page.getByRole('menuitem', { name: 'Project Manager' }).click();

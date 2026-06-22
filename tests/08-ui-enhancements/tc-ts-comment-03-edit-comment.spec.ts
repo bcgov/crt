@@ -35,19 +35,42 @@ import { test, expect } from '@playwright/test';
 test.describe('TC-TS-COMMENT-03 — Edit existing status comment', () => {
   test.setTimeout(120_000);
 
-  const PROJECT_ID = 79;
   const ORIGINAL_COMMENT = 'CRT-AUTO original status comment';
   const UPDATED_COMMENT = 'CRT-AUTO updated status comment text';
 
   test.beforeEach(async ({ page }) => {
-    await page.goto(`/projects/${PROJECT_ID}`);
-    await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible();
+    await page.goto('/projects');
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+    const firstProjectLink = page.locator('table tbody tr td:nth-child(2) a').first();
+    const href = await firstProjectLink.getAttribute('href');
+    await page.goto(href as string);
+    await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible({ timeout: 30000 });
   });
 
   test('Edit status comment via history dialog', async ({ page }) => {
+    await test.step('Setup: Delete any leftover test comments from a prior run', async () => {
+      const showAllBtn = page.getByRole('button', { name: 'Show all Status Comments' });
+      if (await showAllBtn.isVisible()) {
+        await showAllBtn.click();
+        const historyDialog = page.locator('[role="dialog"]').filter({ hasText: 'Status Comments History' });
+        await expect(historyDialog).toBeVisible();
+        for (const commentText of [ORIGINAL_COMMENT, UPDATED_COMMENT]) {
+          const leftover = historyDialog.locator('table tbody tr', { hasText: commentText });
+          if (await leftover.isVisible()) {
+            await leftover.getByRole('button', { name: 'Delete Record' }).click();
+            const popover = page.locator('[role="tooltip"]');
+            await expect(popover).toBeVisible();
+            await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+            await expect(leftover).toBeHidden({ timeout: 10_000 });
+          }
+        }
+        await historyDialog.getByRole('button', { name: 'Close' }).last().click();
+      }
+    });
+
     await test.step('Step 1: Create a test comment', async () => {
       await page.getByRole('button', { name: 'Add Status Comments' }).click();
-      const dialog = page.locator('[role="dialog"]');
+      const dialog = page.getByRole('dialog').filter({ hasText: 'Add Status Comments' });
       await expect(dialog).toBeVisible();
       await dialog.locator('textarea').fill(ORIGINAL_COMMENT);
       await dialog.getByRole('button', { name: 'Submit' }).click();

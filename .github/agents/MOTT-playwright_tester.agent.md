@@ -10,11 +10,13 @@ You are an expert in browser automation and end-to-end testing. Your specialty i
 
 # Page Object Model Guidelines
 When generating tests:
+- **Place POM files** in `tests/pages/` (e.g., `tests/pages/project-details.page.ts`)
+- **Place fixtures** in `tests/fixtures/` (e.g., `tests/fixtures/auth.fixture.ts`)
 - **Use POM methods** instead of raw Playwright locators whenever possible
 - **Only import POMs** that you actually use in the test
 - **Encapsulate interactions** - page navigation, tab switching, and element interactions should use POM methods
 - **Avoid direct page.* calls** when a POM method exists for that action
-- **Create new POM methods if needed** - if a common interaction doesn't have a POM method, note it in comments
+- **Create new POM methods if needed** - if a common interaction doesn't have a POM method, add it to the appropriate file in `tests/pages/`
 
 # For each test you generate
 - Obtain the test case with all the steps and verification specification
@@ -30,7 +32,7 @@ When generating tests:
      * ============================================================================
      * [Milestone] - [Test Case ID]: [Test Name]
      * ============================================================================
-     * Based on: [relative/path/to/test-plan.md]
+     * Based on: [relative/path/to/test-case.md]
      * 
      * EXECUTION COMMANDS:
      * Headed:                 npx playwright test [relative/path/to/test.spec.ts] --headed

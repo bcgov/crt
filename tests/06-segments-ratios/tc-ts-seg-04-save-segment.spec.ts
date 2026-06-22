@@ -43,7 +43,11 @@ test.describe('TC-TS-SEG-04 — Save segment with coordinates and description', 
     });
 
     await test.step('Step 1: Navigate to segments page', async () => {
-      await page.goto('/projects/79/segments');
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const firstProjectLink = page.locator('table tbody tr td:nth-child(2) a').first();
+      const href = await firstProjectLink.getAttribute('href');
+      await page.goto(`${href}/segments`);
       await expect(page.getByRole('button', { name: '+ Add Segment / View Map' })).toBeVisible();
     });
 
@@ -90,18 +94,40 @@ test.describe('TC-TS-SEG-04 — Save segment with coordinates and description', 
   });
 
   test('Verify existing segment table structure (read-only validation)', async ({ page }) => {
-    await test.step('Step 1: Navigate to segments page', async () => {
-      await page.goto('/projects/79/segments');
-      await expect(page.getByText('Project Segments')).toBeVisible();
+    await test.step('Step 1: Navigate to segments page for a project with segments', async () => {
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+
+      const projectLinks = page.locator('table tbody tr td:nth-child(2) a');
+      const count = await projectLinks.count();
+      const hrefs: (string | null)[] = [];
+      for (let i = 0; i < count; i++) {
+        hrefs.push(await projectLinks.nth(i).getAttribute('href'));
+      }
+
+      let found = false;
+      for (let i = 0; i < hrefs.length && !found; i++) {
+        await page.goto(`${hrefs[i]}/segments`);
+        await expect(page.getByText('Project Segments')).toBeVisible();
+        const segTable = page.locator('table').first();
+        const segRows = await segTable.locator('tbody tr').count();
+        if (segRows > 0) {
+          found = true;
+        }
+      }
+
+      expect(found, 'Could not find a project with segments').toBe(true);
     });
 
     await test.step('Step 2: Verify existing segment row has correct structure', async () => {
       const segTable = page.locator('table').first();
       const row = segTable.locator('tbody tr').first();
 
-      // Verify coordinates are displayed
-      await expect(row.locator('td').nth(0)).toContainText('48.816870,-123.718150');
-      await expect(row.locator('td').nth(1)).toContainText('48.769420,-123.698870');
+      // Verify coordinates are displayed (non-empty)
+      const startCoord = await row.locator('td').nth(0).textContent();
+      expect(startCoord?.trim().length).toBeGreaterThan(0);
+      const endCoord = await row.locator('td').nth(1).textContent();
+      expect(endCoord?.trim().length).toBeGreaterThan(0);
 
       // Verify description is present
       const descText = await row.locator('td').nth(2).textContent();

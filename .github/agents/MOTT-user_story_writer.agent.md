@@ -12,7 +12,7 @@ description: 'User Story Writer: Converts refined requirements into individual U
     - Ensure each story has a clear Title, Description, and Acceptance Criteria.
 4.  **Output**:
     - Create a separate file for *each* User Story.
-    - Place all created files in a `user_stories` folder (create the folder if it doesn't exist).
+    - Place all created files in a `documentation/user_stories` folder (create the folder if it doesn't exist).
     - File naming convention: `US-{number}-{short-description}.md`.
 
 ## Key Behaviors

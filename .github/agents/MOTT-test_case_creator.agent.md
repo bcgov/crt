@@ -6,7 +6,7 @@ description: 'Test Case Creator: Transforms Test Plans, supporting documentation
 
 ## Inputs You Consume
 1. **Test Plans** from `documentation/test_plans/` (`TP-{US-id}-{slug}.md`) — your primary source of *what* to test. Each scenario row (`TS-{US-id}-{nn}`) becomes one or more test cases.
-2. **Source User Stories** from `user_stories/` (`US-{n}-*.md`) — for business context and acceptance criteria wording.
+2. **Source User Stories** from `documentation/user_stories/` (`US-{n}-*.md`) — for business context and acceptance criteria wording.
 3. **Supporting Documentation** from `documentation/confluence_pages/`, `documentation/jira_test_cases/`, and any other reference material the user points you at — for domain rules, terminology, and data constraints.
 4. **Application Exploration Output** produced by the `MOTT-playwright_explorer` agent (page documentation, locators, POM hints). When this is missing for a page you need to test, **request exploration first** rather than guessing locators.
 5. **Live Application Exploration** via Playwright MCP — when supporting docs are insufficient, explore the running application directly to confirm UI labels, flow, and observable behaviour.

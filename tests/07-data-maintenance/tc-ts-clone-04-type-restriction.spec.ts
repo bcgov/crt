@@ -32,11 +32,16 @@ import { test, expect } from '@playwright/test';
 test.describe('TC-TS-CLONE-04 — Clone type restriction: Qty only clones to Qty', () => {
   test.setTimeout(120_000);
 
-  const PROJECT_ID = 79;
+  let projectPath: string;
 
   test.beforeEach(async ({ page }) => {
-    await page.goto(`/projects/${PROJECT_ID}/projecttender`);
-    await expect(page.locator('table').first()).toBeVisible();
+    // Dynamically pick the first project from the list
+    await page.goto('/projects');
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+    const firstLink = page.locator('table tbody tr td:nth-child(2) a').first();
+    projectPath = (await firstLink.getAttribute('href')) as string;
+    await page.goto(`${projectPath}/projecttender`);
+    await expect(page.locator('table').first()).toBeVisible({ timeout: 30000 });
   });
 
   test('Cloning Qty record locks type dropdown to QUANTITY', async ({ page }) => {

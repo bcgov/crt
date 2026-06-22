@@ -29,14 +29,37 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('TC-TS-RAT-08 — Determine ratios button hidden without segments', () => {
-  test.setTimeout(60_000);
+  test.setTimeout(120_000);
 
   test('Button is hidden when project has no segments', async ({ page }) => {
     page.on('dialog', async (d) => { await d.accept(); });
 
-    await test.step('Step 1: Navigate to segments page for project with no segments (project 80)', async () => {
-      await page.goto('/projects/80/segments');
-      await expect(page.getByText('Project Segments')).toBeVisible();
+    await test.step('Step 1: Find a project with no segments', async () => {
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+
+      const projectLinks = page.locator('table tbody tr td:nth-child(2) a');
+      const count = await projectLinks.count();
+
+      // Collect all hrefs while still on the projects list page
+      const hrefs: (string | null)[] = [];
+      for (let i = 0; i < count; i++) {
+        hrefs.push(await projectLinks.nth(i).getAttribute('href'));
+      }
+
+      let found = false;
+      for (let i = hrefs.length - 1; i >= 0 && !found; i--) {
+        await page.goto(`${hrefs[i]}/segments`);
+        await expect(page.getByText('Project Segments')).toBeVisible();
+
+        const segTable = page.locator('table').first();
+        const segRows = await segTable.locator('tbody tr').count();
+        if (segRows === 0) {
+          found = true;
+        }
+      }
+
+      expect(found, 'Could not find a project with no segments in the project list').toBe(true);
     });
 
     await test.step('Step 2: Verify segments table is empty', async () => {
@@ -58,9 +81,32 @@ test.describe('TC-TS-RAT-08 — Determine ratios button hidden without segments'
   test('Button is visible when project has segments', async ({ page }) => {
     page.on('dialog', async (d) => { await d.accept(); });
 
-    await test.step('Step 1: Navigate to segments page for project with segments (project 79)', async () => {
-      await page.goto('/projects/79/segments');
-      await expect(page.getByText('Project Segments')).toBeVisible();
+    await test.step('Step 1: Navigate to segments page for a project with segments', async () => {
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+
+      const projectLinks = page.locator('table tbody tr td:nth-child(2) a');
+      const count = await projectLinks.count();
+
+      // Collect all hrefs while still on the projects list page
+      const hrefs: (string | null)[] = [];
+      for (let i = 0; i < count; i++) {
+        hrefs.push(await projectLinks.nth(i).getAttribute('href'));
+      }
+
+      let found = false;
+      for (let i = 0; i < hrefs.length && !found; i++) {
+        await page.goto(`${hrefs[i]}/segments`);
+        await expect(page.getByText('Project Segments')).toBeVisible();
+
+        const segTable = page.locator('table').first();
+        const segRows = await segTable.locator('tbody tr').count();
+        if (segRows > 0) {
+          found = true;
+        }
+      }
+
+      expect(found, 'Could not find a project with segments in the project list').toBe(true);
     });
 
     await test.step('Step 2: Verify at least one segment exists', async () => {

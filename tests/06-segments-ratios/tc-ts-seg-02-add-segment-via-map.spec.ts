@@ -41,7 +41,11 @@ test.describe('TC-TS-SEG-02 — Add new segment via map interface', () => {
     });
 
     await test.step('Step 1: Navigate to segments page', async () => {
-      await page.goto('/projects/79/segments');
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const firstProjectLink = page.locator('table tbody tr td:nth-child(2) a').first();
+      const href = await firstProjectLink.getAttribute('href');
+      await page.goto(`${href}/segments`);
       await expect(page.getByRole('button', { name: '+ Add Segment / View Map' })).toBeVisible();
     });
 

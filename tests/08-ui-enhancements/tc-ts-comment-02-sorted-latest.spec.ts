@@ -31,19 +31,42 @@ import { test, expect } from '@playwright/test';
 test.describe('TC-TS-COMMENT-02 — Comments sorted latest first', () => {
   test.setTimeout(120_000);
 
-  const PROJECT_ID = 79;
   const COMMENT_OLDER = 'CRT-AUTO first comment - older';
   const COMMENT_NEWER = 'CRT-AUTO second comment - newer';
 
   test.beforeEach(async ({ page }) => {
-    await page.goto(`/projects/${PROJECT_ID}`);
-    await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible();
+    await page.goto('/projects');
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+    const firstProjectLink = page.locator('table tbody tr td:nth-child(2) a').first();
+    const href = await firstProjectLink.getAttribute('href');
+    await page.goto(href as string);
+    await expect(page.getByRole('heading', { name: 'Project Details' })).toBeVisible({ timeout: 30000 });
   });
 
   test('Comments are sorted newest first in history', async ({ page }) => {
+    await test.step('Setup: Delete any leftover test comments from a prior run', async () => {
+      const showAllBtn = page.getByRole('button', { name: 'Show all Status Comments' });
+      if (await showAllBtn.isVisible()) {
+        await showAllBtn.click();
+        const historyDialog = page.locator('[role="dialog"]').filter({ hasText: 'Status Comments History' });
+        await expect(historyDialog).toBeVisible();
+        for (const commentText of [COMMENT_OLDER, COMMENT_NEWER]) {
+          const leftover = historyDialog.locator('table tbody tr', { hasText: commentText });
+          if (await leftover.isVisible()) {
+            await leftover.getByRole('button', { name: 'Delete Record' }).click();
+            const popover = page.locator('[role="tooltip"]');
+            await expect(popover).toBeVisible();
+            await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+            await expect(leftover).toBeHidden({ timeout: 10_000 });
+          }
+        }
+        await historyDialog.getByRole('button', { name: 'Close' }).last().click();
+      }
+    });
+
     await test.step('Step 1: Add first (older) comment', async () => {
       await page.getByRole('button', { name: 'Add Status Comments' }).click();
-      const dialog = page.locator('[role="dialog"]');
+      const dialog = page.getByRole('dialog').filter({ hasText: 'Add Status Comments' });
       await expect(dialog).toBeVisible();
       await dialog.locator('textarea').fill(COMMENT_OLDER);
       await dialog.getByRole('button', { name: 'Submit' }).click();
@@ -51,10 +74,10 @@ test.describe('TC-TS-COMMENT-02 — Comments sorted latest first', () => {
     });
 
     await test.step('Step 2: Add second (newer) comment', async () => {
-      // Brief wait to ensure distinct timestamps
-      await page.waitForTimeout(1000);
+      // Wait for first comment to appear in the main table — ensures a distinct server timestamp
+      await expect(page.locator('table tbody tr', { hasText: COMMENT_OLDER })).toBeVisible({ timeout: 10_000 });
       await page.getByRole('button', { name: 'Add Status Comments' }).click();
-      const dialog = page.locator('[role="dialog"]');
+      const dialog = page.getByRole('dialog').filter({ hasText: 'Add Status Comments' });
       await expect(dialog).toBeVisible();
       await dialog.locator('textarea').fill(COMMENT_NEWER);
       await dialog.getByRole('button', { name: 'Submit' }).click();

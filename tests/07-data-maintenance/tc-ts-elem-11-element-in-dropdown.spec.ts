@@ -34,13 +34,29 @@ test.describe('TC-TS-ELEM-11 — Element appears in Financial Planning form', ()
   test('New element appears in Financial Planning dropdown', async ({ page }) => {
     page.on('dialog', async (d) => { await d.accept(); });
 
+    await test.step('Setup: Delete any leftover Zt element from a prior run', async () => {
+      await page.goto('/admin/elements');
+      await expect(page.getByRole('heading', { name: 'Elements Management' })).toBeVisible();
+      await page.locator('input[placeholder="Search"]').fill('Zt');
+      await page.getByRole('button', { name: 'Search' }).click();
+      await page.waitForTimeout(500);
+      const leftover = page.locator('table tbody tr', { hasText: 'CRT-AUTO Test Element' });
+      if (await leftover.isVisible()) {
+        await leftover.locator('button[title="Delete Record"]').click();
+        const popover = page.locator('.popover.show');
+        await popover.waitFor({ state: 'visible', timeout: 5000 });
+        await popover.getByRole('button', { name: 'Delete' }).click();
+        await expect(leftover).toBeHidden({ timeout: 10_000 });
+      }
+    });
+
     await test.step('Step 1: Create a test element', async () => {
       await page.goto('/admin/elements');
       await expect(page.getByRole('heading', { name: 'Elements Management' })).toBeVisible();
 
       await page.getByRole('button', { name: 'Add New Element' }).click();
-      const dialog = page.locator('[role="dialog"]');
-      await dialog.waitFor({ state: 'visible' });
+      const dialog = page.getByRole('dialog').filter({ hasText: 'Add Element' });
+      await expect(dialog).toBeVisible();
 
       await dialog.locator('input[name="code"]').fill('Zt');
       await dialog.locator('input[name="description"]').fill('CRT-AUTO Test Element');
@@ -64,20 +80,24 @@ test.describe('TC-TS-ELEM-11 — Element appears in Financial Planning form', ()
       await page.waitForTimeout(300);
 
       await dialog.getByRole('button', { name: 'Submit' }).click();
-      await dialog.waitFor({ state: 'hidden', timeout: 10000 });
+      await expect(dialog).toBeHidden({ timeout: 10_000 });
       await page.waitForTimeout(500);
     });
 
-    await test.step('Step 2: Navigate to Financial Plan for project 79', async () => {
-      await page.goto('/projects/79/projectplan');
+    await test.step('Step 2: Navigate to Financial Plan for a project', async () => {
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const firstProjectLink = page.locator('table tbody tr td:nth-child(2) a').first();
+      const href = await firstProjectLink.getAttribute('href');
+      await page.goto(`${href}/projectplan`);
       await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(500);
     });
 
     await test.step('Step 3: Open Add dialog and check Element dropdown', async () => {
       await page.getByRole('button', { name: '+ Add' }).click();
-      const dialog = page.locator('[role="dialog"]');
-      await dialog.waitFor({ state: 'visible' });
+      const dialog = page.getByRole('dialog').filter({ hasText: 'Add Financial' });
+      await expect(dialog).toBeVisible();
 
       // Open Element dropdown (3rd dropdown, index 2)
       await dialog.locator('button.dropdown-toggle').nth(2).click();
@@ -85,7 +105,7 @@ test.describe('TC-TS-ELEM-11 — Element appears in Financial Planning form', ()
     });
 
     await test.step('Step 4: Filter dropdown for "Zt" and verify element appears', async () => {
-      const dialog = page.locator('[role="dialog"]');
+      const dialog = page.getByRole('dialog').filter({ hasText: 'Add Financial' });
       const searchInput = dialog.locator('.dropdown-menu.show input[placeholder="Search"]');
       await searchInput.fill('Zt');
       await page.waitForTimeout(500);
@@ -96,13 +116,12 @@ test.describe('TC-TS-ELEM-11 — Element appears in Financial Planning form', ()
     });
 
     await test.step('Cleanup: Cancel dialog and delete test element', async () => {
-      const dialog = page.locator('[role="dialog"]');
+      const dialog = page.getByRole('dialog').filter({ hasText: 'Add Financial' });
       await dialog.getByRole('button', { name: 'Cancel' }).click();
       await page.waitForTimeout(500);
 
-      // Navigate back to Elements and delete
       await page.goto('/admin/elements');
-      await page.waitForTimeout(1500);
+      await page.waitForTimeout(500);
 
       await page.locator('input[placeholder="Search"]').fill('Zt');
       await page.getByRole('button', { name: 'Search' }).click();
@@ -113,7 +132,7 @@ test.describe('TC-TS-ELEM-11 — Element appears in Financial Planning form', ()
       const popover = page.locator('.popover.show');
       await popover.waitFor({ state: 'visible', timeout: 5000 });
       await popover.getByRole('button', { name: 'Delete' }).click();
-      await page.waitForTimeout(1000);
+      await expect(row).toBeHidden({ timeout: 10_000 });
     });
   });
 });

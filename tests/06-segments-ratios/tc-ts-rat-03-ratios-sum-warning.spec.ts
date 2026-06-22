@@ -32,7 +32,11 @@ test.describe('TC-TS-RAT-03 — Ratios do not sum to 1 — warning displayed', (
     page.on('dialog', async (d) => { await d.accept(); });
 
     await test.step('Step 1: Navigate to segments page', async () => {
-      await page.goto('/projects/79/segments');
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
+      const projectUrl = await projectLink.getAttribute('href');
+      await page.goto(`${projectUrl}/segments`);
       await expect(page.getByText('Project Segments')).toBeVisible();
     });
 
@@ -73,8 +77,8 @@ test.describe('TC-TS-RAT-03 — Ratios do not sum to 1 — warning displayed', (
       await page.waitForTimeout(300);
 
       const hwTable = page.locator('table').nth(2);
-      const row = hwTable.locator('tbody tr', { hasText: 'Hwy 3' });
-      await row.locator('button[title="Delete Record"]').click();
+      const lastRow = hwTable.locator('tbody tr').last();
+      await lastRow.locator('button[title="Delete Record"]').click();
       const popover = page.locator('.popover.show');
       await popover.waitFor({ state: 'visible', timeout: 5000 });
       await popover.getByRole('button', { name: 'Delete' }).click();

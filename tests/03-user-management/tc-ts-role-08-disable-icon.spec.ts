@@ -56,6 +56,10 @@ test.describe('TC-TS-ROLE-08 — Disable role via icon', () => {
 
       await dialog.getByRole('button', { name: 'Submit' }).click();
       await expect(dialog).toBeHidden({ timeout: 10_000 });
+
+      // Search by name so the new role is on page 1 regardless of how many roles exist
+      await page.locator('input[name="searchText"]').fill(ROLE_NAME);
+      await page.getByRole('button', { name: 'Search' }).click();
       await expect(page.locator('table tbody tr', { hasText: ROLE_NAME })).toBeVisible();
     });
 
@@ -108,6 +112,9 @@ test.describe('TC-TS-ROLE-08 — Disable role via icon', () => {
       await page.waitForTimeout(200);
 
       await page.keyboard.press('Escape');
+
+      // Scope by name so the role is found on page 1 even when many test roles are inactive
+      await page.locator('input[name="searchText"]').fill(ROLE_NAME);
       await page.getByRole('button', { name: 'Search' }).click();
       await page.waitForTimeout(3000);
 

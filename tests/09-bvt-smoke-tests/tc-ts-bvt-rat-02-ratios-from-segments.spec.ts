@@ -38,10 +38,10 @@ import { test, expect } from '@playwright/test';
 test.describe('TC-TS-BVT-RAT-02 — BVT: Determine ratios from segments', () => {
   test.setTimeout(180_000);
 
-  const projectId = 81;
-
   test('Determine ratios from segments', async ({ page }) => {
     let authToken: string | null = null;
+    let projectId = 0;
+    let segmentsUrl = '';
 
     page.on('request', (req) => {
       if (req.url().includes('/api/') && !authToken) {
@@ -53,15 +53,55 @@ test.describe('TC-TS-BVT-RAT-02 — BVT: Determine ratios from segments', () => 
       await dialog.accept();
     });
 
-    await test.step('Step 1: Navigate to segments page and verify button is hidden', async () => {
-      await page.goto(`/projects/${projectId}/segments`);
-      await page.waitForTimeout(3000);
+    await test.step('Pre-setup: discover project and clean up any leftover test data', async () => {
+      // Discover first project dynamically
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30_000 });
+      const firstLink = page.locator('table tbody tr td:nth-child(2) a').first();
+      const href = await firstLink.getAttribute('href');
+      const match = href!.match(/\/projects\/(\d+)/);
+      projectId = parseInt(match![1]);
+      segmentsUrl = `${href}/segments`;
 
+      // Navigate to segments page and capture auth token via response wait
+      const tokenResponsePromise = page.waitForResponse(
+        (resp) => resp.url().includes('/api/') && resp.status() === 200,
+        { timeout: 30_000 }
+      );
+      await page.goto(segmentsUrl);
+      await tokenResponsePromise;
+      await expect(page.locator('h1, h2, h3').first()).toBeVisible({ timeout: 30_000 });
+
+      // Clean up leftover test segment (if prior run crashed before Step 6)
+      const segTable = page.locator('table').first();
+      const leftoverSeg = segTable.locator('tbody tr').filter({ hasText: 'BVT Segment for Ratio Determination' });
+      if (await leftoverSeg.isVisible()) {
+        // Also delete any ratios that were auto-generated from the prior run
+        const edTable = page.locator('table').nth(1);
+        let edRows = await edTable.locator('tbody tr').count();
+        while (edRows > 0) {
+          await edTable.locator('tbody tr').first().locator('button[title="Delete Record"]').click();
+          const popover = page.locator('[role="tooltip"]');
+          await expect(popover).toBeVisible({ timeout: 5_000 });
+          await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+          await expect(popover).toBeHidden({ timeout: 10_000 });
+          edRows = await edTable.locator('tbody tr').count();
+        }
+        // Delete the leftover segment
+        await leftoverSeg.locator('button[title="Delete Record"]').click();
+        const popover = page.locator('[role="tooltip"]');
+        await expect(popover).toBeVisible({ timeout: 5_000 });
+        await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+        await expect(leftoverSeg).toBeHidden({ timeout: 10_000 });
+      }
+    });
+
+    await test.step('Step 1: Verify button is hidden when no segments exist', async () => {
       expect(authToken).not.toBeNull();
-
-      // Verify "Determine Ratios Using Segments" button is NOT visible (no segments)
-      const determineBtn = page.locator('button:has-text("Determine Ratios Using Segments"):visible');
-      expect(await determineBtn.count()).toBe(0);
+      // "Determine Ratios Using Segments" button should not be visible with no segments
+      await expect(
+        page.getByRole('button', { name: 'Determine Ratios Using Segments' })
+      ).not.toBeVisible();
     });
 
     await test.step('Step 2: Create a segment via API', async () => {
@@ -91,21 +131,17 @@ test.describe('TC-TS-BVT-RAT-02 — BVT: Determine ratios from segments', () => 
 
     await test.step('Step 3: Reload and verify "Determine Ratios Using Segments" button appears', async () => {
       await page.reload();
-      await page.waitForTimeout(3000);
-
-      const determineBtn = page.locator('button:has-text("Determine Ratios Using Segments"):visible');
-      await expect(determineBtn).toBeVisible();
+      const determineBtn = page.getByRole('button', { name: 'Determine Ratios Using Segments' });
+      await expect(determineBtn).toBeVisible({ timeout: 30_000 });
     });
 
     await test.step('Step 4: Click button and verify modal triggers calculation', async () => {
-      const determineBtn = page.locator('button:has-text("Determine Ratios Using Segments"):visible');
+      const determineBtn = page.getByRole('button', { name: 'Determine Ratios Using Segments' });
       await determineBtn.click();
-      await page.waitForTimeout(2000);
 
-      // The modal opens and may auto-proceed (when no existing ratios, dirty=false)
-      // or show a confirmation with "Proceed" button (when ratios already exist).
+      // The modal opens; may show "Proceed" warning if ratios already exist, or auto-proceed
       const modal = page.getByRole('dialog').filter({ hasText: 'Determine Ratios Using Segments' });
-      await expect(modal).toBeVisible();
+      await expect(modal).toBeVisible({ timeout: 15_000 });
 
       // If "Proceed" button is visible (ratios already exist), click it
       const proceedBtn = modal.getByRole('button', { name: 'Proceed' });
@@ -115,12 +151,14 @@ test.describe('TC-TS-BVT-RAT-02 — BVT: Determine ratios from segments', () => 
         await proceedBtn.click();
       }
 
-      // Wait for the spatial service response (may succeed or fail)
-      await page.waitForTimeout(15000);
+      // Wait for the spatial service response (may succeed or fail; allow up to 30s)
+      const resultLocator = page.locator(
+        '.alert-success:has-text("Ratios determined"), .alert-danger:has-text("Operation Failed"), [role="dialog"]:has-text("Server Error")'
+      );
+      await expect(resultLocator.first()).toBeVisible({ timeout: 30_000 });
     });
 
     await test.step('Step 5: Verify result (success or error handled gracefully)', async () => {
-      // The modal should show either "Ratios determined" or "Operation Failed"
       const successAlert = page.locator('.alert-success:has-text("Ratios determined")');
       const failAlert = page.locator('.alert-danger:has-text("Operation Failed")');
       const errorDialog = page.getByRole('dialog').filter({ hasText: 'Server Error' });
@@ -134,68 +172,46 @@ test.describe('TC-TS-BVT-RAT-02 — BVT: Determine ratios from segments', () => 
 
       // Close any open modals/dialogs
       if (serverError) {
-        await errorDialog.locator('button:has-text("Close")').click().catch(() => {});
-        await page.waitForTimeout(500);
+        await errorDialog.locator('button:has-text("Close")').dispatchEvent('click');
+        await expect(errorDialog).toBeHidden({ timeout: 5_000 });
       }
 
       const determineModal = page.getByRole('dialog').filter({ hasText: 'Determine Ratios' });
       if (await determineModal.isVisible().catch(() => false)) {
-        await determineModal.locator('.modal-footer button:has-text("Close")').click();
-        await page.waitForTimeout(500);
+        await determineModal.locator('.modal-footer button:has-text("Close")').dispatchEvent('click');
+        await expect(determineModal).toBeHidden({ timeout: 5_000 });
       }
     });
 
     await test.step('Step 6: Cleanup - delete the segment and any auto-generated ratios', async () => {
       // Reload to get fresh state
       await page.reload();
-      await page.waitForTimeout(3000);
+      await expect(page.locator('h1, h2, h3').first()).toBeVisible({ timeout: 30_000 });
 
       // Delete any ratios that were auto-generated in the Electoral Districts table
       const edTable = page.locator('table').nth(1);
-      let edRows = await edTable.locator('tbody tr').count();
-      while (edRows > 0) {
-        await edTable.locator('tbody tr').first().locator('button[title="Delete Record"]').evaluate((el) => el.click());
-        await page.waitForTimeout(500);
-        await page.evaluate(() => {
-          const popovers = document.querySelectorAll('.popover');
-          for (const p of popovers) {
-            const btns = p.querySelectorAll('button');
-            for (const btn of btns) {
-              if (btn.textContent && btn.textContent.trim() === 'Delete') {
-                btn.click();
-                return;
-              }
-            }
-          }
-        });
-        await page.waitForTimeout(2000);
-        edRows = await edTable.locator('tbody tr').count();
+      while ((await edTable.locator('tbody tr').count()) > 0) {
+        const currentCount = await edTable.locator('tbody tr').count();
+        await edTable.locator('tbody tr').first().locator('button[title="Delete Record"]').click();
+        const popover = page.locator('[role="tooltip"]');
+        await expect(popover).toBeVisible({ timeout: 5_000 });
+        await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+        await expect(edTable.locator('tbody tr')).toHaveCount(currentCount - 1, { timeout: 10_000 });
       }
 
       // Delete the segment
       const segTable = page.locator('table').first();
-      let segRows = await segTable.locator('tbody tr').count();
-      while (segRows > 0) {
-        await segTable.locator('tbody tr').first().locator('button[title="Delete Record"]').first().evaluate((el) => el.click());
-        await page.waitForTimeout(500);
-        await page.evaluate(() => {
-          const popovers = document.querySelectorAll('.popover');
-          for (const p of popovers) {
-            const btns = p.querySelectorAll('button');
-            for (const btn of btns) {
-              if (btn.textContent && btn.textContent.trim() === 'Delete') {
-                btn.click();
-                return;
-              }
-            }
-          }
-        });
-        await page.waitForTimeout(2000);
-        segRows = await segTable.locator('tbody tr').count();
+      while ((await segTable.locator('tbody tr').count()) > 0) {
+        const currentCount = await segTable.locator('tbody tr').count();
+        await segTable.locator('tbody tr').first().locator('button[title="Delete Record"]').first().click();
+        const popover = page.locator('[role="tooltip"]');
+        await expect(popover).toBeVisible({ timeout: 5_000 });
+        await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+        await expect(segTable.locator('tbody tr')).toHaveCount(currentCount - 1, { timeout: 10_000 });
       }
 
       // Verify segment table is empty
-      await expect(segTable.locator('tbody tr')).toHaveCount(0);
+      await expect(segTable.locator('tbody tr')).toHaveCount(0, { timeout: 10_000 });
     });
   });
 });

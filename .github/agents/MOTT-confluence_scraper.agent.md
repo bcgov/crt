@@ -7,7 +7,7 @@ tools: [read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, se
 
 ## Confluence Access
 
-- Authentication is handled **manually by the user**. When you need to access a Confluence page or space, use `browser/openBrowserPage` to navigate to the URL, then **pause and ask the user to authenticate** before proceeding.
+- Authentication is handled **manually by the user**. When you need to access a Confluence page or space, use `playwright/browser_navigate` to navigate to the URL, then **pause and ask the user to authenticate** before proceeding.
 - Once authenticated, use `web/fetch` to retrieve page content.
 - For spaces with many child pages, navigate the page tree systematically — check for child pages under each parent and process them in order.
 

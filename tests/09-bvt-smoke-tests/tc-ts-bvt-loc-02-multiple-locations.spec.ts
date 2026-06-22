@@ -35,10 +35,12 @@ import { test, expect } from '@playwright/test';
 test.describe('TC-TS-BVT-LOC-02 — BVT: Add multiple project locations', () => {
   test.setTimeout(120_000);
 
-  const projectId = 81;
+  // projectId discovered dynamically at runtime
 
   test('Add multiple project locations', async ({ page }) => {
     let authToken: string | null = null;
+    let projectId = 0;
+    let segmentsUrl = '';
 
     page.on('request', (req) => {
       if (req.url().includes('/api/') && !authToken) {
@@ -51,9 +53,34 @@ test.describe('TC-TS-BVT-LOC-02 — BVT: Add multiple project locations', () => 
     });
 
     await test.step('Step 1: Navigate to segments page and capture auth token', async () => {
-      await page.goto(`/projects/${projectId}/segments`);
-      await page.waitForTimeout(3000);
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+      const href = await page.locator('table tbody tr td:nth-child(2) a').first().getAttribute('href');
+      const match = href?.match(/\/projects\/(\d+)/);
+      projectId = match ? parseInt(match[1]) : 0;
+      expect(projectId).toBeGreaterThan(0);
+      segmentsUrl = `${href}/segments`;
+
+      const responsePromise = page.waitForResponse(
+        resp => resp.url().includes('/api/projects/') && resp.status() === 200,
+        { timeout: 30000 }
+      );
+      await page.goto(segmentsUrl);
+      await responsePromise;
       expect(authToken).not.toBeNull();
+
+      // Defensive cleanup: remove any leftover BVT segments from a prior run
+      const segTable = page.locator('table').first();
+      for (const segText of ['BVT Segment 1 - Highway A', 'BVT Segment 2 - Highway B']) {
+        const leftover = segTable.locator(`tbody tr:has-text("${segText}")`);
+        if (await leftover.isVisible()) {
+          await leftover.locator('button[title="Delete Record"]').click();
+          const popover = page.locator('[role="tooltip"]');
+          await expect(popover).toBeVisible();
+          await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+          await expect(leftover).toBeHidden({ timeout: 10_000 });
+        }
+      }
     });
 
     await test.step('Step 2: Create first segment (Highway A - Start 0, End 5)', async () => {
@@ -108,18 +135,12 @@ test.describe('TC-TS-BVT-LOC-02 — BVT: Add multiple project locations', () => 
 
     await test.step('Step 4: Reload and verify both segments appear in table', async () => {
       await page.reload();
-      await page.waitForTimeout(3000);
 
       const segTable = page.locator('table').first();
-      const rows = segTable.locator('tbody tr');
-
-      // Verify at least 2 rows
-      const rowCount = await rows.count();
-      expect(rowCount).toBeGreaterThanOrEqual(2);
 
       // Verify segment 1
       const seg1 = segTable.locator('tbody tr:has-text("BVT Segment 1 - Highway A")');
-      await expect(seg1).toBeVisible();
+      await expect(seg1).toBeVisible({ timeout: 15_000 });
 
       // Verify segment 2
       const seg2 = segTable.locator('tbody tr:has-text("BVT Segment 2 - Highway B")');
@@ -129,48 +150,24 @@ test.describe('TC-TS-BVT-LOC-02 — BVT: Add multiple project locations', () => 
     await test.step('Step 5: Cleanup - delete both segments', async () => {
       const segTable = page.locator('table').first();
 
-      // Delete segment 2 first (bottom entry)
+      // Delete segment 2
       const seg2 = segTable.locator('tbody tr:has-text("BVT Segment 2 - Highway B")');
-      await seg2.locator('button[title="Delete Record"]').evaluate((el) => el.click());
-      await page.waitForTimeout(500);
-      await page.evaluate(() => {
-        const popovers = document.querySelectorAll('.popover');
-        for (const p of popovers) {
-          const btns = p.querySelectorAll('button');
-          for (const btn of btns) {
-            if (btn.textContent && btn.textContent.trim() === 'Delete') {
-              btn.click();
-              return;
-            }
-          }
-        }
-      });
-      await page.waitForTimeout(2000);
+      await seg2.locator('button[title="Delete Record"]').click();
+      const popover2 = page.locator('[role="tooltip"]');
+      await expect(popover2).toBeVisible();
+      await popover2.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+      await expect(seg2).toBeHidden({ timeout: 10_000 });
 
       // Verify segment 1 still exists
       const seg1 = segTable.locator('tbody tr:has-text("BVT Segment 1 - Highway A")');
       await expect(seg1).toBeVisible();
 
       // Delete segment 1
-      await seg1.locator('button[title="Delete Record"]').evaluate((el) => el.click());
-      await page.waitForTimeout(500);
-      await page.evaluate(() => {
-        const popovers = document.querySelectorAll('.popover');
-        for (const p of popovers) {
-          const btns = p.querySelectorAll('button');
-          for (const btn of btns) {
-            if (btn.textContent && btn.textContent.trim() === 'Delete') {
-              btn.click();
-              return;
-            }
-          }
-        }
-      });
-      await page.waitForTimeout(2000);
-
-      // Verify table is empty
-      const finalRows = await segTable.locator('tbody tr').count();
-      expect(finalRows).toBe(0);
+      await seg1.locator('button[title="Delete Record"]').click();
+      const popover1 = page.locator('[role="tooltip"]');
+      await expect(popover1).toBeVisible();
+      await popover1.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+      await expect(seg1).toBeHidden({ timeout: 10_000 });
     });
   });
 });

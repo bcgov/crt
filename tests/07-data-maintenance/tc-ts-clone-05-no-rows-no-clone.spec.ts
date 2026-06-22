@@ -35,30 +35,41 @@ import { test, expect } from '@playwright/test';
 test.describe('TC-TS-CLONE-05 — Clone button not available when no rows exist', () => {
   test.setTimeout(60_000);
 
-  // Project 79 has no Tender entries and no Qty entries
-  const PROJECT_ID = 79;
-
   test('Empty tables show no Clone buttons but Add is available', async ({ page }) => {
-    await test.step('Step 1: Navigate to Tender/Qty page', async () => {
-      await page.goto(`/projects/${PROJECT_ID}/projecttender`);
-      await expect(page.locator('table').first()).toBeVisible();
+    await test.step('Step 1: Navigate to a project with empty Tender and Qty tables', async () => {
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+
+      const projectLinks = page.locator('table tbody tr td:nth-child(2) a');
+      const count = await projectLinks.count();
+      const hrefs: (string | null)[] = [];
+      for (let i = 0; i < count; i++) {
+        hrefs.push(await projectLinks.nth(i).getAttribute('href'));
+      }
+
+      let found = false;
+      for (let i = 0; i < hrefs.length && !found; i++) {
+        await page.goto(`${hrefs[i]}/projecttender`);
+        await expect(page.locator('table').first()).toBeVisible({ timeout: 15000 });
+        const tenderRows = await page.locator('table').first().locator('tbody tr').count();
+        const qtyRows    = await page.locator('table').nth(1).locator('tbody tr').count();
+        if (tenderRows === 0 && qtyRows === 0) {
+          found = true;
+        }
+      }
+
+      expect(found, 'Could not find a project with both tender and qty tables empty').toBe(true);
     });
 
     await test.step('Step 2: Verify empty Tender table has no Clone button', async () => {
       const tenderTable = page.locator('table').first();
-      const tenderRows = tenderTable.locator('tbody tr');
-      await expect(tenderRows).toHaveCount(0);
-
-      // No Clone button anywhere in the Tender table
+      await expect(tenderTable.locator('tbody tr')).toHaveCount(0);
       await expect(tenderTable.getByRole('button', { name: 'Clone Record' })).toBeHidden();
     });
 
     await test.step('Step 3: Verify empty Qty table has no Clone button', async () => {
       const qtyTable = page.locator('table').nth(1);
-      const qtyRows = qtyTable.locator('tbody tr');
-      await expect(qtyRows).toHaveCount(0);
-
-      // No Clone button in the Qty table
+      await expect(qtyTable.locator('tbody tr')).toHaveCount(0);
       await expect(qtyTable.getByRole('button', { name: 'Clone Record' })).toBeHidden();
     });
 

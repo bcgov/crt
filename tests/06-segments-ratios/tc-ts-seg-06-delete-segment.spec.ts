@@ -41,16 +41,38 @@ test.describe('TC-TS-SEG-06 — Delete segment with confirmation', () => {
       await dialog.accept();
     });
 
-    await test.step('Step 1: Navigate to segments page', async () => {
-      await page.goto('/projects/79/segments');
-      await expect(page.getByText('Project Segments')).toBeVisible();
+    await test.step('Step 1: Navigate to segments page for a project with segments', async () => {
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+
+      const projectLinks = page.locator('table tbody tr td:nth-child(2) a');
+      const count = await projectLinks.count();
+      const hrefs: (string | null)[] = [];
+      for (let i = 0; i < count; i++) {
+        hrefs.push(await projectLinks.nth(i).getAttribute('href'));
+      }
+
+      let found = false;
+      for (let i = 0; i < hrefs.length && !found; i++) {
+        await page.goto(`${hrefs[i]}/segments`);
+        await expect(page.getByText('Project Segments')).toBeVisible();
+        const segTable = page.locator('table').first();
+        const segRows = await segTable.locator('tbody tr').count();
+        if (segRows > 0) {
+          found = true;
+        }
+      }
+
+      expect(found, 'Could not find a project with segments').toBe(true);
     });
 
     const segTable = page.locator('table').first();
     const row = segTable.locator('tbody tr').first();
+    let rowText: string;
 
     await test.step('Step 2: Click Delete Record on segment row', async () => {
       await expect(row).toBeVisible();
+      rowText = (await row.textContent()) || '';
       await row.locator('button[title="Delete Record"]').click();
     });
 
@@ -65,11 +87,11 @@ test.describe('TC-TS-SEG-06 — Delete segment with confirmation', () => {
     await test.step('Step 4: Click Cancel and verify segment is retained', async () => {
       const popover = page.locator('.popover.show');
       await popover.getByRole('button', { name: 'Cancel' }).click();
-      await page.waitForTimeout(300);
 
-      // Row is still visible
+      // Row is still visible with same content
       await expect(row).toBeVisible();
-      await expect(row).toContainText('48.816870,-123.718150');
+      const afterText = await row.textContent();
+      expect(afterText).toBe(rowText);
     });
   });
 
@@ -82,12 +104,32 @@ test.describe('TC-TS-SEG-06 — Delete segment with confirmation', () => {
     });
 
     await test.step('Step 1: Navigate to segments page', async () => {
-      await page.goto('/projects/79/segments');
-      await expect(page.getByText('Project Segments')).toBeVisible();
+      await page.goto('/projects');
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
+
+      const projectLinks = page.locator('table tbody tr td:nth-child(2) a');
+      const count = await projectLinks.count();
+      const hrefs: (string | null)[] = [];
+      for (let i = 0; i < count; i++) {
+        hrefs.push(await projectLinks.nth(i).getAttribute('href'));
+      }
+
+      let found = false;
+      for (let i = 0; i < hrefs.length && !found; i++) {
+        await page.goto(`${hrefs[i]}/segments`);
+        await expect(page.getByText('Project Segments')).toBeVisible();
+        const segTable = page.locator('table').first();
+        const segRows = await segTable.locator('tbody tr').count();
+        if (segRows > 0) {
+          found = true;
+        }
+      }
+
+      expect(found, 'Could not find a project with segments').toBe(true);
     });
 
     const segTable = page.locator('table').first();
-    const row = segTable.locator('tbody tr', { hasText: '48.816870,-123.718150' });
+    const row = segTable.locator('tbody tr').first();
 
     await test.step('Step 2: Click Delete Record and confirm', async () => {
       await row.locator('button[title="Delete Record"]').click();
