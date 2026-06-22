@@ -53,47 +53,62 @@ test.describe('TC-TS-BVT-RAT-02 — BVT: Determine ratios from segments', () => 
       await dialog.accept();
     });
 
-    await test.step('Pre-setup: discover project and clean up any leftover test data', async () => {
-      // Discover first project dynamically
-      await page.goto('/projects');
-      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30_000 });
-      const firstLink = page.locator('table tbody tr td:nth-child(2) a').first();
-      const href = await firstLink.getAttribute('href');
-      const match = href!.match(/\/projects\/(\d+)/);
-      projectId = parseInt(match![1]);
-      segmentsUrl = `${href}/segments`;
-
-      // Navigate to segments page and capture auth token via response wait
+    await test.step('Pre-setup: discover project with no segments and clean up any leftover test data', async () => {
+      // Navigate to projects page and capture auth token via response wait
       const tokenResponsePromise = page.waitForResponse(
         (resp) => resp.url().includes('/api/') && resp.status() === 200,
         { timeout: 30_000 }
       );
-      await page.goto(segmentsUrl);
+      await page.goto('/projects');
       await tokenResponsePromise;
-      await expect(page.locator('h1, h2, h3').first()).toBeVisible({ timeout: 30_000 });
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30_000 });
 
-      // Clean up leftover test segment (if prior run crashed before Step 6)
-      const segTable = page.locator('table').first();
-      const leftoverSeg = segTable.locator('tbody tr').filter({ hasText: 'BVT Segment for Ratio Determination' });
-      if (await leftoverSeg.isVisible()) {
-        // Also delete any ratios that were auto-generated from the prior run
-        const edTable = page.locator('table').nth(1);
-        let edRows = await edTable.locator('tbody tr').count();
-        while (edRows > 0) {
-          await edTable.locator('tbody tr').first().locator('button[title="Delete Record"]').click();
+      // Collect all project hrefs before navigating away (locators become stale after navigation)
+      const links = page.locator('table tbody tr td:nth-child(2) a');
+      const hrefs: string[] = [];
+      const linkCount = await links.count();
+      for (let i = 0; i < Math.min(linkCount, 10); i++) {
+        hrefs.push((await links.nth(i).getAttribute('href')) ?? '');
+      }
+
+      // Find the first project that has no segments (works in both DEV and TST)
+      for (const href of hrefs) {
+        const match = href.match(/\/projects\/(\d+)/);
+        if (!match) continue;
+
+        await page.goto(`${href}/segments`);
+        await expect(page.locator('h1, h2, h3').first()).toBeVisible({ timeout: 30_000 });
+
+        // Clean up our leftover test segment if it exists on this project
+        const segTable = page.locator('table').first();
+        const leftoverSeg = segTable.locator('tbody tr').filter({ hasText: 'BVT Segment for Ratio Determination' });
+        if (await leftoverSeg.isVisible()) {
+          const edTable = page.locator('table').nth(1);
+          let edRows = await edTable.locator('tbody tr').count();
+          while (edRows > 0) {
+            await edTable.locator('tbody tr').first().locator('button[title="Delete Record"]').click();
+            const popover = page.locator('[role="tooltip"]');
+            await expect(popover).toBeVisible({ timeout: 5_000 });
+            await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
+            await expect(popover).toBeHidden({ timeout: 10_000 });
+            edRows = await edTable.locator('tbody tr').count();
+          }
+          await leftoverSeg.locator('button[title="Delete Record"]').click();
           const popover = page.locator('[role="tooltip"]');
           await expect(popover).toBeVisible({ timeout: 5_000 });
           await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
-          await expect(popover).toBeHidden({ timeout: 10_000 });
-          edRows = await edTable.locator('tbody tr').count();
+          await expect(leftoverSeg).toBeHidden({ timeout: 10_000 });
         }
-        // Delete the leftover segment
-        await leftoverSeg.locator('button[title="Delete Record"]').click();
-        const popover = page.locator('[role="tooltip"]');
-        await expect(popover).toBeVisible({ timeout: 5_000 });
-        await popover.getByRole('button', { name: 'Delete' }).dispatchEvent('click');
-        await expect(leftoverSeg).toBeHidden({ timeout: 10_000 });
+
+        // Use this project only if it now has no segments
+        if ((await segTable.locator('tbody tr').count()) === 0) {
+          projectId = parseInt(match[1]);
+          segmentsUrl = `${href}/segments`;
+          break;
+        }
       }
+
+      expect(segmentsUrl).toBeTruthy();
     });
 
     await test.step('Step 1: Verify button is hidden when no segments exist', async () => {
