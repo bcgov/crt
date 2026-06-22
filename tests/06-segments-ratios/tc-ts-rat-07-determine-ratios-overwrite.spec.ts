@@ -38,12 +38,34 @@ test.describe('TC-TS-RAT-07 — Determine ratios with existing data — overwrit
 
   test.beforeEach(async ({ page }) => {
     page.on('dialog', async (d) => { await d.accept(); });
+
     await page.goto('/projects');
-    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
-    const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
-    const projectUrl = await projectLink.getAttribute('href');
-    await page.goto(`${projectUrl}/segments`);
-    await expect(page.getByText('Project Segments')).toBeVisible();
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30_000 });
+
+    // Collect hrefs before navigating away
+    const links = page.locator('table tbody tr td:nth-child(2) a');
+    const hrefs: string[] = [];
+    const linkCount = await links.count();
+    for (let i = 0; i < Math.min(linkCount, 10); i++) {
+      hrefs.push((await links.nth(i).getAttribute('href')) ?? '');
+    }
+
+    // Find a project that has segments (button visible) AND existing rows in the ratios table
+    for (const href of hrefs) {
+      await page.goto(`${href}/segments`);
+      await expect(page.getByText('Project Segments')).toBeVisible({ timeout: 15_000 });
+
+      // Button only appears when the project has segments
+      const hasBtn = await page.getByRole('button', { name: 'Determine Ratios Using Segments' }).isVisible();
+      if (!hasBtn) continue;
+
+      // Need existing ratio rows in table.nth(2) so the overwrite warning fires
+      const ratioRows = await page.locator('table').nth(2).locator('tbody tr').count();
+      if (ratioRows === 0) continue;
+
+      return; // Found a suitable project — stay here
+    }
+    // No suitable project found; test will fail in Step 1/2 with a clear locator error
   });
 
   test('Warning dialog appears and Cancel preserves existing ratios', async ({ page }) => {

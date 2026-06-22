@@ -87,7 +87,7 @@ test.describe('TC-TS-PROJ-03 — Keyword partial search across project fields', 
       await expect(page.locator('table tbody tr').first()).toBeVisible();
 
       // Verify a row containing the project number appears
-      await expect(page.locator('table tbody tr', { hasText: projectNumber })).toBeVisible();
+      await expect(page.locator('table tbody tr', { hasText: projectNumber }).first()).toBeVisible();
     });
 
     await test.step('Step 3: Reset and search by different partial term', async () => {

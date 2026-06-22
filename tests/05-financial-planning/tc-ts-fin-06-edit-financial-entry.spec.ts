@@ -37,13 +37,26 @@ test.describe('TC-TS-FIN-06 — Edit financial planning entry with negative amou
   test.setTimeout(120_000);
 
   test.beforeEach(async ({ page }) => {
-    // Navigate to the first project's financial plan dynamically
+    // Find the first project that has at least one financial planning target row
     await page.goto('/projects');
-    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30000 });
-    const projectLink = page.locator('table tbody tr').first().locator('td:nth-child(2) a');
-    const projectUrl = await projectLink.getAttribute('href');
-    await page.goto(`${projectUrl}/projectplan`);
-    await expect(page.locator('h1', { hasText: 'Financial Planning Targets' })).toBeVisible();
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 30_000 });
+
+    const links = page.locator('table tbody tr td:nth-child(2) a');
+    const hrefs: string[] = [];
+    const linkCount = await links.count();
+    for (let i = 0; i < Math.min(linkCount, 10); i++) {
+      hrefs.push((await links.nth(i).getAttribute('href')) ?? '');
+    }
+
+    for (const href of hrefs) {
+      await page.goto(`${href}/projectplan`);
+      await expect(page.locator('h1', { hasText: 'Financial Planning Targets' })).toBeVisible({ timeout: 15_000 });
+      const rows = await page.locator('table').first().locator('tbody tr').count();
+      if (rows > 0) {
+        return; // Found a project with existing rows — test can proceed
+      }
+    }
+    // No project with rows found; Step 1 will fail with a clear message
   });
 
   test('Edit financial planning entry with negative amount', async ({ page }) => {
