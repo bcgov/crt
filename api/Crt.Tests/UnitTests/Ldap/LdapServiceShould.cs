@@ -5,8 +5,7 @@ using Moq;
 using System;
 using Xunit;
 
-namespace Crt.Tests.Ldap
-{
+namespace Crt.Tests.UnitTests.Ldap
     public class LdapServiceShould
     {
         private static LdapService BuildSut()
