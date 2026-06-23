@@ -17,6 +17,12 @@ namespace Crt.Domain.Services
 
     public class LdapService : ILdapService
     {
+        private static readonly HashSet<string> _allowedFilterAttrs = new HashSet<string>(StringComparer.Ordinal)
+        {
+            LdapAttrs.SamAccountName,
+            LdapAttrs.BcgovGuid
+        };
+
         private string _userId;
         private string _password;
         private string _server;
@@ -29,8 +35,38 @@ namespace Crt.Domain.Services
             _server = config.GetValue<string>("ServiceAccount:Server");
             _port = config.GetValue<int>("ServiceAccount:Port");
         }
+
+        /// <summary>
+        /// Escapes special characters in an LDAP filter value per RFC 4515.
+        /// Characters escaped: NUL, '(', ')', '*', '\'.
+        /// </summary>
+        public static string EscapeLdapFilterValue(string value)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
+            var sb = new StringBuilder(value.Length);
+            foreach (char c in value)
+            {
+                switch (c)
+                {
+                    case '\\': sb.Append(@"\5c"); break;
+                    case '*':  sb.Append(@"\2a"); break;
+                    case '(':  sb.Append(@"\28"); break;
+                    case ')':  sb.Append(@"\29"); break;
+                    case '\0': sb.Append(@"\00"); break;
+                    default:   sb.Append(c);      break;
+                }
+            }
+            return sb.ToString();
+        }
+
         public AdAccount LdapSearch(string filterAttr, string value)
         {
+            if (!_allowedFilterAttrs.Contains(filterAttr))
+                throw new ArgumentException($"LDAP filter attribute '{filterAttr}' is not permitted.", nameof(filterAttr));
+
+            var safeValue = EscapeLdapFilterValue(value);
+
             using var conn = new LdapConnection() { SecureSocketLayer = false };
             conn.Connect(_server, _port);
 
@@ -49,7 +85,7 @@ namespace Crt.Domain.Services
 
             conn.Bind(@$"IDIR\{_userId}", _password);
 
-            var filter = $"(&(objectCategory=person)(objectClass=user)({filterAttr}={value}))";
+            var filter = $"(&(objectCategory=person)(objectClass=user)({filterAttr}={safeValue}))";
             var search = conn.Search("OU=BCGOV,DC=idir,DC=BCGOV", LdapConnection.ScopeSub, filter, new string[] { "sAMAccountName", "bcgovGUID", "givenName", "sn", "mail", "displayName" }, false);
 
             var entry = search.FirstOrDefault();
