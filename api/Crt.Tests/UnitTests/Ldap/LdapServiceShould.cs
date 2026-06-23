@@ -106,10 +106,10 @@ namespace Crt.Tests.Ldap
         {
             var sut = BuildSut();
 
-            // The allowlist guard must pass; a network exception is expected
-            // because no real LDAP server is present in the test environment.
-            var ex = Record.Exception(() => sut.LdapSearch(allowedAttr, "testvalue"));
-            Assert.IsNotType<ArgumentException>(ex);
+            // Passing a null value forces a deterministic failure *after* the allowlist guard,
+            // avoiding any dependency on network availability/timeouts.
+            var ex = Assert.Throws<ArgumentNullException>(() => sut.LdapSearch(allowedAttr, null));
+            Assert.Equal("value", ex.ParamName);
         }
     }
 }
