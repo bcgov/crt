@@ -71,7 +71,6 @@ namespace Crt.Api.Authentication
         private async Task<bool> PopulateCurrentUserFromDb(ClaimsPrincipal principal)
         {
             _ = bool.TryParse(principal.FindFirstValue(CrtClaimTypes.KcIsApiClient), out bool isApiClient);
-            isApiClient = true;
             var preferredUsername = principal.FindFirstValue(CrtClaimTypes.PreferredUsername);
             string[] usernames = null;
             var username = "";
