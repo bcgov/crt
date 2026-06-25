@@ -1,4 +1,5 @@
 export const RUNTIME_OPENSHIFT_BUILD_COMMIT = window.RUNTIME_OPENSHIFT_BUILD_COMMIT ?? '';
+export const RUNTIME_APP_VERSION = window.RUNTIME_APP_VERSION ?? '';
 
 export const API_URL = window.RUNTIME_REACT_APP_API_HOST
   ? `${window.location.protocol}//${window.RUNTIME_REACT_APP_API_HOST}/api`

@@ -9,6 +9,7 @@ echo "window.RUNTIME_REACT_APP_SSO_CLIENT='${REACT_APP_SSO_CLIENT}';" >> $JS_PAT
 echo "window.RUNTIME_REACT_APP_API_HOST='${REACT_APP_API_HOST}';" >> $JS_PATH
 echo "window.RUNTIME_REACT_APP_DWPBI_URL='${REACT_APP_DWPBI_URL}';" >> $JS_PATH
 echo "window.RUNTIME_OPENSHIFT_BUILD_COMMIT='${OPENSHIFT_BUILD_COMMIT}';" >> $JS_PATH
+echo "window.RUNTIME_APP_VERSION='${APP_VERSION}';" >> $JS_PATH
 
 echo "---> Creating nginx.conf ..."
 envsubst '${ENVIRONMENT}' < /tmp/src/nginx.conf.tmpl > /etc/nginx/nginx.conf
