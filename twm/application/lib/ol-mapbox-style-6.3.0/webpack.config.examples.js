@@ -99,7 +99,6 @@ module.exports = (env, argv) => {
       }
     },
     devtool: 'source-map',
-    node: {fs: 'empty'},
     module: {
       rules: [
         {

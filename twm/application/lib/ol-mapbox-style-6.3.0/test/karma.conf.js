@@ -32,7 +32,6 @@ module.exports = function(karma) {
     reporters: ['dots'],
     webpack: {
       devtool: 'inline-source-map',
-      node: {fs: 'empty'},
       mode: 'development'
     },
     webpackMiddleware: {
