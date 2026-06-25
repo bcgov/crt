@@ -108,7 +108,10 @@ namespace Crt.Api.Authentication
             }
 
             _curentUser.UserGuid = userGuid;
-            _curentUser.Username = username;
+            // Use the DB-stored username for audit columns (VARCHAR 30) and note attribution.
+            // For IDIR users the JWT preferred_username is a 36-char GUID which exceeds the
+            // column limit and does not match CrtSystemUsers.Username used for display.
+            _curentUser.Username = user.Username;
             _curentUser.Email = email;
             _curentUser.FirstName = user.FirstName;
             _curentUser.LastName = user.LastName;
