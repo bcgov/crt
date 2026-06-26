@@ -112,6 +112,7 @@ namespace Crt.Api.Authentication
             // For IDIR users the JWT preferred_username is a 36-char GUID which exceeds the
             // column limit and does not match CrtSystemUsers.Username used for display.
             _curentUser.Username = user.Username;
+
             _curentUser.Email = email;
             _curentUser.FirstName = user.FirstName;
             _curentUser.LastName = user.LastName;
