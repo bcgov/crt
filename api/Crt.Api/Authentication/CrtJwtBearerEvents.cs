@@ -108,7 +108,7 @@ namespace Crt.Api.Authentication
             }
 
             _curentUser.UserGuid = userGuid;
-            _curentUser.Username = username;
+            _curentUser.Username = username.Length > 30 ? username[..30] : username;
             _curentUser.Email = email;
             _curentUser.FirstName = user.FirstName;
             _curentUser.LastName = user.LastName;
