@@ -111,8 +111,10 @@ test.describe('TC-TS-PM-13 — PM searchable on Project Search after disable', (
         if (cellText.includes(pmName)) {
           projectHref = href;
           // Extract leading project number for text search (e.g. "999" from "999Another test project")
+          // Fall back to alphanumeric-only prefix to avoid special characters (e.g. "-") that break search
           const numberMatch = text.match(/^\d+/);
-          projectSearchTerm = numberMatch ? numberMatch[0] : text.substring(0, 10);
+          const alphanumMatch = text.match(/^[A-Za-z0-9]+/);
+          projectSearchTerm = numberMatch ? numberMatch[0] : (alphanumMatch ? alphanumMatch[0] : text.substring(0, 10));
           break;
         }
       }

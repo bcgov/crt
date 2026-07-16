@@ -126,14 +126,8 @@ test.describe('TC-TS-USER-14 — Re-enable inactive user via Edit', () => {
 
       // Set today's date to deactivate (app does not allow past dates)
       const endDateInput = dialog.locator('input[name="endDate"]');
-      await endDateInput.click();
-
-      // Type today's date into the focused input
-      const today = new Date();
-      const dateStr = `${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}/${today.getFullYear()}`;
-      await page.keyboard.type(dateStr);
-      // Press Escape to close the calendar overlay if open
-      await page.keyboard.press('Escape');
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      await endDateInput.fill(today);
 
       // Submit to deactivate
       await expect(dialog.getByRole('button', { name: 'Submit' })).toBeEnabled();

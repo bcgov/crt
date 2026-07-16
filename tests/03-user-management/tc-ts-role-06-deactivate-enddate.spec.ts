@@ -56,6 +56,10 @@ test.describe('TC-TS-ROLE-06 — Deactivate role via end date', () => {
 
       await dialog.getByRole('button', { name: 'Submit' }).click();
       await expect(dialog).toBeHidden({ timeout: 10_000 });
+
+      // Search by name so the new role is on page 1 regardless of how many roles exist
+      await page.locator('input[name="searchText"]').fill(ROLE_NAME);
+      await page.getByRole('button', { name: 'Search' }).click();
       await expect(page.locator('table tbody tr', { hasText: ROLE_NAME })).toBeVisible();
     });
 
@@ -92,8 +96,9 @@ test.describe('TC-TS-ROLE-06 — Deactivate role via end date', () => {
       await labels.filter({ hasText: /^ACTIVE$/ }).click();
       await page.waitForTimeout(200);
 
-      // Close dropdown and search
+      // Close dropdown and search, scoping by name to avoid pagination issues
       await page.keyboard.press('Escape');
+      await page.locator('input[name="searchText"]').fill(ROLE_NAME);
       await page.getByRole('button', { name: 'Search' }).click();
       await page.waitForTimeout(3000);
 
