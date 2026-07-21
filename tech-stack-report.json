@@ -1,0 +1,557 @@
+{
+  "cr57a_appshortcode": "CaRT/CRT",
+  "cr57a_applicationstatus": true,
+  "cr57a_appname": "Capital and Rehabilitation Tracking",
+  "cr57a_coderepository": "GitHub Public",
+  "cr57a_coderepositoryurl": "https://github.com/bcgov/crt",
+  "cr57a_risklevel": "Moderate",
+  "imb_supportedbrowsers": [
+    "Chrome",
+    "Firefox",
+    "Safari",
+    "Internet Explorer"
+  ],
+  "cr57a_technologies": [
+    {
+      "TechnologyName": ".NET",
+      "Version": "7"
+    },
+    {
+      "TechnologyName": "ASP.NET Core",
+      "Version": "net7.0"
+    },
+    {
+      "TechnologyName": "C#",
+      "Version": ""
+    },
+    {
+      "TechnologyName": "JavaScript",
+      "Version": ""
+    },
+    {
+      "TechnologyName": "SQL",
+      "Version": ""
+    },
+    {
+      "TechnologyName": "Microsoft SQL Server",
+      "Version": "2017 or newer"
+    },
+    {
+      "TechnologyName": "PostgreSQL",
+      "Version": "10"
+    },
+    {
+      "TechnologyName": "OpenShift",
+      "Version": ""
+    },
+    {
+      "TechnologyName": "Red Hat Enterprise Linux",
+      "Version": "8"
+    },
+    {
+      "TechnologyName": "registry.redhat.io/rhel8/dotnet-70",
+      "Version": "7.0-18"
+    },
+    {
+      "TechnologyName": "registry.redhat.io/rhel8/nginx-116",
+      "Version": "1-39"
+    },
+    {
+      "TechnologyName": "registry.redhat.io/rhel8/postgresql-10",
+      "Version": "1"
+    },
+    {
+      "TechnologyName": "docker.io/node",
+      "Version": "13.7-alpine3.11"
+    },
+    {
+      "TechnologyName": "Node.js",
+      "Version": "v13.7.0 or newer"
+    },
+    {
+      "TechnologyName": "Node.js GitHub Actions runtime",
+      "Version": "12"
+    },
+    {
+      "TechnologyName": "Node.js pipeline engine",
+      "Version": ">=8"
+    },
+    {
+      "TechnologyName": "Nginx",
+      "Version": "1-39"
+    },
+    {
+      "TechnologyName": "nginx-116-rhel8",
+      "Version": "1"
+    },
+    {
+      "TechnologyName": "node-python",
+      "Version": "1"
+    },
+    {
+      "TechnologyName": "GitHub Actions",
+      "Version": ""
+    },
+    {
+      "TechnologyName": "Ubuntu",
+      "Version": "22.04"
+    },
+    {
+      "TechnologyName": "actions/checkout",
+      "Version": "v2"
+    },
+    {
+      "TechnologyName": "actions/setup-node",
+      "Version": "v2"
+    },
+    {
+      "TechnologyName": "styfle/cancel-workflow-action",
+      "Version": "0.9.1"
+    },
+    {
+      "TechnologyName": "@bcgov/pipeline-cli",
+      "Version": "^1.0.1-0"
+    },
+    {
+      "TechnologyName": "Keycloak",
+      "Version": ""
+    },
+    {
+      "TechnologyName": "BC Gov IDIR",
+      "Version": ""
+    },
+    {
+      "TechnologyName": "LDAP",
+      "Version": ""
+    },
+    {
+      "TechnologyName": "GeoServer",
+      "Version": ""
+    },
+    {
+      "TechnologyName": "DataBC OpenMaps",
+      "Version": ""
+    },
+    {
+      "TechnologyName": "AspNetCore.HealthChecks.SqlServer",
+      "Version": "3.2.0"
+    },
+    {
+      "TechnologyName": "AutoMapper",
+      "Version": "10.1.1"
+    },
+    {
+      "TechnologyName": "Bricelam.EntityFrameworkCore.Pluralizer",
+      "Version": "1.0.0"
+    },
+    {
+      "TechnologyName": "Hangfire.AspNetCore",
+      "Version": "1.7.18"
+    },
+    {
+      "TechnologyName": "Hangfire.Core",
+      "Version": "1.7.18"
+    },
+    {
+      "TechnologyName": "HangFire.SqlServer",
+      "Version": "1.7.18"
+    },
+    {
+      "TechnologyName": "Microsoft.AspNetCore.Authentication.JwtBearer",
+      "Version": "7.0.9"
+    },
+    {
+      "TechnologyName": "Microsoft.AspNetCore.Authentication.JwtBearer",
+      "Version": "5.0.9"
+    },
+    {
+      "TechnologyName": "Microsoft.AspNetCore.Http.Extensions",
+      "Version": "2.2.0"
+    },
+    {
+      "TechnologyName": "Microsoft.AspNetCore.Http.Features",
+      "Version": "5.0.0"
+    },
+    {
+      "TechnologyName": "Microsoft.AspNetCore.Mvc.NewtonsoftJson",
+      "Version": "7.0.9"
+    },
+    {
+      "TechnologyName": "Microsoft.AspNetCore.Mvc.NewtonsoftJson",
+      "Version": "5.0.0"
+    },
+    {
+      "TechnologyName": "Microsoft.AspNetCore.Mvc.Versioning",
+      "Version": "4.2.0"
+    },
+    {
+      "TechnologyName": "Microsoft.AspNetCore.SpaServices.Extensions",
+      "Version": "7.0.9"
+    },
+    {
+      "TechnologyName": "Microsoft.AspNetCore.SpaServices.Extensions",
+      "Version": "5.0.0"
+    },
+    {
+      "TechnologyName": "Microsoft.AspNetCore.WebUtilities",
+      "Version": "2.2.0"
+    },
+    {
+      "TechnologyName": "Microsoft.EntityFrameworkCore.Design",
+      "Version": "7.0.9"
+    },
+    {
+      "TechnologyName": "Microsoft.EntityFrameworkCore.SqlServer",
+      "Version": "7.0.9"
+    },
+    {
+      "TechnologyName": "Microsoft.EntityFrameworkCore.SqlServer",
+      "Version": "5.0.0"
+    },
+    {
+      "TechnologyName": "Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite",
+      "Version": "7.0.9"
+    },
+    {
+      "TechnologyName": "Microsoft.EntityFrameworkCore.Tools",
+      "Version": "7.0.9"
+    },
+    {
+      "TechnologyName": "Microsoft.EntityFrameworkCore.Tools",
+      "Version": "5.0.0"
+    },
+    {
+      "TechnologyName": "Microsoft.Extensions.Configuration",
+      "Version": "7.0.0"
+    },
+    {
+      "TechnologyName": "Microsoft.Extensions.Configuration.Abstractions",
+      "Version": "7.0.0"
+    },
+    {
+      "TechnologyName": "Microsoft.Extensions.Configuration.Binder",
+      "Version": "7.0.4"
+    },
+    {
+      "TechnologyName": "Microsoft.Extensions.Configuration.Binder",
+      "Version": "5.0.0"
+    },
+    {
+      "TechnologyName": "Microsoft.Extensions.DependencyInjection.Abstractions",
+      "Version": "7.0.0"
+    },
+    {
+      "TechnologyName": "Microsoft.Extensions.Diagnostics.HealthChecks",
+      "Version": "7.0.9"
+    },
+    {
+      "TechnologyName": "Microsoft.Extensions.Diagnostics.HealthChecks",
+      "Version": "5.0.0"
+    },
+    {
+      "TechnologyName": "Microsoft.Extensions.Hosting",
+      "Version": "7.0.1"
+    },
+    {
+      "TechnologyName": "Microsoft.Extensions.Http",
+      "Version": "7.0.0"
+    },
+    {
+      "TechnologyName": "NetCore.AutoRegisterDi",
+      "Version": "2.1.0"
+    },
+    {
+      "TechnologyName": "Serilog.AspNetCore",
+      "Version": "3.4.0"
+    },
+    {
+      "TechnologyName": "Serilog.Enrichers.Environment",
+      "Version": "2.1.3"
+    },
+    {
+      "TechnologyName": "Serilog.Settings.Configuration",
+      "Version": "3.1.0"
+    },
+    {
+      "TechnologyName": "Serilog.Sinks.Async",
+      "Version": "1.4.0"
+    },
+    {
+      "TechnologyName": "HaemmerElectronics.SeppPenner.SerilogSinkForPostgreSQL",
+      "Version": "3.1.0"
+    },
+    {
+      "TechnologyName": "Swashbuckle.AspNetCore",
+      "Version": "5.6.3"
+    },
+    {
+      "TechnologyName": "System.Linq.Dynamic.Core",
+      "Version": "1.2.5"
+    },
+    {
+      "TechnologyName": "CsvHelper",
+      "Version": "16.1.0"
+    },
+    {
+      "TechnologyName": "MailKit",
+      "Version": "2.10.0"
+    },
+    {
+      "TechnologyName": "Novell.Directory.Ldap.NETStandard",
+      "Version": "3.4.0"
+    },
+    {
+      "TechnologyName": "GeoJSON.Net",
+      "Version": "1.2.19"
+    },
+    {
+      "TechnologyName": "NetTopologySuite",
+      "Version": "2.5.0"
+    },
+    {
+      "TechnologyName": "NetTopologySuite.IO.GeoJSON",
+      "Version": "2.0.4"
+    },
+    {
+      "TechnologyName": "AutoFixture",
+      "Version": "4.15.0"
+    },
+    {
+      "TechnologyName": "AutoFixture.AutoMoq",
+      "Version": "4.15.0"
+    },
+    {
+      "TechnologyName": "AutoFixture.Xunit2",
+      "Version": "4.15.0"
+    },
+    {
+      "TechnologyName": "Microsoft.NET.Test.Sdk",
+      "Version": "16.7.1"
+    },
+    {
+      "TechnologyName": "Moq",
+      "Version": "4.15.2"
+    },
+    {
+      "TechnologyName": "xunit",
+      "Version": "2.4.1"
+    },
+    {
+      "TechnologyName": "xunit.runner.visualstudio",
+      "Version": "2.4.3"
+    },
+    {
+      "TechnologyName": "coverlet.collector",
+      "Version": "1.3.0"
+    },
+    {
+      "TechnologyName": "React client package",
+      "Version": "0.1.0"
+    },
+    {
+      "TechnologyName": "React",
+      "Version": "^16.14.0"
+    },
+    {
+      "TechnologyName": "react-dom",
+      "Version": "^16.14.0"
+    },
+    {
+      "TechnologyName": "react-router-dom",
+      "Version": "^5.2.0"
+    },
+    {
+      "TechnologyName": "react-scripts",
+      "Version": "^5.0.1"
+    },
+    {
+      "TechnologyName": "react-redux",
+      "Version": "^7.2.2"
+    },
+    {
+      "TechnologyName": "redux",
+      "Version": "^4.0.5"
+    },
+    {
+      "TechnologyName": "redux-devtools-extension",
+      "Version": "^2.13.8"
+    },
+    {
+      "TechnologyName": "redux-thunk",
+      "Version": "^2.3.0"
+    },
+    {
+      "TechnologyName": "Bootstrap",
+      "Version": "^4.5.3"
+    },
+    {
+      "TechnologyName": "reactstrap",
+      "Version": "^8.7.1"
+    },
+    {
+      "TechnologyName": "jQuery",
+      "Version": "^3.5.1"
+    },
+    {
+      "TechnologyName": "axios",
+      "Version": "^0.21.1"
+    },
+    {
+      "TechnologyName": "axios",
+      "Version": "^0.21.4"
+    },
+    {
+      "TechnologyName": "keycloak-js",
+      "Version": "^26.2.0"
+    },
+    {
+      "TechnologyName": "@fortawesome/fontawesome-svg-core",
+      "Version": "^1.2.32"
+    },
+    {
+      "TechnologyName": "@fortawesome/free-regular-svg-icons",
+      "Version": "^5.15.1"
+    },
+    {
+      "TechnologyName": "@fortawesome/free-solid-svg-icons",
+      "Version": "^5.15.1"
+    },
+    {
+      "TechnologyName": "@fortawesome/react-fontawesome",
+      "Version": "^0.1.13"
+    },
+    {
+      "TechnologyName": "file-saver",
+      "Version": "^2.0.5"
+    },
+    {
+      "TechnologyName": "formik",
+      "Version": "^2.2.5"
+    },
+    {
+      "TechnologyName": "http-proxy-middleware",
+      "Version": "^1.0.6"
+    },
+    {
+      "TechnologyName": "lodash",
+      "Version": "^4.17.21"
+    },
+    {
+      "TechnologyName": "moment",
+      "Version": "^2.29.1"
+    },
+    {
+      "TechnologyName": "prop-types",
+      "Version": "^15.7.2"
+    },
+    {
+      "TechnologyName": "query-string",
+      "Version": "^6.13.7"
+    },
+    {
+      "TechnologyName": "react-app-polyfill",
+      "Version": "^1.0.6"
+    },
+    {
+      "TechnologyName": "react-clipboard.js",
+      "Version": "^2.0.16"
+    },
+    {
+      "TechnologyName": "react-dates",
+      "Version": "^21.8.0"
+    },
+    {
+      "TechnologyName": "react-markdown",
+      "Version": "^5.0.3"
+    },
+    {
+      "TechnologyName": "react-number-format",
+      "Version": "^4.4.4"
+    },
+    {
+      "TechnologyName": "react-toastify",
+      "Version": "^5.5.0"
+    },
+    {
+      "TechnologyName": "remark-gfm",
+      "Version": "^1.0.0"
+    },
+    {
+      "TechnologyName": "sass",
+      "Version": "^1.87.0"
+    },
+    {
+      "TechnologyName": "yup",
+      "Version": "^0.28.5"
+    },
+    {
+      "TechnologyName": "autoprefixer",
+      "Version": "10.4.5"
+    },
+    {
+      "TechnologyName": "concurrently",
+      "Version": "^6.0.0"
+    },
+    {
+      "TechnologyName": "lite-server",
+      "Version": "^2.6.1"
+    },
+    {
+      "TechnologyName": "redux-immutable-state-invariant",
+      "Version": "^2.1.0"
+    },
+    {
+      "TechnologyName": "Keycloak JavaScript adapter",
+      "Version": "12.0.3"
+    },
+    {
+      "TechnologyName": "OpenLayers",
+      "Version": "6.5.0"
+    },
+    {
+      "TechnologyName": "ol-mapbox-style",
+      "Version": "6.3.0"
+    },
+    {
+      "TechnologyName": "@mapbox/mapbox-gl-style-spec",
+      "Version": "^13.14.0"
+    },
+    {
+      "TechnologyName": "mapbox-to-css-font",
+      "Version": "^2.4.0"
+    },
+    {
+      "TechnologyName": "webfont-matcher",
+      "Version": "^1.1.0"
+    },
+    {
+      "TechnologyName": "proj4js",
+      "Version": "2.6.3"
+    },
+    {
+      "TechnologyName": "jQuery UI",
+      "Version": "1.12.1"
+    },
+    {
+      "TechnologyName": "jQuery Bootstrap Scrolling Tabs",
+      "Version": "2.6.1"
+    },
+    {
+      "TechnologyName": "Bootstrap",
+      "Version": "4.6.0"
+    },
+    {
+      "TechnologyName": "bstreeview",
+      "Version": "1.2.0"
+    },
+    {
+      "TechnologyName": "Bootbox",
+      "Version": "5.5.2"
+    },
+    {
+      "TechnologyName": "open-iconic",
+      "Version": "1.1.1"
+    }
+  ],
+  "cr57a_keywords": "#capital-projects #rehabilitation #transportation #project-tracking #maintenance #geospatial #segments #reporting #forecasting #funding"
+}
